@@ -1,12 +1,11 @@
 {
     "name": "maybelinworks",
     "compatibility_date": "2026-08-12",
+    "main": "./src/worker.js",
 
     "observability": {
         "enabled": false
     },
-
-    "main": "./src/worker.js",
 
     "assets": {
         "directory": "./public",
@@ -15,5 +14,13 @@
             "/api/*",
             "/admin/*"
         ]
-    }
+    },
+
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "maybelinworks-db",
+            "database_id": "cfc698b0-c7ad-4ee6-91e9-d9157baf1d47"
+        }
+    ]
 }
