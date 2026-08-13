@@ -50,9 +50,21 @@ async function sign(value, secret) {
 
 export async function onRequestPost(context) {
     try {
-        const { ADMIN_USERNAME, ADMIN_PASSWORD, SESSION_SECRET } = context.env;
+        const {
+            ADMIN_USERNAME_1,
+            ADMIN_PASSWORD_1,
+            ADMIN_USERNAME_2,
+            ADMIN_PASSWORD_2,
+            SESSION_SECRET
+        } = context.env;
 
-        if (!ADMIN_USERNAME || !ADMIN_PASSWORD || !SESSION_SECRET) {
+        if (
+            !ADMIN_USERNAME_1 ||
+            !ADMIN_PASSWORD_1 ||
+            !ADMIN_USERNAME_2 ||
+            !ADMIN_PASSWORD_2 ||
+            !SESSION_SECRET
+        ) {
             console.error("Admin authentication secrets are missing.");
 
             return json({
@@ -79,19 +91,29 @@ export async function onRequestPost(context) {
             }, 400);
         }
 
-        if (
-            username !== ADMIN_USERNAME ||
-            password !== ADMIN_PASSWORD
-        ) {
+        const validAdmin1 =
+            username === ADMIN_USERNAME_1 &&
+            password === ADMIN_PASSWORD_1;
+
+        const validAdmin2 =
+            username === ADMIN_USERNAME_2 &&
+            password === ADMIN_PASSWORD_2;
+
+        if (!validAdmin1 && !validAdmin2) {
             return json({
                 error: "Incorrect username or password."
             }, 401);
         }
 
-        const expires = Math.floor(Date.now() / 1000) + SESSION_DURATION;
+        const expires =
+            Math.floor(Date.now() / 1000) + SESSION_DURATION;
 
         const payload = `${username}:${expires}`;
-        const signature = await sign(payload, SESSION_SECRET);
+
+        const signature = await sign(
+            payload,
+            SESSION_SECRET
+        );
 
         const session = `${payload}:${signature}`;
 
@@ -106,7 +128,8 @@ export async function onRequestPost(context) {
 
         return json(
             {
-                success: true
+                success: true,
+                username
             },
             200,
             {
@@ -114,7 +137,7 @@ export async function onRequestPost(context) {
             }
         );
     } catch (error) {
-        console.error(error);
+        console.error("Admin login error:", error);
 
         return json({
             error: "Unable to sign in."

@@ -53,54 +53,92 @@ async function sign(value, secret) {
     return base64UrlEncode(signature);
 }
 
-export async function onRequestGet(context) {
-    const session = getCookie(
-        context.request,
-        "maybelin_admin"
-    );
-
-    if (!session || !context.env.SESSION_SECRET) {
-        return Response.json({
-            authenticated: false
-        });
-    }
-
-    const parts = session.split(":");
-
-    if (parts.length !== 3) {
-        return Response.json({
-            authenticated: false
-        });
-    }
-
-    const [username, expiresText, suppliedSignature] = parts;
-    const expires = Number(expiresText);
-
-    if (
-        username !== context.env.ADMIN_USERNAME ||
-        !Number.isFinite(expires) ||
-        expires <= Math.floor(Date.now() / 1000)
-    ) {
-        return Response.json({
-            authenticated: false
-        });
-    }
-
-    const payload = `${username}:${expires}`;
-
-    const expectedSignature = await sign(
-        payload,
-        context.env.SESSION_SECRET
-    );
-
-    if (expectedSignature !== suppliedSignature) {
-        return Response.json({
-            authenticated: false
-        });
-    }
-
-    return Response.json({
-        authenticated: true,
-        username
+function json(data, status = 200) {
+    return new Response(JSON.stringify(data), {
+        status,
+        headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store"
+        }
     });
+}
+
+export async function onRequestGet(context) {
+    try {
+        const session = getCookie(
+            context.request,
+            "maybelin_admin"
+        );
+
+        if (!session || !context.env.SESSION_SECRET) {
+            return json({
+                authenticated: false
+            });
+        }
+
+        const parts = session.split(":");
+
+        if (parts.length !== 3) {
+            return json({
+                authenticated: false
+            });
+        }
+
+        const [
+            username,
+            expiresText,
+            suppliedSignature
+        ] = parts;
+
+        const expires = Number(expiresText);
+
+        if (
+            !Number.isFinite(expires) ||
+            expires <= Math.floor(Date.now() / 1000)
+        ) {
+            return json({
+                authenticated: false
+            });
+        }
+
+        const validUsername =
+            username === context.env.ADMIN_USERNAME_1 ||
+            username === context.env.ADMIN_USERNAME_2;
+
+        if (!validUsername) {
+            return json({
+                authenticated: false
+            });
+        }
+
+        const payload = `${username}:${expires}`;
+
+        const expectedSignature = await sign(
+            payload,
+            context.env.SESSION_SECRET
+        );
+
+        if (suppliedSignature !== expectedSignature) {
+            return json({
+                authenticated: false
+            });
+        }
+
+        return json({
+            authenticated: true,
+            username
+        });
+    } catch (error) {
+        console.error("Session check error:", error);
+
+        return json({
+            authenticated: false
+        }, 500);
+    }
+}
+
+export function onRequest() {
+    return json({
+        error: "Method not allowed."
+    }, 405);
 }

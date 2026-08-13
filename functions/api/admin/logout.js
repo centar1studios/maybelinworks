@@ -1,3 +1,14 @@
+function json(data, status = 200, headers = {}) {
+    return new Response(JSON.stringify(data), {
+        status,
+        headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store",
+            ...headers
+        }
+    });
+}
+
 export function onRequestPost() {
     const cookie = [
         "maybelin_admin=",
@@ -8,31 +19,19 @@ export function onRequestPost() {
         "Max-Age=0"
     ].join("; ");
 
-    return new Response(
-        JSON.stringify({
-            success: true
-        }),
+    return json(
         {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-                "Cache-Control": "no-store",
-                "Set-Cookie": cookie
-            }
+            success: true
+        },
+        200,
+        {
+            "Set-Cookie": cookie
         }
     );
 }
 
 export function onRequest() {
-    return new Response(
-        JSON.stringify({
-            error: "Method not allowed."
-        }),
-        {
-            status: 405,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }
-    );
+    return json({
+        error: "Method not allowed."
+    }, 405);
 }

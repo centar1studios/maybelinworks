@@ -56,7 +56,10 @@ async function sign(value, secret) {
 }
 
 async function validSession(request, env) {
-    const session = getCookie(request, "maybelin_admin");
+    const session = getCookie(
+        request,
+        "maybelin_admin"
+    );
 
     if (!session || !env.SESSION_SECRET) {
         return false;
@@ -68,19 +71,26 @@ async function validSession(request, env) {
         return false;
     }
 
-    const [username, expiresText, suppliedSignature] = parts;
+    const [
+        username,
+        expiresText,
+        suppliedSignature
+    ] = parts;
 
     const expires = Number(expiresText);
 
-    if (!Number.isFinite(expires)) {
+    if (
+        !Number.isFinite(expires) ||
+        expires <= Math.floor(Date.now() / 1000)
+    ) {
         return false;
     }
 
-    if (expires <= Math.floor(Date.now() / 1000)) {
-        return false;
-    }
+    const validUsername =
+        username === env.ADMIN_USERNAME_1 ||
+        username === env.ADMIN_USERNAME_2;
 
-    if (username !== env.ADMIN_USERNAME) {
+    if (!validUsername) {
         return false;
     }
 
@@ -91,17 +101,17 @@ async function validSession(request, env) {
         env.SESSION_SECRET
     );
 
-    return expectedSignature === suppliedSignature;
+    return suppliedSignature === expectedSignature;
 }
 
 export async function onRequest(context) {
     const url = new URL(context.request.url);
 
-    const protectedAdminPage =
+    const protectedAdminRoute =
         url.pathname === "/admin" ||
         url.pathname.startsWith("/admin/");
 
-    if (!protectedAdminPage) {
+    if (!protectedAdminRoute) {
         return context.next();
     }
 
