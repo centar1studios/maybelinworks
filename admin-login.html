@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>Admin Login | Maybelin Works</title>
+
+    <link rel="icon" type="image/png" href="./assets/maygarcia_logo.png">
+    <link rel="stylesheet" href="./stylesheet.css">
+</head>
+
+<body class="admin-login-page">
+
+    <main class="admin-login-main">
+        <section class="admin-login-card">
+            <div class="admin-login-heading">
+                <p class="admin-login-kicker">Maybelin Works</p>
+                <h1>Admin Login</h1>
+                <p>Sign in to manage the portfolio.</p>
+            </div>
+
+            <form class="admin-login-form" id="admin-login-form">
+                <div class="admin-form-group">
+                    <label for="username">Username</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+
+                <div class="admin-form-group">
+                    <label for="password">Password</label>
+
+                    <div class="admin-password-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            class="admin-password-toggle"
+                            type="button"
+                            id="password-toggle"
+                            aria-label="Show password"
+                        >
+                            Show
+                        </button>
+                    </div>
+                </div>
+
+                <p class="admin-login-status" id="admin-login-status" aria-live="polite"></p>
+
+                <button class="admin-login-submit" type="submit">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="admin-login-footer">
+                <a href="./index.html">Return to Website</a>
+            </div>
+        </section>
+    </main>
+
+    <script src="./admin-login.js"></script>
+
+</body>
+</html>

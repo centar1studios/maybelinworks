@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Landing page for May Garcia made by Centari Studios.">
+
+    <title>Maybelin Works</title>
+
+    <link rel="icon" type="image/png" href="./assets/maygarcia_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Hind:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./stylesheet.css">
+</head>
+
+<body>
+
+    <video class="background-video" autoplay muted loop playsinline>
+        <source src="./assets/bkg_video.mp4" type="video/mp4">
+    </video>
+
+    <div class="background-overlay"></div>
+
+    <a class="skip-link" href="#main-content">Skip to Content</a>
+
+    <header class="site-header">
+        <a class="wordmark" href="#" aria-label="Return to Homepage">
+            Maybelin Garcia Romero
+        </a>
+
+        <nav class="site-nav" aria-label="Site Links">
+            <button class="nav-button" type="button" data-open-about>
+                Information
+            </button>
+
+            <a href="https://www.instagram.com/may.sun.jar" target="_blank" rel="noreferrer">
+                Instagram
+            </a>
+
+            <a href="mailto:maygarcia227@gmail.com">
+                Email Me
+            </a>
+
+            <a href="tel:+12623657992">
+                Call Me
+            </a>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        <section class="hero">
+            <div class="hero-text-box">
+                <div class="hero-inner">
+
+                    <p class="hero-kicker">Freelance Artist</p>
+
+                    <h1 class="hero-title">
+                        Work that not only looks good but does good.
+                    </h1>
+
+                    <div class="hero-bottom">
+                        <p class="hero-description">
+                            I am a branding and art direction specialist with over five years of experience dedicated to shaping compelling narratives.
+                            My approach is high-level, consistently delivering stylized solutions that perfectly capture a client's desired vibe.
+                            As an advocate for feminine empowerment and social rights, I infuse purpose into every project, creating work that not only looks good but does good.
+                            When I'm not designing, you can find me journaling my thoughts, soaking in the peace of the beach, exploring art in museums,
+                            or expanding my mind through research into spiritualism and the healing power of plants.
+                        </p>
+
+                        <button class="text-button" type="button" data-open-projects>
+                            Read More?
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>Maybelin Works, <span data-current-year></span></p>
+        <p><em>Website created by Centari Studios</em></p>
+        <p><em>Powered by Cloudflare</em></p>
+        <p><a href="./admin-login.html">Admin Login</a></p>
+    </footer>
+
+    <dialog data-projects-dialog>
+        <div class="dialog-toolbar">
+            <p>Projects</p>
+
+            <button class="dialog-close" type="button" data-close-projects>
+                Close
+            </button>
+        </div>
+
+        <div class="portfolio-dialog-content">
+            <header class="portfolio-intro">
+                <h2>Projects and Creative Works</h2>
+            </header>
+
+            <div class="project-list">
+                <article class="project">
+                    <div class="project-gallery">
+                        <img src="./assets/project-placeholder-1.jpg" alt="Casa Guadalupe project image">
+                        <img src="./assets/project-placeholder-2.jpg" alt="Casa Guadalupe branding image">
+                    </div>
+
+                    <div class="project-info">
+                        <p class="project-number">Project 01</p>
+                        <p class="project-kicker">Branding Identity</p>
+
+                        <h3>Casa Guadalupe</h3>
+
+                        <p class="project-description">
+                            Brand identity proposal for Casa Guadalupe.
+                        </p>
+
+                        <dl class="project-meta">
+                            <div>
+                                <dt>Year</dt>
+                                <dd>2026</dd>
+                            </div>
+
+                            <div>
+                                <dt>Role</dt>
+                                <dd>Identity & Branding</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog data-about-dialog>
+        <div class="dialog-toolbar">
+            <p>Information</p>
+
+            <button class="dialog-close" type="button" data-close-about>
+                Close
+            </button>
+        </div>
+
+        <div class="about-content">
+            <div>
+                <h2>About Maybelin</h2>
+            </div>
+
+            <div class="about-copy">
+                <p>
+                    Brand identity and art direction for founders, creatives, and brands with something real to say.
+                </p>
+
+                <dl class="contact-list">
+                    <div>
+                        <dt>Email</dt>
+                        <dd>
+                            <a href="mailto:maygarcia227@gmail.com">
+                                maygarcia227@gmail.com
+                            </a>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Instagram</dt>
+                        <dd>
+                            <a href="https://www.instagram.com/may.sun.jar" target="_blank" rel="noreferrer">
+                                @may.sun.jar
+                            </a>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Phone</dt>
+                        <dd>
+                            <a href="tel:+12623657992">
+                                262-365-7992
+                            </a>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="./site-config.js"></script>
+
+</body>
+</html>
