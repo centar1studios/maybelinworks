@@ -5,3 +5,6 @@ node_modules/
 .env.*
 .DS_Store
 Thumbs.db
+
+# Large website media
+public/assets/*.mp4
