@@ -1,13 +1,560 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="description" content="Admin pages for Maybelin Works">
-    <title>Maybelin Works | Admin</title>
-    <link rel="icon" type="image/png" href="./assets/maygarcia_logo.png">
-    <style> @import './admin-stylesheet.css'; </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="Admin dashboard for Maybelin Works">
+
+    <title>Admin Dashboard | Maybelin Works</title>
+
+    <link rel="icon" type="image/png" href="../assets/maygarcia_logo.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Hind:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="./admin-stylesheet.css">
 </head>
 
+<body>
+
+    <div class="admin-layout">
+
+        <aside class="admin-sidebar">
+            <div class="sidebar-top">
+
+                <a class="admin-brand" href="../index.html">
+                    <img
+                        class="admin-brand-logo"
+                        src="../assets/maygarcia_logo.png"
+                        alt=""
+                    >
+
+                    <div>
+                        <p class="admin-brand-name">Maybelin Works</p>
+                        <p class="admin-brand-label">Admin</p>
+                    </div>
+                </a>
+
+                <nav class="admin-nav" aria-label="Admin Navigation">
+                    <a href="#overview" class="admin-nav-link active">
+                        Overview
+                    </a>
+
+                    <a href="#site-settings" class="admin-nav-link">
+                        Site Settings
+                    </a>
+
+                    <a href="#projects" class="admin-nav-link">
+                        Projects
+                    </a>
+
+                    <a href="#media" class="admin-nav-link">
+                        Media
+                    </a>
+
+                    <a href="#account" class="admin-nav-link">
+                        Account
+                    </a>
+                </nav>
+
+            </div>
+
+            <div class="sidebar-bottom">
+                <a class="sidebar-site-link" href="../index.html" target="_blank">
+                    View Website
+                </a>
+
+                <button class="sidebar-logout" type="button" data-logout>
+                    Log Out
+                </button>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+
+            <header class="admin-topbar">
+                <div>
+                    <p class="admin-eyebrow">Maybelin Works</p>
+                    <h1>Admin Dashboard</h1>
+                </div>
+
+                <div class="admin-user">
+                    <div class="admin-user-avatar" data-user-avatar>
+                        M
+                    </div>
+
+                    <div class="admin-user-info">
+                        <span class="admin-user-label">Signed in as</span>
+                        <strong data-admin-username>Loading...</strong>
+                    </div>
+                </div>
+            </header>
+
+            <div class="admin-content">
+
+                <section class="dashboard-section" id="overview">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-kicker">Overview</p>
+                            <h2>Welcome back.</h2>
+                        </div>
+
+                        <a class="primary-link-button" href="../index.html" target="_blank">
+                            Preview Website
+                        </a>
+                    </div>
+
+                    <div class="overview-grid">
+
+                        <article class="overview-card highlight-card">
+                            <p class="overview-label">
+                                Website
+                            </p>
+
+                            <h3>
+                                Maybelin Works
+                            </h3>
+
+                            <p>
+                                Portfolio website for Maybelin Garcia Romero.
+                            </p>
+
+                            <span class="status-badge">
+                                In Development
+                            </span>
+                        </article>
+
+                        <article class="overview-card">
+                            <p class="overview-label">
+                                Projects
+                            </p>
+
+                            <p class="overview-number">
+                                1
+                            </p>
+
+                            <p class="overview-note">
+                                Casa Guadalupe
+                            </p>
+                        </article>
+
+                        <article class="overview-card">
+                            <p class="overview-label">
+                                Background
+                            </p>
+
+                            <p class="overview-value">
+                                Video
+                            </p>
+
+                            <p class="overview-note">
+                                Temporarily disabled
+                            </p>
+                        </article>
+
+                        <article class="overview-card">
+                            <p class="overview-label">
+                                CMS Status
+                            </p>
+
+                            <p class="overview-value">
+                                Setup
+                            </p>
+
+                            <p class="overview-note">
+                                D1 connection is next
+                            </p>
+                        </article>
+
+                    </div>
+                </section>
+
+                <section class="dashboard-section" id="site-settings">
+
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-kicker">Website</p>
+                            <h2>Site Settings</h2>
+                            <p class="section-description">
+                                These controls show what will become editable once the database is connected.
+                            </p>
+                        </div>
+
+                        <span class="coming-soon-badge">
+                            CMS Setup Required
+                        </span>
+                    </div>
+
+                    <div class="settings-grid">
+
+                        <article class="dashboard-panel large-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Homepage</p>
+                                    <h3>Hero Content</h3>
+                                </div>
+
+                                <span class="panel-status">
+                                    Draft
+                                </span>
+                            </div>
+
+                            <div class="form-grid">
+
+                                <div class="admin-field full-field">
+                                    <label for="hero-kicker">
+                                        Kicker
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="hero-kicker"
+                                        value="Freelance Artist"
+                                        disabled
+                                    >
+                                </div>
+
+                                <div class="admin-field full-field">
+                                    <label for="hero-title">
+                                        Hero Title
+                                    </label>
+
+                                    <textarea
+                                        id="hero-title"
+                                        rows="3"
+                                        disabled
+                                    >Work that not only looks good but does good.</textarea>
+                                </div>
+
+                                <div class="admin-field full-field">
+                                    <label for="hero-description">
+                                        Description
+                                    </label>
+
+                                    <textarea
+                                        id="hero-description"
+                                        rows="7"
+                                        disabled
+                                    >I am a branding and art direction specialist with over five years of experience dedicated to shaping compelling narratives.</textarea>
+                                </div>
+
+                            </div>
+
+                            <div class="panel-footer">
+                                <p>
+                                    Editing will be enabled when D1 is connected.
+                                </p>
+
+                                <button class="disabled-button" type="button" disabled>
+                                    Save Changes
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="dashboard-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Appearance</p>
+                                    <h3>Colors</h3>
+                                </div>
+                            </div>
+
+                            <div class="color-list">
+
+                                <div class="color-row">
+                                    <span
+                                        class="color-preview"
+                                        style="background: #b1125b;"
+                                        aria-hidden="true"
+                                    ></span>
+
+                                    <div>
+                                        <p>Primary Magenta</p>
+                                        <span>#B1125B</span>
+                                    </div>
+                                </div>
+
+                                <div class="color-row">
+                                    <span
+                                        class="color-preview"
+                                        style="background: #5f8f54;"
+                                        aria-hidden="true"
+                                    ></span>
+
+                                    <div>
+                                        <p>Accent Green</p>
+                                        <span>#5F8F54</span>
+                                    </div>
+                                </div>
+
+                                <div class="color-row">
+                                    <span
+                                        class="color-preview"
+                                        style="background: #4b1734;"
+                                        aria-hidden="true"
+                                    ></span>
+
+                                    <div>
+                                        <p>Deep Plum</p>
+                                        <span>#4B1734</span>
+                                    </div>
+                                </div>
+
+                                <div class="color-row">
+                                    <span
+                                        class="color-preview light-color"
+                                        style="background: #fff7ef;"
+                                        aria-hidden="true"
+                                    ></span>
+
+                                    <div>
+                                        <p>Cream</p>
+                                        <span>#FFF7EF</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </article>
+
+                        <article class="dashboard-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Typography</p>
+                                    <h3>Fonts</h3>
+                                </div>
+                            </div>
+
+                            <div class="font-preview">
+                                <div>
+                                    <span>Display</span>
+                                    <p class="font-display-preview">
+                                        Cardo
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span>Body</span>
+                                    <p class="font-body-preview">
+                                        Hind
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="dashboard-panel background-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Homepage</p>
+                                    <h3>Background</h3>
+                                </div>
+                            </div>
+
+                            <div class="background-preview">
+                                <div class="background-placeholder">
+                                    <span>Video Background</span>
+                                    <strong>Temporarily Disabled</strong>
+                                </div>
+                            </div>
+
+                            <p class="panel-note">
+                                Background uploads and switching between video, image, gradient, and solid color will be added later.
+                            </p>
+                        </article>
+
+                    </div>
+
+                </section>
+
+                <section class="dashboard-section" id="projects">
+
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-kicker">Portfolio</p>
+                            <h2>Projects</h2>
+                            <p class="section-description">
+                                Manage the work shown in the Projects dialog.
+                            </p>
+                        </div>
+
+                        <button
+                            class="disabled-button"
+                            type="button"
+                            disabled
+                        >
+                            + Add Project
+                        </button>
+                    </div>
+
+                    <div class="project-admin-list">
+
+                        <article class="project-admin-card">
+
+                            <div class="project-admin-number">
+                                01
+                            </div>
+
+                            <div class="project-admin-content">
+                                <p class="project-admin-type">
+                                    Branding Identity
+                                </p>
+
+                                <h3>
+                                    Casa Guadalupe
+                                </h3>
+
+                                <p>
+                                    Brand identity proposal for Casa Guadalupe.
+                                </p>
+                            </div>
+
+                            <div class="project-admin-meta">
+                                <div>
+                                    <span>Year</span>
+                                    <strong>2026</strong>
+                                </div>
+
+                                <div>
+                                    <span>Status</span>
+                                    <strong>Published</strong>
+                                </div>
+                            </div>
+
+                            <button
+                                class="project-edit-button"
+                                type="button"
+                                disabled
+                            >
+                                Edit
+                            </button>
+
+                        </article>
+
+                    </div>
+
+                    <p class="feature-note">
+                        Project editing, uploading images, reordering, publishing, and deleting will be enabled after the database and media storage are connected.
+                    </p>
+
+                </section>
+
+                <section class="dashboard-section" id="media">
+
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-kicker">Files</p>
+                            <h2>Media Library</h2>
+                            <p class="section-description">
+                                Images and videos used throughout the portfolio.
+                            </p>
+                        </div>
+
+                        <button
+                            class="disabled-button"
+                            type="button"
+                            disabled
+                        >
+                            Upload Media
+                        </button>
+                    </div>
+
+                    <div class="media-grid">
+
+                        <article class="media-card">
+                            <div class="media-preview logo-preview">
+                                <img
+                                    src="../assets/maygarcia_logo.png"
+                                    alt="Maybelin Works logo"
+                                >
+                            </div>
+
+                            <div class="media-info">
+                                <strong>maygarcia_logo.png</strong>
+                                <span>Logo</span>
+                            </div>
+                        </article>
+
+                        <article class="media-card empty-media-card">
+                            <div class="media-empty-icon">
+                                +
+                            </div>
+
+                            <div class="media-info">
+                                <strong>More media coming soon</strong>
+                                <span>R2 storage will be connected later</span>
+                            </div>
+                        </article>
+
+                    </div>
+
+                </section>
+
+                <section class="dashboard-section" id="account">
+
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-kicker">Account</p>
+                            <h2>Admin Session</h2>
+                        </div>
+                    </div>
+
+                    <article class="dashboard-panel account-panel">
+
+                        <div class="account-detail">
+                            <span>Signed in as</span>
+                            <strong data-account-username>Loading...</strong>
+                        </div>
+
+                        <div class="account-detail">
+                            <span>Session Length</span>
+                            <strong>8 Hours</strong>
+                        </div>
+
+                        <div class="account-actions">
+                            <button
+                                class="logout-button"
+                                type="button"
+                                data-logout
+                            >
+                                Log Out
+                            </button>
+                        </div>
+
+                    </article>
+
+                </section>
+
+            </div>
+
+            <footer class="admin-footer">
+                <p>
+                    Maybelin Works Admin
+                </p>
+
+                <p>
+                    Website created by Centari Studios
+                </p>
+            </footer>
+
+        </main>
+
+    </div>
+
+    <div
+        class="admin-toast"
+        data-admin-toast
+        role="status"
+        aria-live="polite"
+    ></div>
+
+    <script src="./admin-dashboard.js"></script>
+
+</body>
 
 </html>
