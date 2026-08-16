@@ -54,9 +54,9 @@ INSERT INTO projects (
 )
 VALUES (
     'casa-guadalupe',
-    'Casa Guadalupe Education Center',
+    'Casa Guadalupe',
     'Educational Branding',
-    'Casa Guadalupe Education Center is a conceptual brand identity created to connect with parents between the ages of 25 and 35 and build a welcoming sense of community around education.'
+    'Casa Guadalupe is a conceptual brand identity created to connect with parents between the ages of 25 and 35 and build a welcoming sense of community around education.'
         || char(10) || char(10) ||
     'The final visual direction was inspired by the colors and patterns of a zarape blanket I discovered while visiting Downtown Los Angeles with my family shortly before the COVID-19 shutdown.'
         || char(10) || char(10) ||

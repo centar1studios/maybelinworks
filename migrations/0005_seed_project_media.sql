@@ -223,7 +223,7 @@ WITH casa_media (
     VALUES
         (
             'projects/casa-guadalupe/casa_pres1.png',
-            'Casa Guadalupe Education Center brand presentation',
+            'Casa Guadalupe brand presentation',
             0
         ),
         (
