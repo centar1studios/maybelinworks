@@ -1,38 +1,110 @@
 document.addEventListener("DOMContentLoaded", () => {
     /* DIALOGS */
 
-    const projectsDialog = document.querySelector("[data-projects-dialog]");
-    const openProjectsButton = document.querySelector("[data-open-projects]");
-    const closeProjectsButton = document.querySelector("[data-close-projects]");
+    const projectsDialog = document.querySelector(
+        "[data-projects-dialog]"
+    );
 
-    const aboutDialog = document.querySelector("[data-about-dialog]");
-    const openAboutButton = document.querySelector("[data-open-about]");
-    const closeAboutButton = document.querySelector("[data-close-about]");
+    const openProjectsButton = document.querySelector(
+        "[data-open-projects]"
+    );
+
+    const closeProjectsButton = document.querySelector(
+        "[data-close-projects]"
+    );
+
+    const aboutDialog = document.querySelector(
+        "[data-about-dialog]"
+    );
+
+    const openAboutButton = document.querySelector(
+        "[data-open-about]"
+    );
+
+    const closeAboutButton = document.querySelector(
+        "[data-close-about]"
+    );
 
     /* HOMEPAGE */
 
-    const heroKicker = document.querySelector(".hero-kicker");
-    const heroTitle = document.querySelector(".hero-title");
-    const currentYear = document.querySelector("[data-current-year]");
+    const heroKicker = document.querySelector(
+        ".hero-kicker"
+    );
+
+    const heroTitle = document.querySelector(
+        ".hero-title"
+    );
+
+    const currentYear = document.querySelector(
+        "[data-current-year]"
+    );
 
     if (currentYear) {
-        currentYear.textContent = new Date().getFullYear();
+        currentYear.textContent =
+            new Date().getFullYear();
     }
 
-    /* LOAD SAVED HOMEPAGE TEXT */
+    /* PUBLIC PROJECTS */
+
+    const publicProjectList =
+        document.querySelector(".project-list");
+
+    const staticProjectArticles = Array.from(
+        document.querySelectorAll(
+            ".project-list > .project"
+        )
+    );
+
+    const projectArticlesBySlug =
+        new Map();
+
+    staticProjectArticles.forEach((article) => {
+        const title = article
+            .querySelector(".project-info h3")
+            ?.textContent
+            .trim()
+            .toLowerCase();
+
+        if (title === "fenix") {
+            projectArticlesBySlug.set(
+                "fenix",
+                article
+            );
+        }
+
+        if (
+            title &&
+            title.includes(
+                "casa guadalupe"
+            )
+        ) {
+            projectArticlesBySlug.set(
+                "casa-guadalupe",
+                article
+            );
+        }
+    });
+
+    /* LOAD HOMEPAGE SETTINGS */
 
     async function loadSiteSettings() {
         try {
-            const response = await fetch("/api/settings", {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json"
-                },
-                cache: "no-store"
-            });
+            const response = await fetch(
+                "/api/settings",
+                {
+                    method: "GET",
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    },
+                    cache: "no-store"
+                }
+            );
 
             if (!response.ok) {
-                throw new Error("Unable to load website settings.");
+                throw new Error(
+                    "Unable to load website settings."
+                );
             }
 
             const data = await response.json();
@@ -45,24 +117,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (
                 heroKicker &&
-                typeof settings.hero_kicker === "string" &&
+                typeof settings.hero_kicker ===
+                    "string" &&
                 settings.hero_kicker.trim()
             ) {
-                heroKicker.textContent = settings.hero_kicker;
+                heroKicker.textContent =
+                    settings.hero_kicker;
             }
 
             if (
                 heroTitle &&
-                typeof settings.hero_title === "string" &&
+                typeof settings.hero_title ===
+                    "string" &&
                 settings.hero_title.trim()
             ) {
-                heroTitle.textContent = settings.hero_title;
+                heroTitle.textContent =
+                    settings.hero_title;
             }
         } catch (error) {
-            /*
-             * Keep the text already written in index.html if
-             * the settings cannot be loaded.
-             */
             console.warn(
                 "Website settings couldn't be loaded. Using the default homepage text.",
                 error
@@ -70,19 +142,330 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    /* FIND PROJECT META */
+
+    function findMetaRow(meta, label) {
+        if (!meta) {
+            return null;
+        }
+
+        const rows = Array.from(
+            meta.querySelectorAll(":scope > div")
+        );
+
+        return rows.find((row) => {
+            const heading = row
+                .querySelector("dt")
+                ?.textContent
+                .trim()
+                .toLowerCase();
+
+            return heading ===
+                label.toLowerCase();
+        }) || null;
+    }
+
+    /* UPDATE PROJECT META */
+
+    function setProjectMeta(
+        meta,
+        label,
+        value
+    ) {
+        if (!meta) {
+            return;
+        }
+
+        let row = findMetaRow(
+            meta,
+            label
+        );
+
+        if (!value) {
+            if (
+                row &&
+                row.dataset.dynamicMeta ===
+                    "true"
+            ) {
+                row.remove();
+            }
+
+            return;
+        }
+
+        if (!row) {
+            row =
+                document.createElement("div");
+
+            row.dataset.dynamicMeta =
+                "true";
+
+            const term =
+                document.createElement("dt");
+
+            const description =
+                document.createElement("dd");
+
+            term.textContent = label;
+
+            row.append(
+                term,
+                description
+            );
+
+            meta.appendChild(row);
+        }
+
+        const description =
+            row.querySelector("dd");
+
+        if (description) {
+            description.textContent =
+                String(value);
+        }
+    }
+
+    /* PROJECT PARAGRAPHS */
+
+    function updateProjectDescription(
+        container,
+        description
+    ) {
+        if (!container) {
+            return;
+        }
+
+        container.replaceChildren();
+
+        if (!description) {
+            return;
+        }
+
+        const paragraphs = description
+            .split(/\n\s*\n/)
+            .map(paragraph =>
+                paragraph.trim()
+            )
+            .filter(Boolean);
+
+        paragraphs.forEach((text) => {
+            const paragraph =
+                document.createElement("p");
+
+            paragraph.textContent = text;
+
+            container.appendChild(
+                paragraph
+            );
+        });
+    }
+
+    /* APPLY PROJECT */
+
+    function applyProjectData(
+        article,
+        project,
+        displayNumber
+    ) {
+        if (!article) {
+            return;
+        }
+
+        article.hidden = false;
+
+        const number = article.querySelector(
+            ".project-number"
+        );
+
+        const kicker = article.querySelector(
+            ".project-kicker"
+        );
+
+        const title = article.querySelector(
+            ".project-info h3"
+        );
+
+        const description =
+            article.querySelector(
+                ".project-description"
+            );
+
+        const meta = article.querySelector(
+            ".project-meta"
+        );
+
+        if (number) {
+            number.textContent =
+                `Project ${String(
+                    displayNumber
+                ).padStart(2, "0")}`;
+        }
+
+        if (kicker) {
+            kicker.textContent =
+                project.kicker ||
+                "Portfolio Project";
+        }
+
+        if (title) {
+            title.textContent =
+                project.title ||
+                "Untitled Project";
+        }
+
+        updateProjectDescription(
+            description,
+            project.description
+        );
+
+        setProjectMeta(
+            meta,
+            "Type",
+            project.kicker
+        );
+
+        setProjectMeta(
+            meta,
+            "Role",
+            project.role
+        );
+
+        setProjectMeta(
+            meta,
+            "Year",
+            project.year
+        );
+    }
+
+    /* LOAD PUBLIC PROJECTS */
+
+    async function loadProjects() {
+        if (
+            !publicProjectList ||
+            projectArticlesBySlug.size === 0
+        ) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                "/api/projects",
+                {
+                    method: "GET",
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    },
+                    cache: "no-store"
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    "Unable to load portfolio projects."
+                );
+            }
+
+            const data = await response.json();
+
+            if (
+                !Array.isArray(
+                    data.projects
+                )
+            ) {
+                return;
+            }
+
+            /*
+             * The public API only returns projects
+             * marked as visible.
+             */
+            projectArticlesBySlug.forEach(
+                (article) => {
+                    article.hidden = true;
+                }
+            );
+
+            let displayNumber = 1;
+
+            data.projects.forEach(
+                (project) => {
+                    const article =
+                        projectArticlesBySlug.get(
+                            project.slug
+                        );
+
+                    if (!article) {
+                        return;
+                    }
+
+                    applyProjectData(
+                        article,
+                        project,
+                        displayNumber
+                    );
+
+                    /*
+                     * This also keeps the public
+                     * order synced with D1.
+                     */
+                    publicProjectList.appendChild(
+                        article
+                    );
+
+                    displayNumber += 1;
+                }
+            );
+        } catch (error) {
+            /*
+             * Leave the original project text visible
+             * if the database cannot be reached.
+             */
+            projectArticlesBySlug.forEach(
+                (article) => {
+                    article.hidden = false;
+                }
+            );
+
+            console.warn(
+                "Portfolio projects couldn't be loaded. Using the default project information.",
+                error
+            );
+        }
+    }
+
     /* IMAGE LIGHTBOX */
 
-    const galleryImages = Array.from(
-        document.querySelectorAll(".project-gallery img")
+    const allGalleryImages = Array.from(
+        document.querySelectorAll(
+            ".project-gallery img"
+        )
     );
 
     let currentImageIndex = 0;
     let previousFocus = null;
 
-    const lightbox = document.createElement("dialog");
+    function getVisibleGalleryImages() {
+        return allGalleryImages.filter(
+            (image) => {
+                const project =
+                    image.closest(".project");
 
-    lightbox.className = "portfolio-lightbox";
-    lightbox.setAttribute("aria-label", "Portfolio image viewer");
+                return !project?.hidden;
+            }
+        );
+    }
+
+    const lightbox =
+        document.createElement("dialog");
+
+    lightbox.className =
+        "portfolio-lightbox";
+
+    lightbox.setAttribute(
+        "aria-label",
+        "Portfolio image viewer"
+    );
 
     lightbox.innerHTML = `
         <div class="portfolio-lightbox-toolbar">
@@ -95,8 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <button
                 class="portfolio-lightbox-close"
                 type="button"
-                data-lightbox-close
-            >
+                data-lightbox-close>
                 Close
             </button>
         </div>
@@ -136,12 +518,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.body.appendChild(lightbox);
 
-    const lightboxImage = lightbox.querySelector("[data-lightbox-image]");
-    const lightboxCaption = lightbox.querySelector("[data-lightbox-caption]");
-    const lightboxCount = lightbox.querySelector("[data-lightbox-count]");
-    const lightboxClose = lightbox.querySelector("[data-lightbox-close]");
-    const lightboxPrevious = lightbox.querySelector("[data-lightbox-prev]");
-    const lightboxNext = lightbox.querySelector("[data-lightbox-next]");
+    const lightboxImage =
+        lightbox.querySelector(
+            "[data-lightbox-image]"
+        );
+
+    const lightboxCaption =
+        lightbox.querySelector(
+            "[data-lightbox-caption]"
+        );
+
+    const lightboxCount =
+        lightbox.querySelector(
+            "[data-lightbox-count]"
+        );
+
+    const lightboxClose =
+        lightbox.querySelector(
+            "[data-lightbox-close]"
+        );
+
+    const lightboxPrevious =
+        lightbox.querySelector(
+            "[data-lightbox-prev]"
+        );
+
+    const lightboxNext =
+        lightbox.querySelector(
+            "[data-lightbox-next]"
+        );
 
     /* BODY SCROLL */
 
@@ -157,76 +562,137 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-    /* PROJECTS */
+    /* PROJECT DIALOG */
 
-    if (openProjectsButton && projectsDialog) {
-        openProjectsButton.addEventListener("click", () => {
-            projectsDialog.showModal();
-            updateDialogState();
-        });
+    if (
+        openProjectsButton &&
+        projectsDialog
+    ) {
+        openProjectsButton.addEventListener(
+            "click",
+            () => {
+                projectsDialog.showModal();
+                updateDialogState();
+            }
+        );
     }
 
-    if (closeProjectsButton && projectsDialog) {
-        closeProjectsButton.addEventListener("click", () => {
-            projectsDialog.close();
-            updateDialogState();
-        });
+    if (
+        closeProjectsButton &&
+        projectsDialog
+    ) {
+        closeProjectsButton.addEventListener(
+            "click",
+            () => {
+                projectsDialog.close();
+                updateDialogState();
+            }
+        );
     }
 
-    /* ABOUT */
+    /* ABOUT DIALOG */
 
-    if (openAboutButton && aboutDialog) {
-        openAboutButton.addEventListener("click", () => {
-            aboutDialog.showModal();
-            updateDialogState();
-        });
+    if (
+        openAboutButton &&
+        aboutDialog
+    ) {
+        openAboutButton.addEventListener(
+            "click",
+            () => {
+                aboutDialog.showModal();
+                updateDialogState();
+            }
+        );
     }
 
-    if (closeAboutButton && aboutDialog) {
-        closeAboutButton.addEventListener("click", () => {
-            aboutDialog.close();
-            updateDialogState();
-        });
+    if (
+        closeAboutButton &&
+        aboutDialog
+    ) {
+        closeAboutButton.addEventListener(
+            "click",
+            () => {
+                aboutDialog.close();
+                updateDialogState();
+            }
+        );
     }
 
-    projectsDialog?.addEventListener("close", updateDialogState);
-    aboutDialog?.addEventListener("close", updateDialogState);
+    projectsDialog?.addEventListener(
+        "close",
+        updateDialogState
+    );
+
+    aboutDialog?.addEventListener(
+        "close",
+        updateDialogState
+    );
 
     /* IMAGE DETAILS */
 
     function updateLightboxImage() {
-        const image = galleryImages[currentImageIndex];
+        const galleryImages =
+            getVisibleGalleryImages();
+
+        const image =
+            galleryImages[
+                currentImageIndex
+            ];
 
         if (!image) {
             return;
         }
 
-        const imageSource = image.currentSrc || image.src;
-        const imageAlt = image.alt || "Portfolio artwork";
+        const imageSource =
+            image.currentSrc ||
+            image.src;
 
-        lightboxImage.src = imageSource;
-        lightboxImage.alt = imageAlt;
+        const imageAlt =
+            image.alt ||
+            "Portfolio artwork";
 
-        lightboxCaption.textContent = imageAlt;
+        lightboxImage.src =
+            imageSource;
+
+        lightboxImage.alt =
+            imageAlt;
+
+        lightboxCaption.textContent =
+            imageAlt;
 
         lightboxCount.textContent =
             `${currentImageIndex + 1} / ${galleryImages.length}`;
 
-        const hasMultipleImages = galleryImages.length > 1;
+        const hasMultipleImages =
+            galleryImages.length > 1;
 
-        lightboxPrevious.hidden = !hasMultipleImages;
-        lightboxNext.hidden = !hasMultipleImages;
+        lightboxPrevious.hidden =
+            !hasMultipleImages;
+
+        lightboxNext.hidden =
+            !hasMultipleImages;
     }
 
     /* OPEN IMAGE */
 
-    function openLightbox(index) {
-        if (!galleryImages[index]) {
+    function openLightbox(image) {
+        const galleryImages =
+            getVisibleGalleryImages();
+
+        const imageIndex =
+            galleryImages.indexOf(
+                image
+            );
+
+        if (imageIndex === -1) {
             return;
         }
 
-        currentImageIndex = index;
-        previousFocus = document.activeElement;
+        currentImageIndex =
+            imageIndex;
+
+        previousFocus =
+            document.activeElement;
 
         updateLightboxImage();
 
@@ -235,6 +701,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         updateDialogState();
+
         lightboxClose.focus();
     }
 
@@ -249,7 +716,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (
             previousFocus &&
-            typeof previousFocus.focus === "function"
+            typeof previousFocus.focus ===
+                "function"
         ) {
             previousFocus.focus();
         }
@@ -260,7 +728,12 @@ document.addEventListener("DOMContentLoaded", () => {
     /* PREVIOUS IMAGE */
 
     function showPreviousImage() {
-        if (galleryImages.length === 0) {
+        const galleryImages =
+            getVisibleGalleryImages();
+
+        if (
+            galleryImages.length === 0
+        ) {
             return;
         }
 
@@ -277,48 +750,77 @@ document.addEventListener("DOMContentLoaded", () => {
     /* NEXT IMAGE */
 
     function showNextImage() {
-        if (galleryImages.length === 0) {
+        const galleryImages =
+            getVisibleGalleryImages();
+
+        if (
+            galleryImages.length === 0
+        ) {
             return;
         }
 
         currentImageIndex =
-            (currentImageIndex + 1) %
-            galleryImages.length;
+            (
+                currentImageIndex +
+                1
+            ) % galleryImages.length;
 
         updateLightboxImage();
     }
 
     /* MAKE IMAGES CLICKABLE */
 
-    galleryImages.forEach((image, index) => {
-        image.classList.add("portfolio-zoomable");
+    allGalleryImages.forEach(
+        (image) => {
+            image.classList.add(
+                "portfolio-zoomable"
+            );
 
-        image.setAttribute("tabindex", "0");
-        image.setAttribute("role", "button");
+            image.setAttribute(
+                "tabindex",
+                "0"
+            );
 
-        const imageDescription =
-            image.alt ||
-            "portfolio image";
+            image.setAttribute(
+                "role",
+                "button"
+            );
 
-        image.setAttribute(
-            "aria-label",
-            `View larger: ${imageDescription}`
-        );
+            const imageDescription =
+                image.alt ||
+                "portfolio image";
 
-        image.addEventListener("click", () => {
-            openLightbox(index);
-        });
+            image.setAttribute(
+                "aria-label",
+                `View larger: ${imageDescription}`
+            );
 
-        image.addEventListener("keydown", (event) => {
-            if (
-                event.key === "Enter" ||
-                event.key === " "
-            ) {
-                event.preventDefault();
-                openLightbox(index);
-            }
-        });
-    });
+            image.addEventListener(
+                "click",
+                () => {
+                    openLightbox(image);
+                }
+            );
+
+            image.addEventListener(
+                "keydown",
+                (event) => {
+                    if (
+                        event.key ===
+                            "Enter" ||
+                        event.key ===
+                            " "
+                    ) {
+                        event.preventDefault();
+
+                        openLightbox(
+                            image
+                        );
+                    }
+                }
+            );
+        }
+    );
 
     /* LIGHTBOX BUTTONS */
 
@@ -337,54 +839,88 @@ document.addEventListener("DOMContentLoaded", () => {
         showNextImage
     );
 
-    /* CLICK BACKGROUND TO CLOSE */
+    /* CLICK BACKGROUND */
 
-    lightbox.addEventListener("click", (event) => {
-        if (event.target === lightbox) {
-            closeLightbox();
+    lightbox.addEventListener(
+        "click",
+        (event) => {
+            if (
+                event.target ===
+                lightbox
+            ) {
+                closeLightbox();
+            }
         }
-    });
+    );
 
     /* ESCAPE */
 
-    lightbox.addEventListener("cancel", (event) => {
-        event.preventDefault();
-        closeLightbox();
-    });
-
-    /* KEYBOARD NAVIGATION */
-
-    document.addEventListener("keydown", (event) => {
-        if (!lightbox.open) {
-            return;
-        }
-
-        if (event.key === "ArrowLeft") {
+    lightbox.addEventListener(
+        "cancel",
+        (event) => {
             event.preventDefault();
-            showPreviousImage();
+            closeLightbox();
         }
+    );
 
-        if (event.key === "ArrowRight") {
-            event.preventDefault();
-            showNextImage();
+    /* KEYBOARD */
+
+    document.addEventListener(
+        "keydown",
+        (event) => {
+            if (!lightbox.open) {
+                return;
+            }
+
+            const galleryImages =
+                getVisibleGalleryImages();
+
+            if (
+                galleryImages.length === 0
+            ) {
+                return;
+            }
+
+            if (
+                event.key ===
+                "ArrowLeft"
+            ) {
+                event.preventDefault();
+                showPreviousImage();
+            }
+
+            if (
+                event.key ===
+                "ArrowRight"
+            ) {
+                event.preventDefault();
+                showNextImage();
+            }
+
+            if (
+                event.key ===
+                "Home"
+            ) {
+                event.preventDefault();
+
+                currentImageIndex = 0;
+
+                updateLightboxImage();
+            }
+
+            if (
+                event.key ===
+                "End"
+            ) {
+                event.preventDefault();
+
+                currentImageIndex =
+                    galleryImages.length - 1;
+
+                updateLightboxImage();
+            }
         }
-
-        if (event.key === "Home") {
-            event.preventDefault();
-
-            currentImageIndex = 0;
-            updateLightboxImage();
-        }
-
-        if (event.key === "End") {
-            event.preventDefault();
-
-            currentImageIndex =
-                galleryImages.length - 1;
-
-            updateLightboxImage();
-        }
-    });
+    );
 
     lightbox.addEventListener(
         "close",
@@ -393,5 +929,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* START */
 
-    loadSiteSettings();
+    Promise.all([
+        loadSiteSettings(),
+        loadProjects()
+    ]);
 });

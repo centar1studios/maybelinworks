@@ -1235,3 +1235,262 @@ button:disabled {
         height: 165px;
     }
 }
+
+/* PROJECT EDITING */
+body.editor-open {
+    overflow: hidden;
+}
+
+.project-edit-button:not(:disabled) {
+    border-color: var(--purple);
+    background: var(--purple);
+    color: #FFFFFF;
+    cursor: pointer;
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        transform 180ms ease;
+}
+
+.project-edit-button:not(:disabled):hover {
+    border-color: var(--pink);
+    background: var(--pink);
+    color: var(--dark-green);
+    transform: translateY(-1px);
+}
+
+.project-is-hidden {
+    border-style: dashed;
+    background: #FAFAF9;
+}
+
+.project-is-hidden .project-admin-number {
+    color: var(--muted);
+}
+
+.project-loading-card {
+    grid-template-columns: 66px minmax(0, 1fr);
+}
+
+.project-editor-dialog {
+    width: min(720px, calc(100vw - 32px));
+    max-width: 720px;
+    max-height: calc(100vh - 32px);
+    margin: auto;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 30px 90px rgba(42, 63, 56, 0.32);
+}
+
+.project-editor-dialog::backdrop {
+    background: rgba(25, 34, 31, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.project-editor-form {
+    max-height: calc(100vh - 32px);
+    display: flex;
+    flex-direction: column;
+}
+
+.project-editor-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px 26px;
+    background: var(--dark-green);
+    color: #FFFFFF;
+    border-bottom: 3px solid var(--lime);
+}
+
+.project-editor-header h2 {
+    margin: 4px 0 0;
+    color: #FFFFFF;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+}
+
+.project-editor-header > div > p:last-child {
+    max-width: 500px;
+    margin: 8px 0 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.project-editor-header .panel-kicker {
+    color: var(--lime);
+}
+
+.project-editor-close {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 8px;
+    background: transparent;
+    color: #FFFFFF;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.project-editor-close:hover {
+    border-color: var(--lime);
+    color: var(--lime);
+}
+
+.project-editor-body {
+    padding: 25px 26px;
+    overflow-y: auto;
+}
+
+.project-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.project-editor-body .admin-field small {
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+
+.project-visibility-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 22px;
+    padding: 15px;
+    border: 1px solid rgba(141, 246, 136, 0.7);
+    border-radius: 11px;
+    background: rgba(141, 246, 136, 0.08);
+    cursor: pointer;
+}
+
+.project-visibility-option input {
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    accent-color: var(--dark-green);
+}
+
+.project-visibility-option > span {
+    display: grid;
+    gap: 3px;
+}
+
+.project-visibility-option strong {
+    color: var(--dark-green);
+    font-size: 0.84rem;
+}
+
+.project-visibility-option small {
+    color: var(--muted);
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+.project-editor-note {
+    display: grid;
+    gap: 4px;
+    margin-top: 15px;
+    padding: 13px 15px;
+    border-radius: 10px;
+    background: var(--surface-purple);
+}
+
+.project-editor-note strong {
+    color: var(--purple);
+    font-size: 0.78rem;
+}
+
+.project-editor-note span {
+    color: var(--muted);
+    font-size: 0.74rem;
+    line-height: 1.45;
+}
+
+.project-editor-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 17px 26px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-soft);
+}
+
+.secondary-button,
+.project-save-button {
+    min-height: 42px;
+    padding: 10px 17px;
+    border-radius: 9px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.secondary-button {
+    border: 1px solid var(--line);
+    background: #FFFFFF;
+    color: var(--dark-green);
+}
+
+.secondary-button:hover {
+    border-color: var(--purple);
+    color: var(--purple);
+}
+
+.project-save-button {
+    border: 1px solid var(--pink);
+    background: var(--pink);
+    color: var(--dark-green);
+}
+
+.project-save-button:hover {
+    border-color: var(--lime);
+    background: var(--lime);
+}
+
+.project-save-button:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+@media (max-width: 700px) {
+    .project-editor-dialog {
+        width: calc(100vw - 18px);
+        max-height: calc(100vh - 18px);
+    }
+
+    .project-editor-form {
+        max-height: calc(100vh - 18px);
+    }
+
+    .project-editor-header {
+        padding: 20px;
+    }
+
+    .project-editor-body {
+        padding: 20px;
+    }
+
+    .project-editor-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .project-editor-actions {
+        padding: 15px 20px;
+    }
+
+    .project-editor-actions button {
+        flex: 1;
+    }
+}

@@ -7,21 +7,20 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="description" content="Manage the Maybelin Works portfolio website">
     <title>Website Manager | Maybelin Works</title>
-    <link rel="icon"type="image/png" href="../assets/maygarcia_logo.png">
+    <link rel="icon" type="image/png" href="../assets/maygarcia_logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./admin-stylesheet.css">
 </head>
-
 <body>
+
     <div class="admin-layout">
         <!-- SIDEBAR -->
         <aside class="admin-sidebar">
             <div class="sidebar-top">
                 <a class="admin-brand" href="../index.html">
                     <img class="admin-brand-logo" src="../assets/maygarcia_logo.png" alt="">
-
                     <div>
                         <p class="admin-brand-name">Maybelin Works</p>
                         <p class="admin-brand-label">Website Manager</p>
@@ -33,7 +32,7 @@
                     <a href="#homepage" class="admin-nav-link">Homepage</a>
                     <a href="#projects" class="admin-nav-link">Projects</a>
                     <a href="#media" class="admin-nav-link">Images &amp; Media</a>
-                    <a href="#account"class="admin-nav-link">Account</a>
+                    <a href="#account" class="admin-nav-link">Account</a>
                 </nav>
             </div>
 
@@ -43,10 +42,12 @@
             </div>
         </aside>
 
+
         <!-- MAIN -->
         <main class="admin-main">
             <!-- TOP BAR -->
             <header class="admin-topbar">
+
                 <div>
                     <p class="admin-eyebrow">Maybelin Works</p>
                     <h1>Website Manager</h1>
@@ -62,13 +63,14 @@
             </header>
 
             <div class="admin-content">
+
                 <!-- OVERVIEW -->
                 <section class="dashboard-section" id="overview">
                     <div class="section-heading">
                         <div>
                             <p class="section-kicker">Your Website</p>
-                            <h2>Welcome back! </h2>
-                            <p class="section-description">This is where you can manage the content shown on your portfolio website.</p>
+                            <h2>Welcome back!</h2>
+                            <p class="section-description"> This is where you can manage the content shown on your portfolio website.</p>
                         </div>
                         <a class="primary-link-button" href="../index.html" target="_blank" rel="noreferrer">View My Website</a>
                     </div>
@@ -76,15 +78,15 @@
                     <div class="overview-grid">
                         <article class="overview-card highlight-card">
                             <p class="overview-label">Website</p>
-                            <h3>Maybelin Work</h3>
-                            <p>Your portfolio is online and currently being prepared for easy editing through this page.</p>
+                            <h3>Maybelin Works</h3>
+                            <p>Your portfolio is online and ready for content updates.</p>
                             <span class="status-badge">Online</span>
                         </article>
 
                         <article class="overview-card">
                             <p class="overview-label">Portfolio Projects</p>
-                            <p class="overview-number">2</p>
-                            <p class="overview-note">Fenix and Casa Guadalupe</p>
+                            <p class="overview-number" data-project-count>2</p>
+                            <p class="overview-note" data-project-summary>Fenix and Casa Guadalupe</p>
                         </article>
 
                         <article class="overview-card">
@@ -95,8 +97,8 @@
 
                         <article class="overview-card">
                             <p class="overview-label">Website Editing</p>
-                            <p class="overview-value">Almost Ready</p>
-                            <p class="overview-note">Editing controls are being connected</p>
+                            <p class="overview-value">Ready</p>
+                            <p class="overview-note">Homepage and project text can be edited</p>
                         </article>
                     </div>
                 </section>
@@ -107,18 +109,18 @@
                         <div>
                             <p class="section-kicker">Homepage</p>
                             <h2>What visitors see first</h2>
-                            <p class="section-description"> 
-                                Change the main words, colors, and background
-                                people see when they first visit your website.</p>
+                            <p class="section-description">
+                                Change the main words people see when
+                                they first visit your website.</p>
                         </div>
-                        <span class="coming-soon-badge">Editing Coming Next</span>
+                        <span class="coming-soon-badge">Loading...</span>
                     </div>
-
 
                     <div class="settings-grid">
 
                         <!-- MAIN HOMEPAGE TEXT -->
-                        <article class="dashboard-panel large-panel">
+                        <articleclass="dashboard-panel large-panel">
+
                             <div class="panel-heading">
                                 <div>
                                     <p class="panel-kicker">Main Text</p>
@@ -130,23 +132,24 @@
                             <div class="form-grid">
                                 <div class="admin-field full-field">
                                     <label for="hero-kicker">Small Text Above Your Heading</label>
-                                    <input type="text" id="hero-kicker" value="Freelance Artist" disabled>
+                                    <input type="text" id="hero-kicker" disabled>
                                 </div>
 
                                 <div class="admin-field full-field">
                                     <label for="hero-title">Main Heading</label>
-                                    <textarea id="hero-title" rows="3" disabled>Work that not only looks good but does good.</textarea>
+                                    <textarea id="hero-title" rows="3" disabled></textarea>
                                 </div>
 
                                 <div class="admin-field full-field">
                                     <label for="hero-description">Extra Description</label>
-                                    <textarea id="hero-description" rows="4" placeholder="No extra description is currently shown." disabled></textarea>
+                                    <textarea id="hero-description" rows="4" placeholder="This isn't shown on the homepage right now." disabled
+                                    ></textarea>
                                 </div>
                             </div>
 
                             <div class="panel-footer">
-                                <p>Soon you'll be able to change these words
-                                    here without touching any website code. :></p>
+                                <p>Save your changes here and the
+                                    homepage will update automatically.</p>
                                 <button class="disabled-button" type="button" data-save-settings disabled>Save Homepage Changes</button>
                             </div>
                         </article>
@@ -200,7 +203,6 @@
                                         <span>Accent color</span>
                                     </div>
                                 </div>
-
                             </div>
                         </article>
 
@@ -232,7 +234,8 @@
                                 <div>
                                     <p class="panel-kicker">Homepage</p>
                                     <h3>Background</h3>
-                                </div>                        
+                                </div>
+
                                 <span class="panel-status">Active</span>
                             </div>
 
@@ -244,102 +247,68 @@
                             </div>
 
                             <p class="panel-note">
-                                Your homepage currently uses a looping video
-                                behind the main text.</p>
+                                Your homepage currently uses a looping
+                                video behind the main text.</p>
+
                             <p class="panel-note">
-                                Later, you'll be able to replace it here by
-                                choosing a new video or image.</p>
+                                Replacing the background will be added
+                                later.</p>
                         </article>
                     </div>
                 </section>
 
                 <!-- PROJECTS -->
-                <section= class="dashboard-section" id="projects">
+                <section class="dashboard-section" id="projects">
+
                     <div class="section-heading">
                         <div>
                             <p class="section-kicker">Portfolio</p>
                             <h2>Your Projects</h2>
                             <p class="section-description">
-                                These are the projects visitors can currently
-                                explore on your website.</p>
+                                Change a project's name, description,
+                                year, role, or whether it appears on
+                                the website.</p>
                         </div>
+
                         <button class="disabled-button" type="button" data-add-project disabled>+ Add a Project</button>
                     </div>
 
-                    <div class="project-admin-list">
 
-                        <!-- FENIX -->
-                        <article class="project-admin-card">
-                            <div class="project-admin-number"> 01</div>
+                    <div class="project-admin-list" data-project-list>
+                        <article class="project-admin-card project-loading-card">
+                            <div class="project-admin-number">...</div>
                             <div class="project-admin-content">
-                                <p class="project-admin-type">Educational Publication</p>
-                                <h3>Fenix</h3>
-                                <p>A travel publication featuring
-                                    kid-friendly places across Arizona,
-                                    photography, typography, and design work.</p>
+                                <p class="project-admin-type">Portfolio</p>
+                                <h3>Loading Projects</h3>
+                                <p>Getting your latest project
+                                    information...</p>
                             </div>
-
-                            <div class="project-admin-meta">
-                                <div>
-                                    <span>Images</span>
-                                    <strong>Publication + Process</strong>
-                                </div>
-
-                                <div>
-                                    <span>Website</span>
-                                    <strong>Visible</strong>
-                                </div>
-                            </div>
-
-                            <button class="project-edit-button" type="button" data-project-edit="fenix" disabled>Edit Project</button>
-                        </article>
-
-                        <!-- CASA -->
-                        <article class="project-admin-card">
-                            <div class="project-admin-number">02</div>
-                            <div class="project-admin-content">
-                                <p class="project-admin-type">Educational Branding</p>
-                                <h3>Casa Guadalupe</h3>
-                                <p>A colorful educational brand identity
-                                    inspired by community, Mexican culture,
-                                    Los Angeles, and zarape patterns.</p>
-                            </div>
-
-                            <div class="project-admin-meta">
-                                <div>
-                                    <span>mages</span>
-                                    <strong>Branding + Presentation</strong>
-                                </div>
-
-                                <div>
-                                    <span>Website</span>
-                                    <strong>Visible</strong>
-                                </div>
-                            </div>
-
-                            <button class="project-edit-button" type="button" data-project-edit="casa-guadalupe" disabled>Edit Project</button>
                         </article>
                     </div>
 
-                    <p class="feature-note"> 
-                        Project editing is being set up. Once finished,
-                        you'll be able to change descriptions, add images,
-                        rearrange projects, hide projects, and add new ones
-                        from this page.</p>
+                    <p class="feature-note">
+                        Project text and visibility can now be edited.
+                        Adding new projects and managing their images
+                        will come next.</p>
                 </section>
 
                 <!-- MEDIA -->
-                <section class="dashboard-section"id="media">
+                <section class="dashboard-section" id="media">
                     <div class="section-heading">
                         <div>
-                            <p class="section-kicker">Images &amp; Media</p>
+                            <p class="section-kicker">
+                                Images &amp; Media</p>
                             <h2>Your Website Files</h2>
-                            <p class="section-description">A simple overview of the images and videoscurrently being used on your website.</p>
+                            <p class="section-description">
+                                A simple overview of the images and
+                                videos currently being used on your
+                                website.</p>
                         </div>
+
                         <button class="disabled-button" type="button" data-upload-media disabled>Upload an Image or Video</button>
                     </div>
-                    <div class="media-grid">
 
+                    <div class="media-grid">
                         <!-- LOGO -->
                         <article class="media-card">
                             <div class="media-preview logo-preview">
@@ -355,7 +324,7 @@
                         <!-- PHOTO -->
                         <article class="media-card">
                             <div class="media-preview">
-                                <img src="../assets/may_photo.jpg" alt="Portrait of Maybelin Garcia Romero" loading="lazy">
+                                <img src="../assets/may_photo.jpg" alt="Headshot of Maybelin Garcia Romero" loading="lazy">
                             </div>
 
                             <div class="media-info">
@@ -367,7 +336,7 @@
                         <!-- FENIX -->
                         <article class="media-card">
                             <div class="media-preview">
-                                <img rc="../assets/fenix_pub/page_01.png" alt="Fenix publication cover" loading="lazy">
+                                <img src="../assets/fenix_pub/page_01.png" alt="Fenix publication cover" loading="lazy">
                             </div>
 
                             <div class="media-info">
@@ -390,31 +359,41 @@
 
                         <!-- VIDEO -->
                         <article class="media-card empty-media-card">
-                            <div class="media-empty-icon">▶</div>
+                            <div class="media-preview">
+                                <div class="media-empty-icon">▶</div>
+                            </div>
+
                             <div class="media-info">
                                 <strong>Homepage Video</strong>
                                 <span>Used behind the main homepage text</span>
                             </div>
                         </article>
                     </div>
-
-                    <p class="feature-note">Soon you'll be able to upload and replace these files directly from this page.</p>
+                    <p class="feature-note">
+                        Uploading and replacing website files will
+                        be added later.
+                    </p>
                 </section>
 
                 <!-- ACCOUNT -->
-                <section class="dashboard-section"id="account">
+                <section class="dashboard-section" id="account">
                     <div class="section-heading">
                         <div>
                             <p class="section-kicker">Account</p>
                             <h2>Your Login</h2>
-                            <p class="section-description"> Information about your current website manager session.</p>
+                            <p class="section-description">
+                                Information about your current Website
+                                Manager session.
+                            </p>
                         </div>
                     </div>
 
                     <article class="dashboard-panel account-panel">
                         <div class="account-detail">
                             <span>Signed in as</span>
-                            <strong data-account-username>Loading...</strong>
+                            <strong data-account-username>
+                                Loading...
+                            </strong>
                         </div>
 
                         <div class="account-detail">
@@ -428,7 +407,7 @@
                         </div>
 
                         <div class="account-actions">
-                            <button class="logout-button" type="button" data-logout>Log Out</button>
+                            <button class="logout-button" type="button" data-logout >Log Out</button>
                         </div>
                     </article>
                 </section>
@@ -442,10 +421,80 @@
         </main>
     </div>
 
+    <!-- PROJECT EDITOR -->
+    <dialog class="project-editor-dialog" data-project-editor aria-labelledby="project-editor-title">
+        <form class="project-editor-form" data-project-editor-form>
+            <div class="project-editor-header">
+                <div>
+                    <p class="panel-kicker">Portfolio Project</p>
+                    <h2 id="project-editor-title">Edit Project</h2>
+                    <p>Make your changes below and save when
+                        you're finished.</p>
+                </div>
+                <button class="project-editor-close"  type="button" data-close-project-editor>Close</button>
+            </div>
+
+            <div class="project-editor-body">
+                <input type="hidden" id="project-id">
+                <div class="project-editor-grid">
+                    <div class="admin-field full-field">
+                        <label for="project-title">Project Name</label>
+                        <input type="text" id="project-title" maxlength="200" required>
+                    </div>
+
+                    <div class="admin-field full-field">
+                        <label for="project-kicker">Short Label</label>
+                        <input type="text" id="project-kicker" maxlength="200" placeholder="Example: Educational Publication">
+                        <small>This appears above the project name. </small>
+                    </div>
+
+                    <div class="admin-field full-field">
+                        <label for="project-description">Project Story</label>
+                        <textarea id="project-description" rows="10" maxlength="10000" placeholder="Tell visitors about this project..."></textarea>
+                        <small>Leave a blank line between paragraphs.</small>
+                    </div>
+
+                    <div class="admin-field">
+                        <label for="project-year">Year</label>
+                        <input type="number" id="project-year" min="1900" max="2100" placeholder="Optional">
+                    </div>
+
+                    <div class="admin-field">
+                        <label for="project-role"> My Role</label>
+                        <input type="text" id="project-role" maxlength="500" placeholder="Example: Editorial Design">
+                    </div>
+                </div>
+
+                <label class="project-visibility-option">
+                    <input type="checkbox" id="project-visible">
+                    <span>
+                        <strong>Show this project on the website</strong>
+                        <small>Turn this off if you want to temporarily
+                            hide the project from visitors.</small>
+                    </span>
+                </label>
+
+                <div class="project-editor-note">
+                    <strong>Images stay the same for now.</strong>
+                    <span>Image uploading and rearranging will be added
+                        separately so it's easy to use.</span>
+                </div>
+            </div>
+
+            <div class="project-editor-actions">
+                <button class="secondary-button" type="button" data-close-project-editor>Cancel</button>
+                <button class="project-save-button" type="submit" data-save-project>Save Project</button>
+            </div>
+        </form>
+    </dialog>
+
     <!-- MESSAGE -->
     <div
-        class="admin-toast" data-admin-toast role="status" aria-live="polite">
-    </div>
+        class="admin-toast"
+        data-admin-toast
+        role="status"
+        aria-live="polite"
+    ></div>
 
     <script src="./admin-dashboard.js"></script>
 </body>
