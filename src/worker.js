@@ -1,3 +1,10 @@
+import {
+    handleGetMedia,
+    handleUploadProjectMedia,
+    handleDeleteProjectMedia,
+    handleReorderProjectMedia
+} from "./media.js";
+
 const COOKIE_NAME = "maybelin_admin";
 const SESSION_DURATION = 60 * 60 * 8;
 
@@ -1232,6 +1239,24 @@ export default {
     async fetch(request, env) {
         const url = new URL(request.url);
 
+        /* PUBLIC MEDIA */
+
+        if (
+            url.pathname.startsWith(
+                "/media/"
+            )
+        ) {
+            return handleGetMedia(
+                request,
+                env,
+                url.pathname.slice(
+                    "/media/".length
+                )
+            );
+        }
+
+        /* ADMIN LOGIN */
+
         if (
             url.pathname ===
             "/api/admin/login"
@@ -1241,6 +1266,8 @@ export default {
                 env
             );
         }
+
+        /* ADMIN SESSION */
 
         if (
             url.pathname ===
@@ -1252,12 +1279,16 @@ export default {
             );
         }
 
+        /* ADMIN LOGOUT */
+
         if (
             url.pathname ===
             "/api/admin/logout"
         ) {
             return handleLogout(request);
         }
+
+        /* SITE SETTINGS */
 
         if (
             url.pathname ===
@@ -1269,6 +1300,8 @@ export default {
             );
         }
 
+        /* UPDATE SITE SETTINGS */
+
         if (
             url.pathname ===
             "/api/admin/settings"
@@ -1278,6 +1311,8 @@ export default {
                 env
             );
         }
+
+        /* PUBLIC PROJECTS */
 
         if (
             url.pathname ===
@@ -1289,6 +1324,8 @@ export default {
             );
         }
 
+        /* ADMIN PROJECTS */
+
         if (
             url.pathname ===
             "/api/admin/projects"
@@ -1298,6 +1335,90 @@ export default {
                 env
             );
         }
+
+        /* REORDER PROJECT IMAGES */
+
+        const projectMediaOrderMatch =
+            url.pathname.match(
+                /^\/api\/admin\/projects\/(\d+)\/media\/order$/
+            );
+
+        if (projectMediaOrderMatch) {
+            const session =
+                await requireAdmin(
+                    request,
+                    env
+                );
+
+            if (!session) {
+                return json({
+                    error: "Unauthorized."
+                }, 401);
+            }
+
+            return handleReorderProjectMedia(
+                request,
+                env,
+                projectMediaOrderMatch[1]
+            );
+        }
+
+        /* UPLOAD PROJECT IMAGE */
+
+        const projectMediaMatch =
+            url.pathname.match(
+                /^\/api\/admin\/projects\/(\d+)\/media$/
+            );
+
+        if (projectMediaMatch) {
+            const session =
+                await requireAdmin(
+                    request,
+                    env
+                );
+
+            if (!session) {
+                return json({
+                    error: "Unauthorized."
+                }, 401);
+            }
+
+            return handleUploadProjectMedia(
+                request,
+                env,
+                projectMediaMatch[1],
+                session.username
+            );
+        }
+
+        /* DELETE PROJECT IMAGE */
+
+        const mediaDeleteMatch =
+            url.pathname.match(
+                /^\/api\/admin\/media\/(\d+)$/
+            );
+
+        if (mediaDeleteMatch) {
+            const session =
+                await requireAdmin(
+                    request,
+                    env
+                );
+
+            if (!session) {
+                return json({
+                    error: "Unauthorized."
+                }, 401);
+            }
+
+            return handleDeleteProjectMedia(
+                request,
+                env,
+                mediaDeleteMatch[1]
+            );
+        }
+
+        /* UPDATE PROJECT */
 
         const projectMatch =
             url.pathname.match(
@@ -1312,6 +1433,8 @@ export default {
             );
         }
 
+        /* PROTECTED ADMIN PAGES */
+
         if (
             url.pathname === "/admin" ||
             url.pathname.startsWith(
@@ -1323,6 +1446,8 @@ export default {
                 env
             );
         }
+
+        /* STATIC WEBSITE */
 
         return env.ASSETS.fetch(request);
     }
