@@ -1,23 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Hind:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
 :root {
-    --background: #fff7ef;
+    --dark-green: #2A3F38;
+    --lime: #8DF688;
+    --purple: #562F54;
+    --charcoal: #57585D;
+    --pink: #F650BD;
 
-    --text: #b1125b;
-    --muted: #5f7f58;
-    --line: #d94f8a;
-    --panel: #fff2f6;
-    --accent-magenta: #c2185b;
-    --accent-pink: #e65f9e;
-    --accent-green: #5f8f54;
-    --accent-lime: #9bbb59;
-    --accent-yellow: #f2c94c;
-    --header-footer: #4b1734;
-    --dark-plum: #351126;
-    --light-text: #fff7ef;
-    --soft-pink: #f4c9d9;
-    --font-display: "Cardo", Georgia, serif;
-    --font-body: "Hind", Arial, sans-serif;
+    --background: #57585D;
+    --text: #2A3F38;
+    --muted: #57585D;
+    --line: #F650BD;
+    --panel: #FFFFFF;
+
+    --accent-magenta: #F650BD;
+    --accent-pink: #F650BD;
+    --accent-green: #8DF688;
+    --accent-lime: #8DF688;
+
+    --header-footer: #2A3F38;
+    --dark-plum: #562F54;
+
+    --light-text: #FFFFFF;
+    --soft-pink: #F650BD;
+
+    --font-display: "Playfair Display", Georgia, serif;
+    --font-body: "Lato", Arial, sans-serif
 }
 
 * {
@@ -63,6 +71,7 @@ button:hover {
     color: var(--accent-green);
 }
 
+
 /* SKIP LINK */
 
 .skip-link {
@@ -70,8 +79,8 @@ button:hover {
     top: 0;
     left: 0;
     padding: 0.75rem 1rem;
-    background: var(--accent-magenta);
-    color: #ffffff;
+    background: var(--pink);
+    color: var(--dark-green);
     z-index: 500;
     transform: translateY(-100%);
 }
@@ -79,6 +88,7 @@ button:hover {
 .skip-link:focus {
     transform: translateY(0);
 }
+
 
 /* HEADER */
 
@@ -92,14 +102,18 @@ button:hover {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1.25rem 1.5rem;
-    background: var(--header-footer);
+    padding: 1.15rem 1.5rem;
+    background: rgba(42, 63, 56, 0.97);
     color: var(--light-text);
-    border-bottom: 2px solid var(--accent-magenta);
+    border-bottom: 2px solid var(--pink);
+    box-shadow: 0 8px 30px rgba(42, 63, 56, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     font-family: var(--font-body);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     pointer-events: none;
 }
 
@@ -112,20 +126,20 @@ button:hover {
 .wordmark {
     color: var(--light-text);
     font-family: var(--font-display);
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 1.35rem;
+    font-weight: 400;
     text-transform: none;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
 }
 
 .wordmark:hover {
-    color: var(--accent-lime);
+    color: var(--lime);
 }
 
 .site-nav {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1.3rem;
 }
 
 .nav-button,
@@ -148,7 +162,7 @@ button:hover {
     content: "";
     position: absolute;
     right: 0;
-    bottom: -0.25rem;
+    bottom: -0.3rem;
     left: 0;
     height: 1px;
     background: currentColor;
@@ -169,8 +183,9 @@ button:hover {
 
 .site-nav a:hover,
 .site-nav button:hover {
-    color: var(--accent-lime);
+    color: var(--lime);
 }
+
 
 /* VIDEO BACKGROUND */
 
@@ -190,13 +205,15 @@ button:hover {
     background:
         linear-gradient(
             135deg,
-            rgba(194, 24, 91, 0.18),
-            rgba(95, 143, 84, 0.14)
+            rgba(86, 47, 84, 0.28),
+            rgba(42, 63, 56, 0.18) 45%,
+            rgba(246, 80, 189, 0.12)
         ),
-        rgba(0, 0, 0, 0.12);
+        rgba(42, 63, 56, 0.16);
     z-index: -1;
     pointer-events: none;
 }
+
 
 /* HERO */
 
@@ -211,7 +228,6 @@ button:hover {
     padding: 6.5rem 2rem;
     text-align: center;
     z-index: 5;
-    transform: translateY(0);
     pointer-events: none;
 }
 
@@ -226,17 +242,22 @@ button:hover {
 
 .hero-text-box {
     position: relative;
-    width: min(68vw, 980px);
+    width: min(70vw, 980px);
     margin: 0 auto;
-    padding: 32px 48px;
-    background: rgba(75, 23, 52, 0.78);
-    border: 1px solid rgba(230, 95, 158, 0.55);
-    border-radius: 14px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    padding: 38px 52px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(86, 47, 84, 0.90),
+            rgba(73, 47, 72, 0.88)
+        );
+    border: 1px solid rgba(246, 80, 189, 0.60);
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-shadow:
-        0 20px 50px rgba(45, 15, 35, 0.35),
-        0 0 30px rgba(194, 24, 91, 0.08);
+        0 26px 70px rgba(42, 63, 56, 0.35),
+        0 0 40px rgba(246, 80, 189, 0.12);
     text-align: center;
     pointer-events: auto;
 }
@@ -244,39 +265,37 @@ button:hover {
 .hero-text-box::before {
     content: "";
     position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 35px;
-    height: 35px;
-    border-top: 2px solid rgba(155, 187, 89, 0.8);
-    border-top-color: var(--accent-lime);
-    border-left: 2px solid rgba(155, 187, 89, 0.8);
-    border-left-color: var(--accent-lime);
-    border-radius: 4px 0 0 0;
+    top: 12px;
+    left: 12px;
+    width: 38px;
+    height: 38px;
+    border-top: 2px solid var(--lime);
+    border-left: 2px solid var(--lime);
+    border-radius: 5px 0 0 0;
     pointer-events: none;
 }
 
 .hero-text-box::after {
     content: "";
     position: absolute;
-    right: 10px;
-    bottom: 10px;
-    width: 35px;
-    height: 35px;
-    border-right: 2px solid rgba(230, 95, 158, 0.8);
-    border-bottom: 2px solid rgba(230, 95, 158, 0.8);
-    border-radius: 0 0 4px 0;
+    right: 12px;
+    bottom: 12px;
+    width: 38px;
+    height: 38px;
+    border-right: 2px solid var(--pink);
+    border-bottom: 2px solid var(--pink);
+    border-radius: 0 0 5px 0;
     pointer-events: none;
 }
 
 .hero-kicker {
-    margin: 0 0 0.75rem;
-    color: var(--accent-lime);
+    margin: 0 0 0.8rem;
+    color: var(--lime);
     font-family: var(--font-body);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
 }
 
 .hero-title {
@@ -284,10 +303,10 @@ button:hover {
     margin: 0 auto;
     color: var(--light-text);
     font-family: var(--font-display);
-    font-size: clamp(3rem, 6vw, 6.4rem);
+    font-size: clamp(3.2rem, 6vw, 6.7rem);
     font-weight: 400;
-    line-height: 0.95;
-    letter-spacing: -0.025em;
+    line-height: 0.98;
+    letter-spacing: 0.01em;
     text-align: center;
 }
 
@@ -297,21 +316,21 @@ button:hover {
     flex-direction: column;
     align-items: center;
     gap: 1rem;
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(155, 187, 89, 0.9);
+    margin-top: 1.6rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(141, 246, 136, 0.72);
     text-align: center;
     pointer-events: auto;
 }
 
 .hero-description {
-    max-width: 600px;
+    max-width: 650px;
     margin: 0 auto;
-    color: #ffeef5;
+    color: rgba(255, 255, 255, 0.9);
     font-family: var(--font-body);
-    font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+    font-size: clamp(0.9rem, 1.15vw, 1.05rem);
     font-weight: 400;
-    line-height: 1.5;
+    line-height: 1.7;
     text-align: center;
 }
 
@@ -321,20 +340,21 @@ button:hover {
     padding: 0.6rem 1rem;
     border: 0;
     background: none;
-    color: var(--accent-pink);
+    color: var(--pink);
     white-space: nowrap;
     font-family: var(--font-body);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08rem;
+    letter-spacing: 0.1em;
     cursor: pointer;
     pointer-events: auto;
 }
 
 .text-button:hover {
-    color: var(--accent-lime);
+    color: var(--lime);
 }
+
 
 /* FOOTER */
 
@@ -348,14 +368,16 @@ button:hover {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1rem 1.5rem;
-    background: var(--header-footer);
-    color: #f8dce7;
-    border-top: 2px solid var(--accent-green);
+    padding: 0.95rem 1.5rem;
+    background: rgba(42, 63, 56, 0.97);
+    color: rgba(255, 255, 255, 0.82);
+    border-top: 2px solid var(--lime);
+    box-shadow: 0 -8px 30px rgba(42, 63, 56, 0.15);
     font-family: var(--font-body);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.09em;
     pointer-events: none;
 }
 
@@ -364,13 +386,14 @@ button:hover {
 }
 
 .site-footer a {
-    color: var(--accent-lime);
+    color: var(--lime);
     pointer-events: auto;
 }
 
 .site-footer a:hover {
-    color: var(--accent-pink);
+    color: var(--pink);
 }
+
 
 /* DIALOGS */
 
@@ -389,9 +412,9 @@ dialog {
 }
 
 dialog::backdrop {
-    background: rgba(53, 17, 38, 0.65);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: rgba(42, 63, 56, 0.75);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 dialog[open] {
@@ -417,38 +440,42 @@ dialog[open] {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 2px solid var(--accent-magenta);
-    background: rgba(244, 201, 217, 0.97);
-    color: var(--header-footer);
+    padding: 1.15rem 1.5rem;
+    border-bottom: 2px solid var(--pink);
+    background: rgba(42, 63, 56, 0.98);
+    color: var(--light-text);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     font-family: var(--font-body);
-    font-size: 0.78rem;
+    font-size: 0.72rem;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.08rem;
+    letter-spacing: 0.1em;
 }
 
 .dialog-toolbar p {
     margin: 0;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .dialog-close {
-    color: var(--accent-magenta);
+    color: var(--lime);
     font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08rem;
+    letter-spacing: 0.1em;
 }
 
 .dialog-close:hover {
-    color: var(--accent-green);
+    color: var(--pink);
 }
+
 
 /* PORTFOLIO */
 
 .portfolio-dialog-content {
-    padding: clamp(2rem, 5vw, 5rem) 1.5rem 6rem;
+    padding: clamp(2.5rem, 5vw, 5.5rem) 1.5rem 6rem;
 }
 
 .portfolio-intro {
@@ -456,32 +483,34 @@ dialog[open] {
     grid-template-columns:
         minmax(0, 1.5fr)
         minmax(260px, 0.5fr);
-    gap: 2rem;
-    margin-bottom: 4rem;
+    gap: 3rem;
+    margin-bottom: 4.5rem;
 }
 
 .portfolio-intro h2 {
-    max-width: 800px;
+    max-width: 850px;
     margin: 0;
-    color: var(--accent-magenta);
+    color: var(--purple);
     font-family: var(--font-display);
-    font-size: clamp(2.6rem, 7vw, 7rem);
+    font-size: clamp(3.2rem, 7vw, 7.5rem);
     font-weight: 400;
     line-height: 0.95;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.01em;
 }
 
 .portfolio-intro p {
+    max-width: 500px;
     margin: 0;
-    color: var(--muted);
+    color: var(--charcoal);
     font-family: var(--font-body);
-    line-height: 1.55;
+    font-size: 0.95rem;
+    line-height: 1.75;
 }
 
 .project-list {
     display: grid;
     gap: 0;
-    border-top: 2px solid var(--accent-green);
+    border-top: 3px solid var(--lime);
 }
 
 .project {
@@ -489,24 +518,29 @@ dialog[open] {
     grid-template-columns:
         minmax(0, 1.4fr)
         minmax(270px, 0.6fr);
-    gap: 2rem;
-    padding: 2rem 0 4rem;
-    border-bottom: 1px solid rgba(194, 24, 91, 0.35);
+    gap: clamp(2rem, 5vw, 5rem);
+    padding: 3rem 0 5rem;
+    border-bottom: 1px solid rgba(86, 47, 84, 0.25);
 }
 
 .project-gallery {
     display: grid;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .project-gallery img {
     display: block;
     width: 100%;
     min-height: 280px;
-    background: var(--soft-pink);
+    background: var(--purple);
     object-fit: cover;
-    border: 1px solid rgba(194, 24, 91, 0.18);
-    border-radius: 10px;
+    border: 1px solid rgba(86, 47, 84, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(42, 63, 56, 0.08);
+}
+
+.project-gallery img:first-child {
+    min-height: 380px;
 }
 
 .project-info {
@@ -517,97 +551,169 @@ dialog[open] {
 
 .project-number,
 .project-kicker {
-    margin: 0 0 0.75rem;
-    color: var(--accent-green);
+    margin: 0 0 0.8rem;
+    color: var(--dark-green);
     font-family: var(--font-body);
-    font-size: 0.78rem;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08rem;
+    letter-spacing: 0.13em;
+}
+
+.project-kicker {
+    color: var(--pink);
 }
 
 .project-info h3 {
-    margin: 0 0 1rem;
-    color: var(--accent-magenta);
+    margin: 0 0 1.25rem;
+    color: var(--purple);
     font-family: var(--font-display);
-    font-size: clamp(2rem, 4vw, 4rem);
+    font-size: clamp(2.5rem, 4.5vw, 4.8rem);
     font-weight: 400;
     line-height: 1;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.01em;
 }
 
 .project-description {
     margin: 0;
-    color: var(--muted);
+    color: var(--charcoal);
     font-family: var(--font-body);
-    line-height: 1.55;
+    font-size: 0.92rem;
+    line-height: 1.75;
+}
+
+.project-description p {
+    margin: 0 0 1rem;
+}
+
+.project-description p:last-child {
+    margin-bottom: 0;
+}
+
+.project-description strong {
+    color: var(--purple);
+    font-weight: 600;
 }
 
 .project-meta {
     display: grid;
-    gap: 0.75rem;
+    gap: 0.8rem;
     margin: 2rem 0 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(141, 246, 136, 0.8);
     font-family: var(--font-body);
+    font-size: 0.82rem;
 }
 
 .project-meta div {
     display: grid;
-    grid-template-columns: 4rem 1fr;
+    grid-template-columns: 5rem 1fr;
     gap: 1rem;
 }
 
 .project-meta dt {
-    color: var(--accent-green);
+    color: var(--dark-green);
     font-weight: 700;
 }
 
 .project-meta dd {
     margin: 0;
-    color: var(--header-footer);
+    color: var(--charcoal);
 }
+
 
 /* ABOUT */
 
 .about-content {
     display: grid;
     grid-template-columns:
-        minmax(0, 1.25fr)
-        minmax(280px, 0.75fr);
-
-    gap: 3rem;
-    padding: clamp(2rem, 7vw, 7rem) 1.5rem;
+        minmax(0, 1.1fr)
+        minmax(320px, 0.9fr);
+    gap: clamp(3rem, 8vw, 8rem);
+    padding: clamp(3rem, 7vw, 7rem) 1.5rem;
 }
 
 .about-content h2 {
     margin: 0;
-    color: var(--accent-magenta);
+    color: var(--purple);
     font-family: var(--font-display);
-    font-size: clamp(2.6rem, 7vw, 7rem);
+    font-size: clamp(3.2rem, 7vw, 7.5rem);
     font-weight: 400;
     line-height: 0.95;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.01em;
 }
 
 .about-copy {
-    color: var(--muted);
+    color: var(--charcoal);
     font-family: var(--font-body);
-    line-height: 1.6;
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+.about-copy p {
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+}
+
+.about-copy p:first-child::first-letter {
+    float: left;
+    margin: 0.08em 0.12em 0 0;
+    color: var(--pink);
+    font-family: var(--font-display);
+    font-size: 4.5rem;
+    line-height: 0.7;
+}
+
+.about-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.about-photo {
+    width: 100%;
+    max-width: 430px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    border: 1px solid rgba(246, 80, 189, 0.45);
+    border-radius: 16px;
+    background: var(--purple);
+    box-shadow: 0 20px 45px rgba(42, 63, 56, 0.14);
+}
+
+.about-photo img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+}
+
+.about-photo:hover img {
+    transform: scale(1.015);
+}
+
+.about-photo img {
+    transition: transform 300ms ease;
 }
 
 .contact-list {
     display: grid;
     gap: 1rem;
-    margin-top: 2rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--lime);
     font-family: var(--font-body);
+    font-size: 0.85rem;
 }
 
 .contact-list div {
     display: grid;
     grid-template-columns: 5rem 1fr;
+    gap: 1rem;
 }
 
 .contact-list dt {
-    color: var(--accent-green);
+    color: var(--dark-green);
     font-weight: 700;
 }
 
@@ -616,16 +722,18 @@ dialog[open] {
 }
 
 .contact-list a {
-    color: var(--accent-magenta);
+    color: var(--pink);
+    font-weight: 500;
 }
 
 .contact-list a:hover {
-    color: var(--accent-green);
+    color: var(--dark-green);
 }
 
 body.dialog-open {
     overflow: hidden;
 }
+
 
 /* ADMIN LOGIN */
 
@@ -635,15 +743,15 @@ body.dialog-open {
     background:
         radial-gradient(
             circle at top left,
-            rgba(194, 24, 91, 0.38),
+            rgba(246, 80, 189, 0.24),
             transparent 38%
         ),
         radial-gradient(
             circle at bottom right,
-            rgba(95, 143, 84, 0.30),
-            transparent 40%
+            rgba(141, 246, 136, 0.18),
+            transparent 42%
         ),
-        var(--dark-plum);
+        var(--dark-green);
     color: var(--light-text);
     font-family: var(--font-body);
 }
@@ -658,13 +766,15 @@ body.dialog-open {
 
 .admin-login-card {
     width: min(100%, 440px);
-    padding: 2.5rem;
-    background: rgba(75, 23, 52, 0.82);
-    border: 1px solid rgba(230, 95, 158, 0.55);
-    border-radius: 16px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 30px 80px rgba(25, 5, 18, 0.45);
+    padding: 2.6rem;
+    background: rgba(86, 47, 84, 0.87);
+    border: 1px solid rgba(246, 80, 189, 0.55);
+    border-radius: 18px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow:
+        0 30px 80px rgba(20, 30, 26, 0.45),
+        0 0 40px rgba(246, 80, 189, 0.08);
 }
 
 .admin-login-heading {
@@ -673,29 +783,30 @@ body.dialog-open {
 
 .admin-login-kicker {
     margin: 0 0 0.75rem;
-    color: var(--accent-lime);
+    color: var(--lime);
     font-family: var(--font-body);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.15em;
 }
 
 .admin-login-heading h1 {
     margin: 0;
     color: var(--light-text);
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-size: clamp(3rem, 7vw, 4.5rem);
     font-weight: 400;
     line-height: 1;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.02em;
 }
 
 .admin-login-heading > p:last-child {
     margin: 1rem 0 0;
-    color: #f1cadb;
+    color: rgba(255, 255, 255, 0.78);
     font-family: var(--font-body);
-    line-height: 1.5;
+    font-size: 0.9rem;
+    line-height: 1.6;
 }
 
 .admin-login-form {
@@ -710,31 +821,33 @@ body.dialog-open {
 }
 
 .admin-form-group label {
-    color: #f8dce7;
-    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.68rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
 }
 
 .admin-form-group input {
     width: 100%;
-    padding: 0.9rem 1rem;
-    border: 1px solid rgba(230, 95, 158, 0.45);
-    border-radius: 8px;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(141, 246, 136, 0.32);
+    border-radius: 9px;
     outline: none;
     background: rgba(255, 255, 255, 0.07);
     color: var(--light-text);
     font-family: var(--font-body);
-    font-size: 1rem;
+    font-size: 0.95rem;
     transition:
         border-color 180ms ease,
-        background 180ms ease;
+        background 180ms ease,
+        box-shadow 180ms ease;
 }
 
 .admin-form-group input:focus {
-    border-color: var(--accent-lime);
-    background: rgba(255, 255, 255, 0.11);
+    border-color: var(--lime);
+    background: rgba(255, 255, 255, 0.10);
+    box-shadow: 0 0 0 3px rgba(141, 246, 136, 0.10);
 }
 
 .admin-password-wrapper {
@@ -753,88 +866,100 @@ body.dialog-open {
     padding: 0;
     border: 0;
     background: none;
-    color: var(--accent-lime);
+    color: var(--lime);
     font-family: var(--font-body);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
 
 .admin-password-toggle:hover {
-    color: var(--accent-pink);
+    color: var(--pink);
 }
 
 .admin-login-submit {
     width: 100%;
-    padding: 0.95rem 1rem;
-    border: 1px solid var(--accent-magenta);
-    border-radius: 8px;
-    background: var(--accent-magenta);
-    color: #ffffff;
+    padding: 1rem;
+    border: 1px solid var(--pink);
+    border-radius: 9px;
+    background: var(--pink);
+    color: var(--dark-green);
     font-family: var(--font-body);
+    font-size: 0.78rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     transition:
         background 180ms ease,
         color 180ms ease,
-        border-color 180ms ease;
+        border-color 180ms ease,
+        transform 180ms ease;
 }
 
 .admin-login-submit:hover {
-    border-color: var(--accent-green);
-    background: var(--accent-green);
-    color: #ffffff;
+    border-color: var(--lime);
+    background: var(--lime);
+    color: var(--dark-green);
+    transform: translateY(-1px);
 }
 
 .admin-login-submit:disabled {
     opacity: 0.6;
     cursor: wait;
+    transform: none;
 }
 
 .admin-login-status {
     min-height: 1.25rem;
     margin: 0;
-    color: #ffb6c9;
-    font-size: 0.85rem;
+    color: var(--pink);
+    font-size: 0.82rem;
 }
 
 .admin-login-status.success {
-    color: #b7e4a5;
+    color: var(--lime);
 }
 
 .admin-login-footer {
     margin-top: 2rem;
     padding-top: 1.25rem;
-    border-top: 1px solid rgba(155, 187, 89, 0.35);
+    border-top: 1px solid rgba(141, 246, 136, 0.3);
     text-align: center;
 }
 
 .admin-login-footer a {
-    color: var(--accent-lime);
+    color: var(--lime);
     font-family: var(--font-body);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.09em;
 }
 
 .admin-login-footer a:hover {
-    color: var(--accent-pink);
+    color: var(--pink);
 }
+
 
 /* TABLET */
 
 @media (max-width: 1000px) {
     .hero-text-box {
-        width: min(85vw, 900px);
+        width: min(86vw, 900px);
     }
 
     .hero-title {
         font-size: clamp(3rem, 8vw, 6rem);
     }
+
+    .portfolio-intro {
+        grid-template-columns:
+            minmax(0, 1.25fr)
+            minmax(240px, 0.75fr);
+    }
 }
+
 
 /* MOBILE */
 
@@ -847,7 +972,7 @@ body.dialog-open {
     }
 
     .wordmark {
-        font-size: 0.95rem;
+        font-size: 1.2rem;
     }
 
     .site-nav {
@@ -859,7 +984,7 @@ body.dialog-open {
 
     .site-nav a,
     .site-nav button {
-        font-size: 0.68rem;
+        font-size: 0.65rem;
     }
 
     .hero {
@@ -871,7 +996,6 @@ body.dialog-open {
         align-items: center;
         justify-content: center;
         padding: 7.5rem 1rem 5.5rem;
-        transform: translateY(0px);
         text-align: center;
         z-index: 5;
         pointer-events: none;
@@ -891,29 +1015,28 @@ body.dialog-open {
         max-width: 620px;
         max-height: calc(100vh - 14rem);
         margin: 0 auto;
-        padding: 24px 20px;
-        border-radius: 12px;
+        padding: 26px 20px;
+        border-radius: 14px;
         overflow-y: auto;
         pointer-events: auto;
     }
 
     .hero-text-box::before,
     .hero-text-box::after {
-        width: 24px;
-        height: 24px;
+        width: 25px;
+        height: 25px;
     }
 
     .hero-kicker {
         margin-bottom: 0.65rem;
-        font-size: 0.68rem;
+        font-size: 0.64rem;
     }
 
     .hero-title {
         max-width: 100%;
         margin: 0 auto;
-        font-size: clamp(2.25rem, 11vw, 4.5rem);
-        line-height: 0.98;
-        letter-spacing: -0.015em;
+        font-size: clamp(2.6rem, 12vw, 4.8rem);
+        line-height: 1;
         text-align: center;
     }
 
@@ -927,14 +1050,14 @@ body.dialog-open {
     .hero-description {
         max-width: 100%;
         margin: 0 auto;
-        font-size: 0.86rem;
-        line-height: 1.4;
+        font-size: 0.82rem;
+        line-height: 1.5;
         text-align: center;
     }
 
     .text-button {
         align-self: center;
-        font-size: 0.7rem;
+        font-size: 0.68rem;
     }
 
     .site-footer {
@@ -942,7 +1065,7 @@ body.dialog-open {
         flex-wrap: wrap;
         justify-content: center;
         gap: 0.25rem 0.8rem;
-        font-size: 0.62rem;
+        font-size: 0.6rem;
         text-align: center;
     }
 
@@ -965,16 +1088,18 @@ body.dialog-open {
     }
 
     .portfolio-intro {
-        margin-bottom: 2.5rem;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
     }
 
     .portfolio-intro h2,
     .about-content h2 {
-        font-size: clamp(2.4rem, 12vw, 4.5rem);
+        font-size: clamp(3rem, 14vw, 5rem);
     }
 
     .project {
         gap: 1.5rem;
+        padding: 2.5rem 0 3.5rem;
     }
 
     .project-info {
@@ -982,14 +1107,19 @@ body.dialog-open {
         order: -1;
     }
 
-    .project-gallery img {
-        min-height: 200px;
+    .project-gallery img,
+    .project-gallery img:first-child {
+        min-height: 220px;
     }
 
     .contact-list div,
     .project-meta div {
         grid-template-columns: 1fr;
         gap: 0.25rem;
+    }
+
+    .about-content {
+        gap: 2rem;
     }
 
     .admin-login-main {
@@ -1001,6 +1131,7 @@ body.dialog-open {
     }
 }
 
+
 /* SMALL PHONES */
 
 @media (max-width: 480px) {
@@ -1009,7 +1140,7 @@ body.dialog-open {
     }
 
     .wordmark {
-        font-size: 0.88rem;
+        font-size: 1.05rem;
     }
 
     .site-nav {
@@ -1018,30 +1149,29 @@ body.dialog-open {
 
     .site-nav a,
     .site-nav button {
-        font-size: 0.62rem;
+        font-size: 0.6rem;
     }
 
     .hero {
         padding: 7rem 0.75rem 5rem;
-        transform: translateY(0px);
     }
 
     .hero-text-box {
         max-height: calc(100vh - 13rem);
-        padding: 20px 16px;
+        padding: 22px 16px;
     }
 
     .hero-title {
-        font-size: clamp(2rem, 10.5vw, 3.5rem);
+        font-size: clamp(2.35rem, 11vw, 3.8rem);
     }
 
     .hero-description {
-        font-size: 0.8rem;
+        font-size: 0.77rem;
     }
 
     .site-footer {
         padding: 0.6rem 0.75rem;
-        font-size: 0.56rem;
+        font-size: 0.54rem;
     }
 
     .admin-login-card {
@@ -1049,6 +1179,6 @@ body.dialog-open {
     }
 
     .admin-login-heading h1 {
-        font-size: 2.6rem;
+        font-size: 3rem;
     }
 }
