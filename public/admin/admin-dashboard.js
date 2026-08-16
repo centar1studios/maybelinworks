@@ -417,11 +417,19 @@ document.addEventListener("DOMContentLoaded", () => {
     function populateSettings(settings) {
         currentSettings = settings;
 
-        heroKicker.value = settings.hero_kicker || "";
-        heroTitle.value = settings.hero_title || "";
-        heroDescription.value = "";
-        heroDescription.placeholder =
-            "This isn't shown on the homepage right now.";
+        if (heroKicker) {
+            heroKicker.value = settings.hero_kicker || "";
+        }
+
+        if (heroTitle) {
+            heroTitle.value = settings.hero_title || "";
+        }
+
+        if (heroDescription) {
+            heroDescription.value = "";
+            heroDescription.placeholder =
+                "This isn't shown on the homepage right now.";
+        }
 
         const savedDisplayFont = settings.display_font || "Playfair Display";
         const savedBodyFont = settings.body_font || "Lato";
@@ -429,16 +437,40 @@ document.addEventListener("DOMContentLoaded", () => {
         makeSureFontExists(displayFont, savedDisplayFont);
         makeSureFontExists(bodyFont, savedBodyFont);
 
-        displayFont.value = savedDisplayFont;
-        bodyFont.value = savedBodyFont;
+        if (displayFont) {
+            displayFont.value = savedDisplayFont;
+        }
+
+        if (bodyFont) {
+            bodyFont.value = savedBodyFont;
+        }
+
         updateFontPreviews();
 
-        aboutKicker.value = settings.about_kicker || "";
-        aboutTitle.value = settings.about_title || "";
-        aboutBio.value = settings.about_bio || "";
-        contactEmail.value = settings.contact_email || "";
-        contactPhone.value = settings.contact_phone || "";
-        instagramUrl.value = settings.instagram_url || "";
+        if (aboutKicker) {
+            aboutKicker.value = settings.about_kicker || "";
+        }
+
+        if (aboutTitle) {
+            aboutTitle.value = settings.about_title || "";
+        }
+
+        if (aboutBio) {
+            aboutBio.value = settings.about_bio || "";
+        }
+
+        if (contactEmail) {
+            contactEmail.value = settings.contact_email || "";
+        }
+
+        if (contactPhone) {
+            contactPhone.value = settings.contact_phone || "";
+        }
+
+        if (instagramUrl) {
+            instagramUrl.value = settings.instagram_url || "";
+        }
+
         setAboutPhotoPreview(settings.about_photo_key);
     }
 
