@@ -210,8 +210,9 @@ async function createSession(username, env) {
         expires
     });
 
-    const payload =
-        base64UrlEncodeText(sessionData);
+    const payload = base64UrlEncodeText(
+        sessionData
+    );
 
     const signature = await signPayload(
         payload,
@@ -358,6 +359,40 @@ function clampNumber(
         Math.max(number, min),
         max
     );
+}
+
+function cleanYear(value, fallback) {
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return null;
+    }
+
+    const year = Number(value);
+
+    if (
+        !Number.isInteger(year) ||
+        year < 1900 ||
+        year > 2100
+    ) {
+        return fallback;
+    }
+
+    return year;
+}
+
+function cleanBoolean(value, fallback) {
+    if (value === true || value === 1) {
+        return 1;
+    }
+
+    if (value === false || value === 0) {
+        return 0;
+    }
+
+    return fallback;
 }
 
 
@@ -787,7 +822,91 @@ async function handleUpdateSettings(
 }
 
 
-/* PROJECTS */
+/* PROJECT QUERY */
+
+async function getProjectsFromDatabase(
+    env,
+    publishedOnly = true
+) {
+    const whereClause = publishedOnly
+        ? "WHERE is_published = 1"
+        : "";
+
+    const projectResult = await env.DB
+        .prepare(`
+            SELECT
+                id,
+                slug,
+                title,
+                kicker,
+                description,
+                year,
+                role,
+                sort_order,
+                is_published,
+                created_at,
+                updated_at
+            FROM projects
+            ${whereClause}
+            ORDER BY sort_order ASC, id ASC
+        `)
+        .all();
+
+    const mediaWhereClause = publishedOnly
+        ? "WHERE p.is_published = 1"
+        : "";
+
+    const mediaResult = await env.DB
+        .prepare(`
+            SELECT
+                pm.id,
+                pm.project_id,
+                pm.r2_key,
+                pm.alt_text,
+                pm.sort_order
+            FROM project_media AS pm
+            INNER JOIN projects AS p
+                ON p.id = pm.project_id
+            ${mediaWhereClause}
+            ORDER BY
+                pm.project_id ASC,
+                pm.sort_order ASC,
+                pm.id ASC
+        `)
+        .all();
+
+    const mediaByProject = new Map();
+
+    for (const media of mediaResult.results) {
+        if (
+            !mediaByProject.has(
+                media.project_id
+            )
+        ) {
+            mediaByProject.set(
+                media.project_id,
+                []
+            );
+        }
+
+        mediaByProject
+            .get(media.project_id)
+            .push(media);
+    }
+
+    return projectResult.results.map(
+        project => ({
+            ...project,
+            media:
+                mediaByProject.get(
+                    project.id
+                ) || []
+        })
+    );
+}
+
+
+/* PUBLIC PROJECTS */
 
 async function handleGetProjects(
     request,
@@ -806,7 +925,218 @@ async function handleGetProjects(
     }
 
     try {
-        const projectResult = await env.DB
+        const projects =
+            await getProjectsFromDatabase(
+                env,
+                true
+            );
+
+        return json({
+            projects
+        });
+    } catch (error) {
+        console.error(
+            "Unable to load projects:",
+            error
+        );
+
+        return json({
+            error: "Unable to load projects."
+        }, 500);
+    }
+}
+
+
+/* ADMIN PROJECTS */
+
+async function handleGetAdminProjects(
+    request,
+    env
+) {
+    if (request.method !== "GET") {
+        return json({
+            error: "Method not allowed."
+        }, 405);
+    }
+
+    const session = await requireAdmin(
+        request,
+        env
+    );
+
+    if (!session) {
+        return json({
+            error: "Unauthorized."
+        }, 401);
+    }
+
+    if (!env.DB) {
+        return json({
+            error: "Database is not configured."
+        }, 500);
+    }
+
+    try {
+        const projects =
+            await getProjectsFromDatabase(
+                env,
+                false
+            );
+
+        return json({
+            projects
+        });
+    } catch (error) {
+        console.error(
+            "Unable to load admin projects:",
+            error
+        );
+
+        return json({
+            error: "Unable to load projects."
+        }, 500);
+    }
+}
+
+
+/* UPDATE PROJECT */
+
+async function handleUpdateProject(
+    request,
+    env,
+    projectId
+) {
+    if (request.method !== "PUT") {
+        return json({
+            error: "Method not allowed."
+        }, 405);
+    }
+
+    const session = await requireAdmin(
+        request,
+        env
+    );
+
+    if (!session) {
+        return json({
+            error: "Unauthorized."
+        }, 401);
+    }
+
+    if (!env.DB) {
+        return json({
+            error: "Database is not configured."
+        }, 500);
+    }
+
+    const numericId = Number(projectId);
+
+    if (
+        !Number.isInteger(numericId) ||
+        numericId <= 0
+    ) {
+        return json({
+            error: "Invalid project."
+        }, 400);
+    }
+
+    let body;
+
+    try {
+        body = await request.json();
+    } catch {
+        return json({
+            error: "Invalid request."
+        }, 400);
+    }
+
+    try {
+        const current = await env.DB
+            .prepare(`
+                SELECT *
+                FROM projects
+                WHERE id = ?
+                LIMIT 1
+            `)
+            .bind(numericId)
+            .first();
+
+        if (!current) {
+            return json({
+                error: "Project not found."
+            }, 404);
+        }
+
+        const title = cleanText(
+            body.title,
+            current.title,
+            200
+        );
+
+        const kicker = cleanNullableText(
+            body.kicker,
+            current.kicker,
+            200
+        );
+
+        const description = cleanNullableText(
+            body.description,
+            current.description,
+            10000
+        );
+
+        const year = cleanYear(
+            body.year,
+            current.year
+        );
+
+        const role = cleanNullableText(
+            body.role,
+            current.role,
+            500
+        );
+
+        const sortOrder = Math.round(
+            clampNumber(
+                body.sort_order,
+                current.sort_order,
+                0,
+                1000
+            )
+        );
+
+        const isPublished = cleanBoolean(
+            body.is_published,
+            current.is_published
+        );
+
+        await env.DB
+            .prepare(`
+                UPDATE projects
+                SET
+                    title = ?,
+                    kicker = ?,
+                    description = ?,
+                    year = ?,
+                    role = ?,
+                    sort_order = ?,
+                    is_published = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `)
+            .bind(
+                title,
+                kicker,
+                description,
+                year,
+                role,
+                sortOrder,
+                isPublished,
+                numericId
+            )
+            .run();
+
+        const updated = await env.DB
             .prepare(`
                 SELECT
                     id,
@@ -821,71 +1151,42 @@ async function handleGetProjects(
                     created_at,
                     updated_at
                 FROM projects
-                WHERE is_published = 1
-                ORDER BY sort_order ASC, id ASC
+                WHERE id = ?
+                LIMIT 1
             `)
-            .all();
+            .bind(numericId)
+            .first();
 
         const mediaResult = await env.DB
             .prepare(`
                 SELECT
-                    pm.id,
-                    pm.project_id,
-                    pm.r2_key,
-                    pm.alt_text,
-                    pm.sort_order
-                FROM project_media AS pm
-                INNER JOIN projects AS p
-                    ON p.id = pm.project_id
-                WHERE p.is_published = 1
-                ORDER BY
-                    pm.project_id ASC,
-                    pm.sort_order ASC,
-                    pm.id ASC
+                    id,
+                    project_id,
+                    r2_key,
+                    alt_text,
+                    sort_order
+                FROM project_media
+                WHERE project_id = ?
+                ORDER BY sort_order ASC, id ASC
             `)
+            .bind(numericId)
             .all();
 
-        const mediaByProject = new Map();
-
-        for (const media of mediaResult.results) {
-            if (
-                !mediaByProject.has(
-                    media.project_id
-                )
-            ) {
-                mediaByProject.set(
-                    media.project_id,
-                    []
-                );
-            }
-
-            mediaByProject
-                .get(media.project_id)
-                .push(media);
-        }
-
-        const projects =
-            projectResult.results.map(
-                project => ({
-                    ...project,
-                    media:
-                        mediaByProject.get(
-                            project.id
-                        ) || []
-                })
-            );
-
         return json({
-            projects
+            success: true,
+            project: {
+                ...updated,
+                media: mediaResult.results
+            }
         });
     } catch (error) {
         console.error(
-            "Unable to load projects:",
+            "Unable to update project:",
             error
         );
 
         return json({
-            error: "Unable to load projects."
+            error: "Unable to save project."
         }, 500);
     }
 }
@@ -985,6 +1286,29 @@ export default {
             return handleGetProjects(
                 request,
                 env
+            );
+        }
+
+        if (
+            url.pathname ===
+            "/api/admin/projects"
+        ) {
+            return handleGetAdminProjects(
+                request,
+                env
+            );
+        }
+
+        const projectMatch =
+            url.pathname.match(
+                /^\/api\/admin\/projects\/(\d+)$/
+            );
+
+        if (projectMatch) {
+            return handleUpdateProject(
+                request,
+                env,
+                projectMatch[1]
             );
         }
 
