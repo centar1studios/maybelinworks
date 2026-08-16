@@ -896,6 +896,36 @@ document.addEventListener("DOMContentLoaded", () => {
             renderProjects();
         } catch (error) {
             console.error("Projects failed to load:", error);
+
+            if (projectList) {
+                projectList.innerHTML = `
+                    <article class="project-admin-card project-loading-card">
+                        <div class="project-admin-number">!</div>
+                        <div class="project-admin-content">
+                            <p class="project-admin-type">Portfolio</p>
+                            <h3>Projects Couldn't Load</h3>
+                            <p>Refresh the page to try again.</p>
+                        </div>
+                    </article>
+                `;
+            }
+
+            if (projectSummary) {
+                projectSummary.textContent = "Projects couldn't load";
+            }
+
+            if (projectCount) {
+                projectCount.textContent = "—";
+            }
+
+            if (mediaCount) {
+                mediaCount.textContent = "—";
+            }
+
+            if (mediaCountLarge) {
+                mediaCountLarge.textContent = "—";
+            }
+
             showToast("We couldn't load your projects. Try refreshing the page.");
         }
     }
