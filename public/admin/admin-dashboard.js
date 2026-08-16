@@ -1,545 +1,1496 @@
-<!DOCTYPE HTML>
-<html lang="en">
+document.addEventListener("DOMContentLoaded", () => {
+    /* FONT OPTIONS */
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="description" content="Manage the Maybelin Works portfolio website">
-    <title>Website Manager | Maybelin Works</title>
+    const GOOGLE_FONTS = new Map([
+        ["Playfair Display", "Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400"],
+        ["Cormorant Garamond", "Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400"],
+        ["DM Serif Display", "DM+Serif+Display:ital@0;1"],
+        ["Libre Baskerville", "Libre+Baskerville:ital,wght@0,400;0,700;1,400"],
+        ["Cardo", "Cardo:ital,wght@0,400;0,700;1,400"],
+        ["Lato", "Lato:wght@300;400;700;900"],
+        ["Inter", "Inter:wght@300;400;500;600;700;800"],
+        ["Montserrat", "Montserrat:wght@300;400;500;600;700;800"],
+        ["Nunito", "Nunito:wght@300;400;500;600;700;800"],
+        ["Source Sans 3", "Source+Sans+3:wght@300;400;500;600;700;800"],
+        ["Hind", "Hind:wght@300;400;500;600;700"]
+    ]);
 
-    <link rel="icon" type="image/png" href="../assets/maygarcia_logo.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    const loadedFonts = new Set([
+        "Playfair Display",
+        "Lato"
+    ]);
 
-    <link rel="stylesheet" href="./admin-stylesheet.css">
-</head>
+    const GALLERY_LAYOUTS = {
+        smart: {
+            label: "Smart Gallery",
+            description:
+                "Best all-around choice. Wide artwork automatically gets more space while portrait and square work can sit side by side."
+        },
+        publication: {
+            label: "Publication / Book",
+            description:
+                "Best for magazines, books and page-based work. Images are shown two at a time like page spreads."
+        },
+        full: {
+            label: "Full Width",
+            description:
+                "Every image is stacked large, one after another. Great for branding decks and presentation boards."
+        },
+        grid: {
+            label: "Classic Grid",
+            description:
+                "A consistent two-column image grid. Great for photography, artwork and collections with similarly sized pieces."
+        },
+        featured: {
+            label: "Featured + Grid",
+            description:
+                "The first image gets a large featured position, then the rest continue in a two-column grid."
+        }
+    };
 
-<body>
+    function loadGoogleFont(fontName) {
+        if (!fontName || loadedFonts.has(fontName)) {
+            return;
+        }
 
-    <div class="admin-layout">
+        const googleName = GOOGLE_FONTS.get(fontName);
 
-        <!-- SIDEBAR -->
-        <aside class="admin-sidebar">
+        if (!googleName) {
+            return;
+        }
 
-            <div class="sidebar-top">
-                <a class="admin-brand" href="../index.html">
-                    <img class="admin-brand-logo" src="../assets/maygarcia_logo.png" alt="">
-                    <div>
-                        <p class="admin-brand-name">Maybelin Works</p>
-                        <p class="admin-brand-label">Website Manager</p>
-                    </div>
-                </a>
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href =
+            `https://fonts.googleapis.com/css2?family=${googleName}&display=swap`;
 
-                <nav class="admin-nav" aria-label="Website Manager Navigation">
-                    <a href="#overview" class="admin-nav-link active">Overview</a>
-                    <a href="#homepage" class="admin-nav-link">Homepage</a>
-                    <a href="#projects" class="admin-nav-link">Projects</a>
-                    <a href="#media" class="admin-nav-link">Images &amp; Media</a>
-                    <a href="#about" class="admin-nav-link">About Me</a>
-                    <a href="#account" class="admin-nav-link">Account</a>
-                </nav>
-            </div>
+        document.head.appendChild(link);
+        loadedFonts.add(fontName);
+    }
 
-            <div class="sidebar-bottom">
-                <a class="sidebar-site-link" href="../index.html" target="_blank" rel="noreferrer">View My Website</a>
-                <button class="sidebar-logout" type="button" data-logout>Log Out</button>
-            </div>
-
-        </aside>
+    function fontStack(fontName, type) {
+        return type === "display"
+            ? `"${fontName}", Georgia, serif`
+            : `"${fontName}", Arial, sans-serif`;
+    }
 
 
-        <!-- MAIN -->
-        <main class="admin-main">
+    /* ELEMENTS */
 
-            <header class="admin-topbar">
-                <div>
-                    <p class="admin-eyebrow">Maybelin Works</p>
-                    <h1>Website Manager</h1>
+    const usernameElements = document.querySelectorAll(
+        "[data-admin-username], [data-account-username]"
+    );
+
+    const avatar = document.querySelector("[data-user-avatar]");
+    const logoutButtons = document.querySelectorAll("[data-logout]");
+    const toast = document.querySelector("[data-admin-toast]");
+    const navigationLinks = document.querySelectorAll(".admin-nav-link");
+
+    const settingsStatus = document.querySelector("[data-settings-status]");
+    const heroKicker = document.querySelector("#hero-kicker");
+    const heroTitle = document.querySelector("#hero-title");
+    const heroDescription = document.querySelector("#hero-description");
+    const displayFont = document.querySelector("#display-font");
+    const bodyFont = document.querySelector("#body-font");
+    const displayFontPreview = document.querySelector("[data-display-font-preview]");
+    const bodyFontPreview = document.querySelector("[data-body-font-preview]");
+    const saveHomepageButton = document.querySelector("[data-save-homepage]");
+
+    const aboutStatus = document.querySelector("[data-about-status]");
+    const aboutKicker = document.querySelector("#about-kicker");
+    const aboutTitle = document.querySelector("#about-title");
+    const aboutBio = document.querySelector("#about-bio");
+    const contactEmail = document.querySelector("#contact-email");
+    const contactPhone = document.querySelector("#contact-phone");
+    const instagramUrl = document.querySelector("#instagram-url");
+    const aboutPhotoFile = document.querySelector("#about-photo-file");
+    const aboutPhotoPreview = document.querySelector("[data-about-photo-preview]");
+    const aboutMediaPreview = document.querySelector("[data-about-media-preview]");
+    const replaceAboutPhotoButton = document.querySelector("[data-replace-about-photo]");
+    const saveAboutButton = document.querySelector("[data-save-about]");
+
+    const projectList = document.querySelector("[data-project-list]");
+    const projectCount = document.querySelector("[data-project-count]");
+    const projectSummary = document.querySelector("[data-project-summary]");
+    const mediaCount = document.querySelector("[data-media-count]");
+    const mediaCountLarge = document.querySelector("[data-media-count-large]");
+    const addProjectButton = document.querySelector("[data-add-project]");
+
+    const projectEditor = document.querySelector("[data-project-editor]");
+    const projectEditorForm = document.querySelector("[data-project-editor-form]");
+    const closeProjectButtons = document.querySelectorAll("[data-close-project-editor]");
+    const projectEditorKicker = document.querySelector("[data-project-editor-kicker]");
+    const projectEditorTitle = document.querySelector("[data-project-editor-title]");
+    const projectEditorIntro = document.querySelector("[data-project-editor-intro]");
+    const saveProjectButton = document.querySelector("[data-save-project]");
+
+    const projectId = document.querySelector("#project-id");
+    const projectTitle = document.querySelector("#project-title");
+    const projectKicker = document.querySelector("#project-kicker");
+    const projectDescription = document.querySelector("#project-description");
+    const projectYear = document.querySelector("#project-year");
+    const projectRole = document.querySelector("#project-role");
+    const projectLayout = document.querySelector("#project-layout");
+    const projectVisible = document.querySelector("#project-visible");
+    const layoutDescription = document.querySelector("[data-layout-description]");
+
+    const projectMediaSection = document.querySelector("[data-project-media-section]");
+    const createProjectMediaNote = document.querySelector("[data-create-project-media-note]");
+    const projectMediaFile = document.querySelector("#project-media-file");
+    const projectMediaAlt = document.querySelector("#project-media-alt");
+    const uploadProjectMediaButton = document.querySelector("[data-upload-project-media]");
+    const projectMediaList = document.querySelector("[data-project-media-list]");
+    const projectMediaCount = document.querySelector("[data-project-media-count]");
+
+    let currentSettings = null;
+    let projects = [];
+    let editingProject = null;
+    let editorMode = "edit";
+
+
+    /* MESSAGES */
+
+    function showToast(message) {
+        if (!toast) {
+            return;
+        }
+
+        toast.textContent = message;
+        toast.classList.add("visible");
+
+        window.setTimeout(() => {
+            toast.classList.remove("visible");
+        }, 3300);
+    }
+
+    function handleExpiredLogin() {
+        showToast(
+            "Your login expired. Please sign in again."
+        );
+
+        window.setTimeout(() => {
+            window.location.href = "../admin-login.html";
+        }, 1200);
+    }
+
+
+    /* SESSION */
+
+    function setUsername(username) {
+        usernameElements.forEach((element) => {
+            element.textContent = username;
+        });
+
+        if (avatar) {
+            avatar.textContent = username
+                .charAt(0)
+                .toUpperCase();
+        }
+    }
+
+    async function checkSession() {
+        try {
+            const response = await fetch(
+                "/api/admin/session",
+                {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json"
+                    },
+                    cache: "no-store"
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Unable to verify session.");
+            }
+
+            const data = await response.json();
+
+            if (!data.authenticated) {
+                window.location.href = "../admin-login.html";
+                return false;
+            }
+
+            setUsername(data.username);
+            return true;
+        } catch (error) {
+            console.error("Session check failed:", error);
+            showToast("We couldn't verify your login. Please sign in again.");
+
+            window.setTimeout(() => {
+                window.location.href = "../admin-login.html";
+            }, 1200);
+
+            return false;
+        }
+    }
+
+    async function logout() {
+        logoutButtons.forEach((button) => {
+            button.disabled = true;
+            button.textContent = "Logging Out...";
+        });
+
+        try {
+            const response = await fetch(
+                "/api/admin/logout",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Unable to log out.");
+            }
+
+            window.location.href = "../admin-login.html";
+        } catch (error) {
+            console.error("Logout failed:", error);
+            showToast("We couldn't log you out. Please try again.");
+
+            logoutButtons.forEach((button) => {
+                button.disabled = false;
+                button.textContent = "Log Out";
+            });
+        }
+    }
+
+    logoutButtons.forEach((button) => {
+        button.addEventListener("click", logout);
+    });
+
+
+    /* MEDIA URL */
+
+    function getMediaUrl(value) {
+        const key = typeof value === "string"
+            ? value
+            : value?.r2_key;
+
+        if (!key) {
+            return "";
+        }
+
+        const encodedKey = key
+            .split("/")
+            .map(part => encodeURIComponent(part))
+            .join("/");
+
+        return `/media/${encodedKey}`;
+    }
+
+
+    /* SETTINGS */
+
+    function makeSureFontExists(select, value) {
+        if (!select || !value) {
+            return;
+        }
+
+        const exists = Array.from(select.options)
+            .some(option => option.value === value);
+
+        if (exists) {
+            return;
+        }
+
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+    }
+
+    function updateFontPreviews() {
+        const heading = displayFont?.value || "Playfair Display";
+        const regular = bodyFont?.value || "Lato";
+
+        loadGoogleFont(heading);
+        loadGoogleFont(regular);
+
+        if (displayFontPreview) {
+            displayFontPreview.style.fontFamily =
+                fontStack(heading, "display");
+        }
+
+        if (bodyFontPreview) {
+            bodyFontPreview.style.fontFamily =
+                fontStack(regular, "body");
+        }
+    }
+
+    displayFont?.addEventListener("change", updateFontPreviews);
+    bodyFont?.addEventListener("change", updateFontPreviews);
+
+    function setSettingsReady(ready) {
+        [
+            heroKicker,
+            heroTitle,
+            displayFont,
+            bodyFont
+        ].forEach((element) => {
+            if (element) {
+                element.disabled = !ready;
+            }
+        });
+
+        if (heroDescription) {
+            heroDescription.disabled = true;
+        }
+
+        if (saveHomepageButton) {
+            saveHomepageButton.disabled = !ready;
+            saveHomepageButton.classList.toggle(
+                "disabled-button",
+                !ready
+            );
+            saveHomepageButton.classList.toggle(
+                "primary-link-button",
+                ready
+            );
+        }
+
+        if (settingsStatus) {
+            settingsStatus.textContent = ready
+                ? "Ready to Edit"
+                : "Loading...";
+        }
+    }
+
+    function setAboutReady(ready) {
+        [
+            aboutKicker,
+            aboutTitle,
+            aboutBio,
+            contactEmail,
+            contactPhone,
+            instagramUrl,
+            aboutPhotoFile
+        ].forEach((element) => {
+            if (element) {
+                element.disabled = !ready;
+            }
+        });
+
+        if (saveAboutButton) {
+            saveAboutButton.disabled = !ready;
+            saveAboutButton.classList.toggle(
+                "disabled-button",
+                !ready
+            );
+            saveAboutButton.classList.toggle(
+                "primary-link-button",
+                ready
+            );
+        }
+
+        if (replaceAboutPhotoButton) {
+            replaceAboutPhotoButton.disabled = !ready;
+        }
+
+        if (aboutStatus) {
+            aboutStatus.textContent = ready
+                ? "Ready to Edit"
+                : "Loading...";
+        }
+    }
+
+    function setAboutPhotoPreview(key) {
+        const source = key
+            ? getMediaUrl(key)
+            : "../assets/may_photo.jpg";
+
+        if (aboutPhotoPreview) {
+            aboutPhotoPreview.src = source;
+        }
+
+        if (aboutMediaPreview) {
+            aboutMediaPreview.src = source;
+        }
+    }
+
+    function populateSettings(settings) {
+        currentSettings = settings;
+
+        heroKicker.value = settings.hero_kicker || "";
+        heroTitle.value = settings.hero_title || "";
+        heroDescription.value = "";
+        heroDescription.placeholder =
+            "This isn't shown on the homepage right now.";
+
+        const savedDisplayFont = settings.display_font || "Playfair Display";
+        const savedBodyFont = settings.body_font || "Lato";
+
+        makeSureFontExists(displayFont, savedDisplayFont);
+        makeSureFontExists(bodyFont, savedBodyFont);
+
+        displayFont.value = savedDisplayFont;
+        bodyFont.value = savedBodyFont;
+        updateFontPreviews();
+
+        aboutKicker.value = settings.about_kicker || "";
+        aboutTitle.value = settings.about_title || "";
+        aboutBio.value = settings.about_bio || "";
+        contactEmail.value = settings.contact_email || "";
+        contactPhone.value = settings.contact_phone || "";
+        instagramUrl.value = settings.instagram_url || "";
+        setAboutPhotoPreview(settings.about_photo_key);
+    }
+
+    async function loadSettings() {
+        setSettingsReady(false);
+        setAboutReady(false);
+
+        try {
+            const response = await fetch(
+                "/api/settings",
+                {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json"
+                    },
+                    cache: "no-store"
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Unable to load website settings.");
+            }
+
+            const data = await response.json();
+
+            if (!data.settings) {
+                throw new Error("Website settings were not found.");
+            }
+
+            populateSettings(data.settings);
+            setSettingsReady(true);
+            setAboutReady(true);
+        } catch (error) {
+            console.error("Settings failed to load:", error);
+
+            if (settingsStatus) {
+                settingsStatus.textContent = "Couldn't Load";
+            }
+
+            if (aboutStatus) {
+                aboutStatus.textContent = "Couldn't Load";
+            }
+
+            showToast("We couldn't load the website settings. Try refreshing the page.");
+        }
+    }
+
+    async function saveSettingsPayload(payload, successMessage) {
+        const response = await fetch(
+            "/api/admin/settings",
+            {
+                method: "PUT",
+                credentials: "include",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            }
+        );
+
+        if (response.status === 401) {
+            handleExpiredLogin();
+            return null;
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error || "Unable to save website settings."
+            );
+        }
+
+        if (data.settings) {
+            currentSettings = data.settings;
+        }
+
+        showToast(successMessage);
+        return data.settings || currentSettings;
+    }
+
+    async function saveHomepage() {
+        if (!currentSettings || !saveHomepageButton) {
+            return;
+        }
+
+        if (!heroKicker.value.trim()) {
+            showToast("Add the small text above your heading before saving.");
+            heroKicker.focus();
+            return;
+        }
+
+        if (!heroTitle.value.trim()) {
+            showToast("Your main heading can't be empty.");
+            heroTitle.focus();
+            return;
+        }
+
+        const originalText = saveHomepageButton.textContent;
+        saveHomepageButton.disabled = true;
+        saveHomepageButton.textContent = "Saving...";
+
+        try {
+            await saveSettingsPayload(
+                {
+                    hero_kicker: heroKicker.value.trim(),
+                    hero_title: heroTitle.value.trim(),
+                    hero_description: currentSettings.hero_description,
+                    display_font: displayFont.value,
+                    body_font: bodyFont.value
+                },
+                "Homepage and fonts saved!"
+            );
+
+            settingsStatus.textContent = "Saved";
+
+            window.setTimeout(() => {
+                settingsStatus.textContent = "Ready to Edit";
+            }, 1800);
+        } catch (error) {
+            console.error("Unable to save homepage:", error);
+            showToast(error.message || "Something went wrong while saving.");
+        } finally {
+            saveHomepageButton.disabled = false;
+            saveHomepageButton.textContent = originalText;
+        }
+    }
+
+    saveHomepageButton?.addEventListener("click", saveHomepage);
+
+    async function saveAbout() {
+        if (!currentSettings || !saveAboutButton) {
+            return;
+        }
+
+        if (!aboutTitle.value.trim()) {
+            showToast("Your About Me section needs a heading.");
+            aboutTitle.focus();
+            return;
+        }
+
+        if (!aboutBio.value.trim()) {
+            showToast("Add your About Me biography before saving.");
+            aboutBio.focus();
+            return;
+        }
+
+        const originalText = saveAboutButton.textContent;
+        saveAboutButton.disabled = true;
+        saveAboutButton.textContent = "Saving...";
+
+        try {
+            const settings = await saveSettingsPayload(
+                {
+                    about_kicker: aboutKicker.value.trim(),
+                    about_title: aboutTitle.value.trim(),
+                    about_bio: aboutBio.value.trim(),
+                    contact_email: contactEmail.value.trim() || null,
+                    contact_phone: contactPhone.value.trim() || null,
+                    instagram_url: instagramUrl.value.trim() || null
+                },
+                "About Me changes saved!"
+            );
+
+            if (settings) {
+                populateSettings(settings);
+                setSettingsReady(true);
+                setAboutReady(true);
+            }
+
+            aboutStatus.textContent = "Saved";
+
+            window.setTimeout(() => {
+                aboutStatus.textContent = "Ready to Edit";
+            }, 1800);
+        } catch (error) {
+            console.error("Unable to save About Me:", error);
+            showToast(error.message || "Something went wrong while saving About Me.");
+        } finally {
+            saveAboutButton.disabled = false;
+            saveAboutButton.textContent = originalText;
+        }
+    }
+
+    saveAboutButton?.addEventListener("click", saveAbout);
+
+    async function replaceAboutPhoto() {
+        const file = aboutPhotoFile?.files?.[0];
+
+        if (!file) {
+            showToast("Choose a new About Me photo first.");
+            aboutPhotoFile?.focus();
+            return;
+        }
+
+        if (file.size > 20 * 1024 * 1024) {
+            showToast("Photos must be 20 MB or smaller.");
+            return;
+        }
+
+        const originalText = replaceAboutPhotoButton.textContent;
+        replaceAboutPhotoButton.disabled = true;
+        replaceAboutPhotoButton.textContent = "Uploading...";
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetch(
+                "/api/admin/about/photo",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    body: formData
+                }
+            );
+
+            if (response.status === 401) {
+                handleExpiredLogin();
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error || "Unable to replace the photo."
+                );
+            }
+
+            currentSettings = {
+                ...currentSettings,
+                about_photo_key: data.about_photo_key
+            };
+
+            setAboutPhotoPreview(data.about_photo_key);
+            aboutPhotoFile.value = "";
+            showToast("About Me photo replaced!");
+        } catch (error) {
+            console.error("Unable to replace About photo:", error);
+            showToast(error.message || "We couldn't replace that photo.");
+        } finally {
+            replaceAboutPhotoButton.disabled = false;
+            replaceAboutPhotoButton.textContent = originalText;
+        }
+    }
+
+    replaceAboutPhotoButton?.addEventListener(
+        "click",
+        replaceAboutPhoto
+    );
+
+
+    /* PROJECT HELPERS */
+
+    function sortedMedia(project) {
+        if (!Array.isArray(project?.media)) {
+            return [];
+        }
+
+        return [...project.media].sort((a, b) => {
+            const orderDifference =
+                (Number(a.sort_order) || 0) -
+                (Number(b.sort_order) || 0);
+
+            return orderDifference ||
+                Number(a.id) - Number(b.id);
+        });
+    }
+
+    function makeProjectPreview(description) {
+        if (!description) {
+            return "No project description has been added yet.";
+        }
+
+        const cleaned = description
+            .replace(/\s+/g, " ")
+            .trim();
+
+        if (cleaned.length <= 220) {
+            return cleaned;
+        }
+
+        return `${cleaned.slice(0, 217)}...`;
+    }
+
+    function updateProjectSummary() {
+        if (projectCount) {
+            projectCount.textContent = String(projects.length);
+        }
+
+        const totalMedia = projects.reduce(
+            (total, project) => total + sortedMedia(project).length,
+            0
+        );
+
+        if (mediaCount) {
+            mediaCount.textContent = String(totalMedia);
+        }
+
+        if (mediaCountLarge) {
+            mediaCountLarge.textContent = String(totalMedia);
+        }
+
+        if (!projectSummary) {
+            return;
+        }
+
+        const visible = projects.filter(
+            project => Number(project.is_published) === 1
+        );
+
+        if (!visible.length) {
+            projectSummary.textContent = "No projects are currently visible";
+            return;
+        }
+
+        const names = visible.map(project => project.title);
+
+        if (names.length === 1) {
+            projectSummary.textContent = names[0];
+        } else if (names.length === 2) {
+            projectSummary.textContent = `${names[0]} and ${names[1]}`;
+        } else {
+            projectSummary.textContent =
+                `${names.slice(0, -1).join(", ")}, and ${names.at(-1)}`;
+        }
+    }
+
+    function renderProjects() {
+        if (!projectList) {
+            return;
+        }
+
+        projectList.replaceChildren();
+
+        const sortedProjects = [...projects].sort((a, b) => {
+            const orderDifference =
+                (Number(a.sort_order) || 0) -
+                (Number(b.sort_order) || 0);
+
+            return orderDifference || Number(a.id) - Number(b.id);
+        });
+
+        if (!sortedProjects.length) {
+            const empty = document.createElement("article");
+            empty.className = "project-admin-card project-loading-card";
+            empty.innerHTML = `
+                <div class="project-admin-number">00</div>
+                <div class="project-admin-content">
+                    <p class="project-admin-type">Portfolio</p>
+                    <h3>No Projects Yet</h3>
+                    <p>Use “Add a Project” to create the first one.</p>
                 </div>
-
-                <div class="admin-user">
-                    <div class="admin-user-avatar" data-user-avatar>M</div>
-                    <div class="admin-user-info">
-                        <span class="admin-user-label">Signed in as</span>
-                        <strong data-admin-username>Loading...</strong>
-                    </div>
-                </div>
-            </header>
-
-
-            <div class="admin-content">
-
-                <!-- OVERVIEW -->
-                <section class="dashboard-section" id="overview">
-                    <div class="section-heading">
-                        <div>
-                            <p class="section-kicker">Your Website</p>
-                            <h2>Welcome back!</h2>
-                            <p class="section-description">Manage the portfolio without opening VS Code, GitHub, or Cloudflare.</p>
-                        </div>
-
-                        <a class="primary-link-button" href="../index.html" target="_blank" rel="noreferrer">View My Website</a>
-                    </div>
-
-                    <div class="overview-grid">
-                        <article class="overview-card highlight-card">
-                            <p class="overview-label">Website</p>
-                            <h3>Maybelin Works</h3>
-                            <p>Your portfolio is online and ready for updates.</p>
-                            <span class="status-badge">Online</span>
-                        </article>
-
-                        <article class="overview-card">
-                            <p class="overview-label">Portfolio Projects</p>
-                            <p class="overview-number" data-project-count>0</p>
-                            <p class="overview-note" data-project-summary>Loading projects...</p>
-                        </article>
-
-                        <article class="overview-card">
-                            <p class="overview-label">Project Images</p>
-                            <p class="overview-number" data-media-count>0</p>
-                            <p class="overview-note">Managed in project editors</p>
-                        </article>
-
-                        <article class="overview-card">
-                            <p class="overview-label">Website Editing</p>
-                            <p class="overview-value">Full CMS</p>
-                            <p class="overview-note">Projects, galleries, About Me, fonts and contact info</p>
-                        </article>
-                    </div>
-                </section>
-
-
-                <!-- HOMEPAGE -->
-                <section class="dashboard-section" id="homepage">
-                    <div class="section-heading">
-                        <div>
-                            <p class="section-kicker">Homepage</p>
-                            <h2>What visitors see first</h2>
-                            <p class="section-description">Edit the homepage message and website typography.</p>
-                        </div>
-
-                        <span class="coming-soon-badge" data-settings-status>Loading...</span>
-                    </div>
-
-                    <div class="settings-grid">
-                        <article class="dashboard-panel large-panel">
-                            <div class="panel-heading">
-                                <div>
-                                    <p class="panel-kicker">Main Text</p>
-                                    <h3>Homepage Message</h3>
-                                </div>
-                                <span class="panel-status">Currently Live</span>
-                            </div>
-
-                            <div class="form-grid">
-                                <div class="admin-field full-field">
-                                    <label for="hero-kicker">Small Text Above Your Heading</label>
-                                    <input type="text" id="hero-kicker" maxlength="100" disabled>
-                                </div>
-
-                                <div class="admin-field full-field">
-                                    <label for="hero-title">Main Heading</label>
-                                    <textarea id="hero-title" rows="4" maxlength="300" disabled></textarea>
-                                </div>
-
-                                <div class="admin-field full-field">
-                                    <label for="hero-description">Extra Description</label>
-                                    <textarea id="hero-description" rows="4" disabled></textarea>
-                                    <small>This is stored for the site, but the current homepage layout does not display it.</small>
-                                </div>
-                            </div>
-
-                            <div class="panel-footer">
-                                <p>Save and the public homepage updates automatically.</p>
-                                <button class="disabled-button" type="button" data-save-homepage disabled>Save Homepage Changes</button>
-                            </div>
-                        </article>
-
-                        <article class="dashboard-panel">
-                            <div class="panel-heading">
-                                <div>
-                                    <p class="panel-kicker">Website Style</p>
-                                    <h3>Fonts</h3>
-                                </div>
-                                <span class="panel-status">Editable</span>
-                            </div>
-
-                            <div class="font-controls">
-                                <div class="admin-field">
-                                    <label for="display-font">Heading Font</label>
-                                    <select id="display-font" disabled>
-                                        <option value="Playfair Display">Playfair Display</option>
-                                        <option value="Cormorant Garamond">Cormorant Garamond</option>
-                                        <option value="DM Serif Display">DM Serif Display</option>
-                                        <option value="Libre Baskerville">Libre Baskerville</option>
-                                        <option value="Cardo">Cardo</option>
-                                        <option value="Lato">Lato</option>
-                                        <option value="Montserrat">Montserrat</option>
-                                    </select>
-                                </div>
-
-                                <div class="font-live-preview">
-                                    <span>Preview</span>
-                                    <p class="font-display-preview" data-display-font-preview>Maybelin Works</p>
-                                </div>
-
-                                <div class="admin-field">
-                                    <label for="body-font">Regular Text Font</label>
-                                    <select id="body-font" disabled>
-                                        <option value="Lato">Lato</option>
-                                        <option value="Inter">Inter</option>
-                                        <option value="Montserrat">Montserrat</option>
-                                        <option value="Nunito">Nunito</option>
-                                        <option value="Source Sans 3">Source Sans 3</option>
-                                        <option value="Hind">Hind</option>
-                                        <option value="Libre Baskerville">Libre Baskerville</option>
-                                    </select>
-                                </div>
-
-                                <div class="font-live-preview">
-                                    <span>Preview</span>
-                                    <p class="font-body-preview" data-body-font-preview>Art, identity, curiosity and thoughtful design.</p>
-                                </div>
-                            </div>
-                        </article>
-
-                        <article class="dashboard-panel">
-                            <div class="panel-heading">
-                                <div>
-                                    <p class="panel-kicker">Website Style</p>
-                                    <h3>Current Colors</h3>
-                                </div>
-                            </div>
-
-                            <div class="color-list">
-                                <div class="color-row"><span class="color-preview" style="background:#2A3F38"></span><div><p>Dark Green</p><span>Main dark color</span></div></div>
-                                <div class="color-row"><span class="color-preview" style="background:#8DF688"></span><div><p>Lime Green</p><span>Highlight</span></div></div>
-                                <div class="color-row"><span class="color-preview" style="background:#562F54"></span><div><p>Purple</p><span>Feature color</span></div></div>
-                                <div class="color-row"><span class="color-preview" style="background:#57585D"></span><div><p>Charcoal</p><span>Neutral</span></div></div>
-                                <div class="color-row"><span class="color-preview" style="background:#F650BD"></span><div><p>Pink</p><span>Accent</span></div></div>
-                            </div>
-                        </article>
-                    </div>
-                </section>
-
-
-                <!-- PROJECTS -->
-                <section class="dashboard-section" id="projects">
-                    <div class="section-heading">
-                        <div>
-                            <p class="section-kicker">Portfolio</p>
-                            <h2>Your Projects</h2>
-                            <p class="section-description">Create projects, choose their gallery style, edit text and manage every image.</p>
-                        </div>
-
-                        <button class="primary-link-button" type="button" data-add-project>+ Add a Project</button>
-                    </div>
-
-                    <div class="project-admin-list" data-project-list>
-                        <article class="project-admin-card project-loading-card">
-                            <div class="project-admin-number">...</div>
-                            <div class="project-admin-content">
-                                <p class="project-admin-type">Portfolio</p>
-                                <h3>Loading Projects</h3>
-                                <p>Getting your latest project information...</p>
-                            </div>
-                        </article>
-                    </div>
-                </section>
-
-
-                <!-- MEDIA -->
-                <section class="dashboard-section" id="media">
-                    <div class="section-heading">
-                        <div>
-                            <p class="section-kicker">Images &amp; Media</p>
-                            <h2>Your Website Files</h2>
-                            <p class="section-description">Project images are managed inside each project. Your About Me photo is managed below.</p>
-                        </div>
-
-                        <a href="#projects" class="primary-link-button">Manage Project Images</a>
-                    </div>
-
-                    <div class="media-grid">
-                        <article class="media-card">
-                            <div class="media-preview logo-preview">
-                                <img src="../assets/maygarcia_logo.png" alt="Maybelin Works logo">
-                            </div>
-                            <div class="media-info"><strong>Website Logo</strong><span>Existing website branding file</span></div>
-                        </article>
-
-                        <article class="media-card">
-                            <div class="media-preview">
-                                <img src="../assets/may_photo.jpg" alt="About Me photo" loading="lazy" data-about-media-preview>
-                            </div>
-                            <div class="media-info"><strong>About Me Photo</strong><span>Replace it from the About Me editor</span></div>
-                        </article>
-
-                        <article class="media-card managed-media-card">
-                            <div class="media-preview">
-                                <div class="managed-media-count">
-                                    <strong data-media-count-large>0</strong>
-                                    <span>Project Images</span>
-                                </div>
-                            </div>
-                            <div class="media-info"><strong>Cloudflare R2</strong><span>Images managed through Website Manager</span></div>
-                        </article>
-                    </div>
-                </section>
-
-
-                <!-- ABOUT -->
-                <section class="dashboard-section" id="about">
-                    <div class="section-heading">
-                        <div>
-                            <p class="section-kicker">About Me</p>
-                            <h2>Your story and contact info</h2>
-                            <p class="section-description">Edit the Information popup, replace your portrait and update the links visitors use to contact you.</p>
-                        </div>
-
-                        <span class="coming-soon-badge" data-about-status>Loading...</span>
-                    </div>
-
-                    <div class="about-editor-grid">
-                        <article class="dashboard-panel about-text-panel">
-                            <div class="panel-heading">
-                                <div>
-                                    <p class="panel-kicker">Information</p>
-                                    <h3>About Me Text</h3>
-                                </div>
-                            </div>
-
-                            <div class="form-grid">
-                                <div class="admin-field full-field">
-                                    <label for="about-kicker">Small Label</label>
-                                    <input type="text" id="about-kicker" maxlength="150" disabled>
-                                </div>
-
-                                <div class="admin-field full-field">
-                                    <label for="about-title">Heading</label>
-                                    <input type="text" id="about-title" maxlength="200" disabled>
-                                </div>
-
-                                <div class="admin-field full-field">
-                                    <label for="about-bio">Biography</label>
-                                    <textarea id="about-bio" rows="16" maxlength="20000" disabled></textarea>
-                                    <small>Leave a blank line between paragraphs.</small>
-                                </div>
-                            </div>
-                        </article>
-
-                        <article class="dashboard-panel about-photo-panel">
-                            <div class="panel-heading">
-                                <div>
-                                    <p class="panel-kicker">Portrait</p>
-                                    <h3>About Me Photo</h3>
-                                </div>
-                            </div>
-
-                            <div class="about-photo-editor">
-                                <div class="about-photo-preview">
-                                    <img src="../assets/may_photo.jpg" alt="Current About Me photo" data-about-photo-preview>
-                                </div>
-
-                                <div class="admin-field">
-                                    <label for="about-photo-file">Choose a New Photo</label>
-                                    <input type="file" id="about-photo-file" accept="image/jpeg,image/png,image/webp,image/avif,.jpg,.jpeg,.png,.webp,.avif" disabled>
-                                    <small>JPG, PNG, WebP or AVIF. Maximum 20 MB.</small>
-                                </div>
-
-                                <button class="media-upload-button" type="button" data-replace-about-photo disabled>Replace Photo</button>
-                            </div>
-                        </article>
-
-                        <article class="dashboard-panel contact-panel">
-                            <div class="panel-heading">
-                                <div>
-                                    <p class="panel-kicker">Contact</p>
-                                    <h3>Visitor Links</h3>
-                                </div>
-                            </div>
-
-                            <div class="form-grid">
-                                <div class="admin-field full-field">
-                                    <label for="contact-email">Email</label>
-                                    <input type="email" id="contact-email" maxlength="320" disabled>
-                                </div>
-
-                                <div class="admin-field full-field">
-                                    <label for="contact-phone">Phone</label>
-                                    <input type="text" id="contact-phone" maxlength="100" disabled>
-                                </div>
-
-                                <div class="admin-field full-field">
-                                    <label for="instagram-url">Instagram URL</label>
-                                    <input type="url" id="instagram-url" maxlength="2000" disabled>
-                                </div>
-                            </div>
-                        </article>
-                    </div>
-
-                    <div class="about-save-bar">
-                        <p>These changes update both the Information popup and the contact links in the site header.</p>
-                        <button class="disabled-button" type="button" data-save-about disabled>Save About Me Changes</button>
-                    </div>
-                </section>
-
-
-                <!-- ACCOUNT -->
-                <section class="dashboard-section" id="account">
-                    <div class="section-heading">
-                        <div>
-                            <p class="section-kicker">Account</p>
-                            <h2>Your Login</h2>
-                            <p class="section-description">Information about your current Website Manager session.</p>
-                        </div>
-                    </div>
-
-                    <article class="dashboard-panel account-panel">
-                        <div class="account-detail"><span>Signed in as</span><strong data-account-username>Loading...</strong></div>
-                        <div class="account-detail"><span>Login lasts for</span><strong>8 Hours</strong></div>
-                        <div class="account-detail"><span>Login Status</span><strong>Secure</strong></div>
-                        <div class="account-actions"><button class="logout-button" type="button" data-logout>Log Out</button></div>
-                    </article>
-                </section>
-
-            </div>
-
-            <footer class="admin-footer">
-                <p>Maybelin Works Website Manager</p>
-                <p>Website created by Centari Studios</p>
-            </footer>
-        </main>
-    </div>
-
-
-    <!-- PROJECT EDITOR -->
-    <dialog class="project-editor-dialog" data-project-editor aria-labelledby="project-editor-title">
-        <form class="project-editor-form" data-project-editor-form>
-
-            <div class="project-editor-header">
-                <div>
-                    <p class="panel-kicker" data-project-editor-kicker>Portfolio Project</p>
-                    <h2 id="project-editor-title" data-project-editor-title>Edit Project</h2>
-                    <p data-project-editor-intro>Change project details and manage images from one place.</p>
-                </div>
-
-                <button class="project-editor-close" type="button" data-close-project-editor>Close</button>
-            </div>
-
-            <div class="project-editor-body">
-                <input type="hidden" id="project-id">
-
-                <section class="editor-section">
-                    <div class="editor-section-heading">
-                        <div>
-                            <p class="panel-kicker">Project Details</p>
-                            <h3>Information</h3>
-                        </div>
-                    </div>
-
-                    <div class="project-editor-grid">
-                        <div class="admin-field full-field">
-                            <label for="project-title">Project Name</label>
-                            <input type="text" id="project-title" maxlength="200" required>
-                        </div>
-
-                        <div class="admin-field full-field">
-                            <label for="project-kicker">Short Label</label>
-                            <input type="text" id="project-kicker" maxlength="200" placeholder="Example: Educational Publication">
-                            <small>This appears above the project name.</small>
-                        </div>
-
-                        <div class="admin-field full-field">
-                            <label for="project-description">Project Story</label>
-                            <textarea id="project-description" rows="10" maxlength="10000" placeholder="Tell visitors about this project..."></textarea>
-                            <small>Leave a blank line between paragraphs.</small>
-                        </div>
-
-                        <div class="admin-field">
-                            <label for="project-year">Year</label>
-                            <input type="number" id="project-year" min="1900" max="2100" placeholder="Optional">
-                        </div>
-
-                        <div class="admin-field">
-                            <label for="project-role">My Role</label>
-                            <input type="text" id="project-role" maxlength="500" placeholder="Example: Editorial Design">
-                        </div>
-
-                        <div class="admin-field full-field gallery-layout-field">
-                            <label for="project-layout">Gallery Layout</label>
-                            <select id="project-layout">
-                                <option value="smart">Smart Gallery</option>
-                                <option value="publication">Publication / Book</option>
-                                <option value="full">Full Width</option>
-                                <option value="grid">Classic Grid</option>
-                                <option value="featured">Featured + Grid</option>
-                            </select>
-                            <div class="layout-help" data-layout-description></div>
-                        </div>
-                    </div>
-
-                    <label class="project-visibility-option">
-                        <input type="checkbox" id="project-visible">
-                        <span>
-                            <strong>Show this project on the website</strong>
-                            <small>New projects start hidden so you can add images before making them public.</small>
-                        </span>
-                    </label>
-                </section>
-
-
-                <section class="editor-section project-media-editor" data-project-media-section>
-                    <div class="editor-section-heading">
-                        <div>
-                            <p class="panel-kicker">Project Images</p>
-                            <h3>Gallery Images</h3>
-                            <p>Upload, remove and reorder images. The selected Gallery Layout decides how these appear publicly.</p>
-                        </div>
-
-                        <span class="project-media-count" data-project-media-count>0 Images</span>
-                    </div>
-
-                    <div class="project-media-upload">
-                        <div class="admin-field">
-                            <label for="project-media-file">Choose an Image</label>
-                            <input type="file" id="project-media-file" accept="image/jpeg,image/png,image/webp,image/avif,.jpg,.jpeg,.png,.webp,.avif">
-                            <small>JPG, PNG, WebP or AVIF. Maximum 20 MB.</small>
-                        </div>
-
-                        <div class="admin-field">
-                            <label for="project-media-alt">Image Description</label>
-                            <input type="text" id="project-media-alt" maxlength="500" placeholder="Example: Fenix publication cover">
-                            <small>Describe what is visible for screen-reader users.</small>
-                        </div>
-
-                        <button class="media-upload-button" type="button" data-upload-project-media>Upload Image</button>
-                    </div>
-
-                    <div class="project-media-list" data-project-media-list></div>
-                </section>
-
-
-                <div class="create-project-media-note" data-create-project-media-note hidden>
-                    <strong>Create the project first.</strong>
-                    <span>After it is created, this window will stay open and the image uploader will appear.</span>
-                </div>
-            </div>
-
-            <div class="project-editor-actions">
-                <button class="secondary-button" type="button" data-close-project-editor>Cancel</button>
-                <button class="project-save-button" type="submit" data-save-project>Save Project</button>
-            </div>
-
-        </form>
-    </dialog>
-
-
-    <div class="admin-toast" data-admin-toast role="status" aria-live="polite"></div>
-
-    <script src="./admin-dashboard.js"></script>
-</body>
-</html>
+            `;
+            projectList.appendChild(empty);
+            updateProjectSummary();
+            return;
+        }
+
+        sortedProjects.forEach((project, index) => {
+            const card = document.createElement("article");
+            card.className = "project-admin-card";
+
+            if (Number(project.is_published) !== 1) {
+                card.classList.add("project-is-hidden");
+            }
+
+            const number = document.createElement("div");
+            number.className = "project-admin-number";
+            number.textContent = String(index + 1).padStart(2, "0");
+
+            const content = document.createElement("div");
+            content.className = "project-admin-content";
+
+            const type = document.createElement("p");
+            type.className = "project-admin-type";
+            type.textContent = project.kicker || "Portfolio Project";
+
+            const title = document.createElement("h3");
+            title.textContent = project.title || "Untitled Project";
+
+            const description = document.createElement("p");
+            description.textContent = makeProjectPreview(project.description);
+
+            content.append(type, title, description);
+
+            const meta = document.createElement("div");
+            meta.className = "project-admin-meta";
+
+            const layout = document.createElement("div");
+            layout.innerHTML = `<span>Layout</span><strong></strong>`;
+            layout.querySelector("strong").textContent =
+                GALLERY_LAYOUTS[project.gallery_layout]?.label || "Smart Gallery";
+
+            const images = document.createElement("div");
+            images.innerHTML = `<span>Images</span><strong></strong>`;
+            images.querySelector("strong").textContent =
+                String(sortedMedia(project).length);
+
+            const visible = document.createElement("div");
+            visible.innerHTML = `<span>Website</span><strong></strong>`;
+            visible.querySelector("strong").textContent =
+                Number(project.is_published) === 1
+                    ? "Visible"
+                    : "Hidden";
+
+            meta.append(layout, images, visible);
+
+            const editButton = document.createElement("button");
+            editButton.className = "project-edit-button";
+            editButton.type = "button";
+            editButton.textContent = "Edit Project";
+            editButton.addEventListener("click", () => {
+                openProjectEditor(project.slug);
+            });
+
+            card.append(number, content, meta, editButton);
+            projectList.appendChild(card);
+        });
+
+        updateProjectSummary();
+    }
+
+    async function loadProjects() {
+        try {
+            const response = await fetch(
+                "/api/admin/projects",
+                {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json"
+                    },
+                    cache: "no-store"
+                }
+            );
+
+            if (response.status === 401) {
+                handleExpiredLogin();
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error("Unable to load projects.");
+            }
+
+            const data = await response.json();
+            projects = Array.isArray(data.projects)
+                ? data.projects
+                : [];
+
+            renderProjects();
+        } catch (error) {
+            console.error("Projects failed to load:", error);
+            showToast("We couldn't load your projects. Try refreshing the page.");
+        }
+    }
+
+
+    /* GALLERY LAYOUT */
+
+    function updateLayoutDescription() {
+        const layout = projectLayout?.value || "smart";
+        const info = GALLERY_LAYOUTS[layout] || GALLERY_LAYOUTS.smart;
+
+        if (layoutDescription) {
+            layoutDescription.innerHTML = `
+                <strong>${info.label}</strong>
+                <span>${info.description}</span>
+            `;
+        }
+    }
+
+    projectLayout?.addEventListener(
+        "change",
+        updateLayoutDescription
+    );
+
+
+    /* PROJECT EDITOR */
+
+    function setEditorMode(mode) {
+        editorMode = mode;
+        const creating = mode === "create";
+
+        projectEditorKicker.textContent = creating
+            ? "New Portfolio Project"
+            : "Portfolio Project";
+
+        projectEditorTitle.textContent = creating
+            ? "Add a Project"
+            : "Edit Project";
+
+        projectEditorIntro.textContent = creating
+            ? "Add the project details first. After it is created, you can upload its images without closing this window."
+            : "Change project details and manage images from one place.";
+
+        saveProjectButton.textContent = creating
+            ? "Create Project"
+            : "Save Project";
+
+        projectMediaSection.hidden = creating;
+        createProjectMediaNote.hidden = !creating;
+    }
+
+    function fillProjectFields(project) {
+        projectId.value = project?.id ? String(project.id) : "";
+        projectTitle.value = project?.title || "";
+        projectKicker.value = project?.kicker || "";
+        projectDescription.value = project?.description || "";
+        projectYear.value = project?.year ?? "";
+        projectRole.value = project?.role || "";
+        projectLayout.value = project?.gallery_layout || "smart";
+        projectVisible.checked = Number(project?.is_published) === 1;
+
+        if (projectMediaFile) {
+            projectMediaFile.value = "";
+        }
+
+        if (projectMediaAlt) {
+            projectMediaAlt.value = "";
+        }
+
+        updateLayoutDescription();
+    }
+
+    function openProjectEditor(slug) {
+        const project = projects.find(
+            item => item.slug === slug
+        );
+
+        if (!project || !projectEditor) {
+            return;
+        }
+
+        editingProject = project;
+        setEditorMode("edit");
+        fillProjectFields(project);
+        renderProjectMedia();
+
+        if (!projectEditor.open) {
+            projectEditor.showModal();
+        }
+
+        document.body.classList.add("editor-open");
+
+        window.setTimeout(() => {
+            projectTitle.focus();
+        }, 0);
+    }
+
+    function openNewProjectEditor() {
+        editingProject = null;
+        setEditorMode("create");
+        fillProjectFields({
+            gallery_layout: "smart",
+            is_published: 0,
+            media: []
+        });
+
+        if (!projectEditor.open) {
+            projectEditor.showModal();
+        }
+
+        document.body.classList.add("editor-open");
+
+        window.setTimeout(() => {
+            projectTitle.focus();
+        }, 0);
+    }
+
+    addProjectButton?.addEventListener(
+        "click",
+        openNewProjectEditor
+    );
+
+    function closeProjectEditor() {
+        if (projectEditor?.open) {
+            projectEditor.close();
+        }
+
+        editingProject = null;
+        editorMode = "edit";
+        document.body.classList.remove("editor-open");
+    }
+
+    closeProjectButtons.forEach((button) => {
+        button.addEventListener("click", closeProjectEditor);
+    });
+
+    projectEditor?.addEventListener("cancel", (event) => {
+        event.preventDefault();
+        closeProjectEditor();
+    });
+
+    projectEditor?.addEventListener("click", (event) => {
+        if (event.target === projectEditor) {
+            closeProjectEditor();
+        }
+    });
+
+    function projectPayload() {
+        const yearValue = projectYear.value.trim();
+
+        return {
+            title: projectTitle.value.trim(),
+            kicker: projectKicker.value.trim() || null,
+            description: projectDescription.value.trim() || null,
+            year: yearValue ? Number(yearValue) : null,
+            role: projectRole.value.trim() || null,
+            gallery_layout: projectLayout.value,
+            is_published: projectVisible.checked
+        };
+    }
+
+    async function saveProject(event) {
+        event.preventDefault();
+
+        if (!projectTitle.value.trim()) {
+            showToast("Your project needs a name.");
+            projectTitle.focus();
+            return;
+        }
+
+        const creating = editorMode === "create";
+        const originalText = saveProjectButton.textContent;
+
+        saveProjectButton.disabled = true;
+        saveProjectButton.textContent = creating
+            ? "Creating..."
+            : "Saving...";
+
+        try {
+            const endpoint = creating
+                ? "/api/admin/projects"
+                : `/api/admin/projects/${editingProject.id}`;
+
+            const response = await fetch(
+                endpoint,
+                {
+                    method: creating ? "POST" : "PUT",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(projectPayload())
+                }
+            );
+
+            if (response.status === 401) {
+                handleExpiredLogin();
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error ||
+                    (creating
+                        ? "Unable to create project."
+                        : "Unable to save project.")
+                );
+            }
+
+            if (!data.project) {
+                throw new Error("The project response was incomplete.");
+            }
+
+            if (creating) {
+                editingProject = data.project;
+                projects.push(data.project);
+                renderProjects();
+
+                setEditorMode("edit");
+                fillProjectFields(editingProject);
+                renderProjectMedia();
+
+                showToast("Project created! Now add images, then turn on visibility when you're ready.");
+            } else {
+                editingProject = data.project;
+                projects = projects.map(project =>
+                    project.id === data.project.id
+                        ? data.project
+                        : project
+                );
+
+                renderProjects();
+                closeProjectEditor();
+                showToast("Project changes saved!");
+            }
+        } catch (error) {
+            console.error("Unable to save project:", error);
+            showToast(error.message || "Something went wrong while saving the project.");
+        } finally {
+            saveProjectButton.disabled = false;
+
+            if (editorMode === "create") {
+                saveProjectButton.textContent = "Create Project";
+            } else {
+                saveProjectButton.textContent = "Save Project";
+            }
+
+            if (!projectEditor?.open) {
+                saveProjectButton.textContent = originalText;
+            }
+        }
+    }
+
+    projectEditorForm?.addEventListener(
+        "submit",
+        saveProject
+    );
+
+
+    /* PROJECT MEDIA */
+
+    function renderProjectMedia() {
+        if (!projectMediaList || !editingProject) {
+            return;
+        }
+
+        projectMediaList.replaceChildren();
+        const media = sortedMedia(editingProject);
+
+        if (projectMediaCount) {
+            projectMediaCount.textContent =
+                `${media.length} ${media.length === 1 ? "Image" : "Images"}`;
+        }
+
+        if (!media.length) {
+            const empty = document.createElement("div");
+            empty.className = "project-media-empty";
+            empty.innerHTML = `
+                <strong>No images yet</strong>
+                <p>Upload the first image above.</p>
+            `;
+            projectMediaList.appendChild(empty);
+            return;
+        }
+
+        media.forEach((item, index) => {
+            const card = document.createElement("article");
+            card.className = "project-media-item";
+
+            const preview = document.createElement("div");
+            preview.className = "project-media-item-preview";
+
+            const image = document.createElement("img");
+            image.src = getMediaUrl(item);
+            image.alt = item.alt_text || "Project image";
+            image.loading = "lazy";
+            preview.appendChild(image);
+
+            const info = document.createElement("div");
+            info.className = "project-media-item-info";
+
+            const position = document.createElement("strong");
+            position.textContent = `Image ${index + 1}`;
+
+            const alt = document.createElement("span");
+            alt.textContent = item.alt_text || "No image description";
+
+            info.append(position, alt);
+
+            const controls = document.createElement("div");
+            controls.className = "project-media-controls";
+
+            const up = document.createElement("button");
+            up.type = "button";
+            up.textContent = "Move Up";
+            up.disabled = index === 0;
+            up.addEventListener("click", () => {
+                moveProjectMedia(item.id, -1);
+            });
+
+            const down = document.createElement("button");
+            down.type = "button";
+            down.textContent = "Move Down";
+            down.disabled = index === media.length - 1;
+            down.addEventListener("click", () => {
+                moveProjectMedia(item.id, 1);
+            });
+
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "remove-media-button";
+            remove.textContent = "Remove";
+            remove.addEventListener("click", () => {
+                deleteProjectMedia(item);
+            });
+
+            controls.append(up, down, remove);
+            card.append(preview, info, controls);
+            projectMediaList.appendChild(card);
+        });
+    }
+
+    function updateEditingProjectMedia(media) {
+        if (!editingProject) {
+            return;
+        }
+
+        editingProject = {
+            ...editingProject,
+            media
+        };
+
+        projects = projects.map(project =>
+            project.id === editingProject.id
+                ? editingProject
+                : project
+        );
+
+        renderProjectMedia();
+        renderProjects();
+    }
+
+    async function uploadProjectMedia() {
+        if (!editingProject || !uploadProjectMediaButton) {
+            return;
+        }
+
+        const file = projectMediaFile?.files?.[0];
+
+        if (!file) {
+            showToast("Choose an image first.");
+            projectMediaFile?.focus();
+            return;
+        }
+
+        if (file.size > 20 * 1024 * 1024) {
+            showToast("Images must be 20 MB or smaller.");
+            return;
+        }
+
+        const originalText = uploadProjectMediaButton.textContent;
+        uploadProjectMediaButton.disabled = true;
+        uploadProjectMediaButton.textContent = "Uploading...";
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append(
+            "alt_text",
+            projectMediaAlt?.value.trim() || ""
+        );
+
+        try {
+            const response = await fetch(
+                `/api/admin/projects/${editingProject.id}/media`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    body: formData
+                }
+            );
+
+            if (response.status === 401) {
+                handleExpiredLogin();
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error || "Unable to upload image."
+                );
+            }
+
+            updateEditingProjectMedia([
+                ...sortedMedia(editingProject),
+                data.media
+            ]);
+
+            projectMediaFile.value = "";
+            projectMediaAlt.value = "";
+            showToast("Image uploaded!");
+        } catch (error) {
+            console.error("Unable to upload image:", error);
+            showToast(error.message || "We couldn't upload that image.");
+        } finally {
+            uploadProjectMediaButton.disabled = false;
+            uploadProjectMediaButton.textContent = originalText;
+        }
+    }
+
+    uploadProjectMediaButton?.addEventListener(
+        "click",
+        uploadProjectMedia
+    );
+
+    async function moveProjectMedia(mediaId, direction) {
+        if (!editingProject) {
+            return;
+        }
+
+        const current = sortedMedia(editingProject);
+        const index = current.findIndex(
+            media => Number(media.id) === Number(mediaId)
+        );
+
+        if (index === -1) {
+            return;
+        }
+
+        const newIndex = index + direction;
+
+        if (newIndex < 0 || newIndex >= current.length) {
+            return;
+        }
+
+        const reordered = [...current];
+        [
+            reordered[index],
+            reordered[newIndex]
+        ] = [
+            reordered[newIndex],
+            reordered[index]
+        ];
+
+        updateEditingProjectMedia(
+            reordered.map((media, order) => ({
+                ...media,
+                sort_order: order
+            }))
+        );
+
+        try {
+            const response = await fetch(
+                `/api/admin/projects/${editingProject.id}/media/order`,
+                {
+                    method: "PUT",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        media_ids: reordered.map(media => media.id)
+                    })
+                }
+            );
+
+            if (response.status === 401) {
+                handleExpiredLogin();
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error || "Unable to reorder images."
+                );
+            }
+
+            if (Array.isArray(data.media)) {
+                updateEditingProjectMedia(data.media);
+            }
+
+            showToast("Image order saved!");
+        } catch (error) {
+            console.error("Unable to reorder images:", error);
+            updateEditingProjectMedia(current);
+            showToast("We couldn't save that image order.");
+        }
+    }
+
+    async function deleteProjectMedia(media) {
+        if (!editingProject || !media) {
+            return;
+        }
+
+        const confirmed = window.confirm(
+            "Remove this image from the project? This deletes the R2 file too."
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `/api/admin/media/${media.id}`,
+                {
+                    method: "DELETE",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
+            );
+
+            if (response.status === 401) {
+                handleExpiredLogin();
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error || "Unable to remove image."
+                );
+            }
+
+            updateEditingProjectMedia(
+                sortedMedia(editingProject).filter(
+                    item => Number(item.id) !== Number(media.id)
+                )
+            );
+
+            showToast("Image removed.");
+        } catch (error) {
+            console.error("Unable to remove image:", error);
+            showToast(error.message || "We couldn't remove that image.");
+        }
+    }
+
+
+    /* NAVIGATION */
+
+    navigationLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+            navigationLinks.forEach(item => {
+                item.classList.remove("active");
+            });
+
+            link.classList.add("active");
+        });
+    });
+
+
+    /* START */
+
+    async function startDashboard() {
+        const authenticated = await checkSession();
+
+        if (!authenticated) {
+            return;
+        }
+
+        await Promise.all([
+            loadSettings(),
+            loadProjects()
+        ]);
+    }
+
+    startDashboard();
+});
