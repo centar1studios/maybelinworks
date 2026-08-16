@@ -22,5 +22,12 @@
             "database_name": "maybelinworks-db",
             "database_id": "cfc698b0-c7ad-4ee6-91e9-d9157baf1d47"
         }
+    ],
+
+    "r2_buckets": [
+        {
+            "binding": "MEDIA",
+            "bucket_name": "maybelinworks-media"
+        }
     ]
 }
