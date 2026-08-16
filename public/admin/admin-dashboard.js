@@ -48,6 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    const PAGE_LAYOUT_COLUMNS = 12;
+    const PAGE_LAYOUT_ROW_HEIGHT = 36;
+
     function loadGoogleFont(fontName) {
         if (!fontName || loadedFonts.has(fontName)) {
             return;
@@ -142,10 +145,42 @@ document.addEventListener("DOMContentLoaded", () => {
     const projectMediaList = document.querySelector("[data-project-media-list]");
     const projectMediaCount = document.querySelector("[data-project-media-count]");
 
+    const pageLayoutSection = document.querySelector("[data-page-layout-section]");
+    const customLayoutEnabled = document.querySelector("#project-custom-layout-enabled");
+    const pageLayoutStatus = document.querySelector("[data-page-layout-status]");
+    const pageLayoutBuilder = document.querySelector("[data-page-layout-builder]");
+    const pageLayoutCanvas = document.querySelector("[data-page-layout-canvas]");
+    const pageLayoutInspector = document.querySelector("[data-page-layout-inspector]");
+    const layoutInspectorTitle = document.querySelector("[data-layout-inspector-title]");
+    const layoutTextField = document.querySelector("[data-layout-text-field]");
+    const layoutBlockText = document.querySelector("#layout-block-text");
+    const layoutFitField = document.querySelector("[data-layout-fit-field]");
+    const layoutBlockFit = document.querySelector("#layout-block-fit");
+    const layoutBlockX = document.querySelector("#layout-block-x");
+    const layoutBlockY = document.querySelector("#layout-block-y");
+    const layoutBlockWidth = document.querySelector("#layout-block-width");
+    const layoutBlockHeight = document.querySelector("#layout-block-height");
+    const addLayoutHeadingButton = document.querySelector("[data-add-layout-heading]");
+    const addLayoutTextButton = document.querySelector("[data-add-layout-text]");
+    const addLayoutSpacerButton = document.querySelector("[data-add-layout-spacer]");
+    const addLayoutMediaButton = document.querySelector("[data-add-layout-media]");
+    const resetPageLayoutButton = document.querySelector("[data-reset-page-layout]");
+    const removeLayoutBlockButton = document.querySelector("[data-remove-layout-block]");
+
+    if (pageLayoutSection && projectMediaSection) {
+        projectMediaSection.before(pageLayoutSection);
+    }
+
     let currentSettings = null;
     let projects = [];
     let editingProject = null;
     let editorMode = "edit";
+    let editingPageLayout = {
+        version: 1,
+        blocks: []
+    };
+    let selectedLayoutBlockId = null;
+    let pageLayoutDirty = false;
 
 
     /* MESSAGES */
@@ -983,6 +1018,827 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
+    /* OPTIONAL PAGE BUILDER */
+
+    function layoutNumber(value, fallback, min, max) {
+        const number = Number(value);
+
+        if (!Number.isFinite(number)) {
+            return fallback;
+        }
+
+        return Math.min(
+            Math.max(Math.round(number), min),
+            max
+        );
+    }
+
+    function newLayoutBlockId(type) {
+        const suffix = typeof crypto.randomUUID === "function"
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+
+        return `${type}-${suffix}`;
+    }
+
+    function normalizeClientPageLayout(value, project) {
+        if (
+            !value ||
+            value.version !== 1 ||
+            !Array.isArray(value.blocks)
+        ) {
+            return {
+                version: 1,
+                blocks: []
+            };
+        }
+
+        const mediaIds = new Set(
+            sortedMedia(project).map(
+                media => Number(media.id)
+            )
+        );
+
+        const allowedTypes = new Set([
+            "media",
+            "heading",
+            "text",
+            "spacer"
+        ]);
+
+        const blocks = value.blocks
+            .filter(block =>
+                block &&
+                allowedTypes.has(block.type)
+            )
+            .map((block, index) => {
+                const x = layoutNumber(
+                    block.x,
+                    0,
+                    0,
+                    PAGE_LAYOUT_COLUMNS - 1
+                );
+
+                const width = layoutNumber(
+                    block.w,
+                    PAGE_LAYOUT_COLUMNS,
+                    1,
+                    PAGE_LAYOUT_COLUMNS - x
+                );
+
+                const normalized = {
+                    id: typeof block.id === "string" && block.id.trim()
+                        ? block.id.trim().slice(0, 80)
+                        : `block-${index + 1}`,
+                    type: block.type,
+                    x,
+                    y: layoutNumber(block.y, 0, 0, 500),
+                    w: width,
+                    h: layoutNumber(block.h, 4, 1, 24)
+                };
+
+                if (block.type === "media") {
+                    normalized.media_id = Number(block.media_id);
+                    normalized.fit = block.fit === "cover"
+                        ? "cover"
+                        : "contain";
+                }
+
+                if (
+                    block.type === "heading" ||
+                    block.type === "text"
+                ) {
+                    normalized.text = String(
+                        block.text || (
+                            block.type === "heading"
+                                ? "New Section"
+                                : "Add your text here."
+                        )
+                    ).slice(
+                        0,
+                        block.type === "heading" ? 160 : 1200
+                    );
+                }
+
+                return normalized;
+            })
+            .filter(block =>
+                block.type !== "media" ||
+                mediaIds.has(block.media_id)
+            );
+
+        return {
+            version: 1,
+            blocks
+        };
+    }
+
+    function galleryTemplate(project) {
+        const layout = project?.gallery_layout || projectLayout?.value || "smart";
+        const media = sortedMedia(project);
+        const headingByLayout = {
+            smart: "Project Gallery",
+            publication: "Publication",
+            full: "Presentation",
+            grid: "Gallery",
+            featured: "Featured Work"
+        };
+
+        const blocks = [{
+            id: newLayoutBlockId("heading"),
+            type: "heading",
+            text: headingByLayout[layout] || "Project Gallery",
+            x: 0,
+            y: 0,
+            w: 12,
+            h: 2
+        }];
+
+        let row = 3;
+        let pairIndex = 0;
+
+        media.forEach((item, index) => {
+            let x = 0;
+            let width = 12;
+            let height = 7;
+            let y = row;
+
+            if (layout === "full") {
+                row += 8;
+            } else if (layout === "featured" && index === 0) {
+                row += 8;
+            } else {
+                const column = pairIndex % 2;
+                height = layout === "publication" ? 7 : 5;
+                width = 6;
+                x = column * 6;
+                y = row;
+                pairIndex++;
+
+                if (column === 1 || index === media.length - 1) {
+                    row += height + 1;
+                }
+            }
+
+            blocks.push({
+                id: newLayoutBlockId("media"),
+                type: "media",
+                media_id: Number(item.id),
+                fit: "contain",
+                x,
+                y,
+                w: width,
+                h: height
+            });
+        });
+
+        return {
+            version: 1,
+            blocks
+        };
+    }
+
+    function currentLayoutBottom() {
+        return editingPageLayout.blocks.reduce(
+            (bottom, block) => Math.max(
+                bottom,
+                block.y + block.h
+            ),
+            0
+        );
+    }
+
+    function markPageLayoutDirty() {
+        pageLayoutDirty = true;
+        updatePageLayoutStatus();
+    }
+
+    function updatePageLayoutStatus() {
+        const enabled = Boolean(customLayoutEnabled?.checked);
+
+        if (pageLayoutBuilder) {
+            pageLayoutBuilder.hidden = !enabled;
+        }
+
+        if (pageLayoutStatus) {
+            pageLayoutStatus.textContent = enabled
+                ? (pageLayoutDirty ? "Unsaved Layout" : "Custom Layout")
+                : "Gallery Mode";
+        }
+    }
+
+    function selectedLayoutBlock() {
+        return editingPageLayout.blocks.find(
+            block => block.id === selectedLayoutBlockId
+        ) || null;
+    }
+
+    function mediaForLayoutBlock(block) {
+        return sortedMedia(editingProject).find(
+            media => Number(media.id) === Number(block.media_id)
+        ) || null;
+    }
+
+    function layoutBlockLabel(block) {
+        if (block.type === "media") {
+            const media = mediaForLayoutBlock(block);
+            return media?.alt_text || "Project image";
+        }
+
+        if (block.type === "heading") {
+            return block.text || "Section heading";
+        }
+
+        if (block.type === "text") {
+            return "Text block";
+        }
+
+        return "Space";
+    }
+
+    function positionLayoutElement(element, block) {
+        element.style.left =
+            `calc(${block.x} * (100% / ${PAGE_LAYOUT_COLUMNS}))`;
+        element.style.top =
+            `${block.y * PAGE_LAYOUT_ROW_HEIGHT}px`;
+        element.style.width =
+            `calc(${block.w} * (100% / ${PAGE_LAYOUT_COLUMNS}))`;
+        element.style.height =
+            `${block.h * PAGE_LAYOUT_ROW_HEIGHT}px`;
+    }
+
+    function updatePageLayoutCanvasHeight() {
+        if (!pageLayoutCanvas) {
+            return;
+        }
+
+        const rows = Math.max(
+            12,
+            currentLayoutBottom() + 2
+        );
+
+        pageLayoutCanvas.style.height =
+            `${rows * PAGE_LAYOUT_ROW_HEIGHT}px`;
+    }
+
+    function renderLayoutInspector() {
+        const block = selectedLayoutBlock();
+
+        if (!pageLayoutInspector || !block) {
+            if (pageLayoutInspector) {
+                pageLayoutInspector.hidden = true;
+            }
+            return;
+        }
+
+        pageLayoutInspector.hidden = false;
+        layoutInspectorTitle.textContent = layoutBlockLabel(block);
+
+        const hasText =
+            block.type === "heading" ||
+            block.type === "text";
+
+        layoutTextField.hidden = !hasText;
+        layoutFitField.hidden = block.type !== "media";
+
+        if (hasText) {
+            layoutBlockText.maxLength = block.type === "heading"
+                ? 160
+                : 1200;
+            layoutBlockText.value = block.text || "";
+        }
+
+        if (block.type === "media") {
+            layoutBlockFit.value = block.fit || "contain";
+        }
+
+        layoutBlockX.value = String(block.x + 1);
+        layoutBlockY.value = String(block.y + 1);
+        layoutBlockWidth.value = String(block.w);
+        layoutBlockHeight.value = String(block.h);
+
+        removeLayoutBlockButton.textContent = block.type === "media"
+            ? "Hide Image from Layout"
+            : "Remove Block";
+    }
+
+    function selectLayoutBlock(blockId) {
+        selectedLayoutBlockId = blockId;
+
+        pageLayoutCanvas
+            ?.querySelectorAll("[data-layout-block-id]")
+            .forEach(element => {
+                element.classList.toggle(
+                    "is-selected",
+                    element.dataset.layoutBlockId === blockId
+                );
+            });
+
+        renderLayoutInspector();
+    }
+
+    function startLayoutPointer(
+        event,
+        block,
+        mode,
+        blockElement
+    ) {
+        if (event.pointerType === "mouse" && event.button !== 0) {
+            return;
+        }
+
+        event.preventDefault();
+        selectLayoutBlock(block.id);
+
+        const pointerTarget = event.currentTarget;
+        const canvasRect = pageLayoutCanvas.getBoundingClientRect();
+        const columnWidth = canvasRect.width / PAGE_LAYOUT_COLUMNS;
+        const startX = event.clientX;
+        const startY = event.clientY;
+        const initial = {
+            x: block.x,
+            y: block.y,
+            w: block.w,
+            h: block.h
+        };
+
+        pointerTarget.setPointerCapture(event.pointerId);
+
+        const move = moveEvent => {
+            moveEvent.preventDefault();
+
+            const columnDelta = Math.round(
+                (moveEvent.clientX - startX) / columnWidth
+            );
+
+            const rowDelta = Math.round(
+                (moveEvent.clientY - startY) / PAGE_LAYOUT_ROW_HEIGHT
+            );
+
+            if (mode === "resize") {
+                block.w = layoutNumber(
+                    initial.w + columnDelta,
+                    initial.w,
+                    1,
+                    PAGE_LAYOUT_COLUMNS - block.x
+                );
+
+                block.h = layoutNumber(
+                    initial.h + rowDelta,
+                    initial.h,
+                    1,
+                    24
+                );
+            } else {
+                block.x = layoutNumber(
+                    initial.x + columnDelta,
+                    initial.x,
+                    0,
+                    PAGE_LAYOUT_COLUMNS - block.w
+                );
+
+                block.y = layoutNumber(
+                    initial.y + rowDelta,
+                    initial.y,
+                    0,
+                    500
+                );
+            }
+
+            positionLayoutElement(blockElement, block);
+            updatePageLayoutCanvasHeight();
+            renderLayoutInspector();
+            markPageLayoutDirty();
+        };
+
+        const finish = () => {
+            pointerTarget.removeEventListener("pointermove", move);
+            pointerTarget.removeEventListener("pointerup", finish);
+            pointerTarget.removeEventListener("pointercancel", finish);
+            renderPageLayout();
+        };
+
+        pointerTarget.addEventListener("pointermove", move);
+        pointerTarget.addEventListener("pointerup", finish);
+        pointerTarget.addEventListener("pointercancel", finish);
+    }
+
+    function moveLayoutBlockWithKeyboard(event, block) {
+        const directions = {
+            ArrowLeft: [-1, 0],
+            ArrowRight: [1, 0],
+            ArrowUp: [0, -1],
+            ArrowDown: [0, 1]
+        };
+
+        const direction = directions[event.key];
+
+        if (!direction) {
+            return;
+        }
+
+        event.preventDefault();
+
+        if (event.shiftKey) {
+            block.w = layoutNumber(
+                block.w + direction[0],
+                block.w,
+                1,
+                PAGE_LAYOUT_COLUMNS - block.x
+            );
+
+            block.h = layoutNumber(
+                block.h + direction[1],
+                block.h,
+                1,
+                24
+            );
+        } else {
+            block.x = layoutNumber(
+                block.x + direction[0],
+                block.x,
+                0,
+                PAGE_LAYOUT_COLUMNS - block.w
+            );
+
+            block.y = layoutNumber(
+                block.y + direction[1],
+                block.y,
+                0,
+                500
+            );
+        }
+
+        markPageLayoutDirty();
+        renderPageLayout();
+
+        window.setTimeout(() => {
+            pageLayoutCanvas
+                ?.querySelector(
+                    `[data-layout-block-id="${block.id}"]`
+                )
+                ?.focus();
+        }, 0);
+    }
+
+    function renderPageLayout() {
+        updatePageLayoutStatus();
+
+        if (!pageLayoutCanvas || !customLayoutEnabled?.checked) {
+            renderLayoutInspector();
+            return;
+        }
+
+        pageLayoutCanvas.replaceChildren();
+        updatePageLayoutCanvasHeight();
+
+        if (!editingPageLayout.blocks.length) {
+            const empty = document.createElement("div");
+            empty.className = "layout-canvas-empty";
+            empty.innerHTML = `
+                <strong>Your page is empty</strong>
+                <span>Add a section, text, space or project images.</span>
+            `;
+            pageLayoutCanvas.appendChild(empty);
+            renderLayoutInspector();
+            return;
+        }
+
+        editingPageLayout.blocks.forEach(block => {
+            const element = document.createElement("article");
+            element.className = `layout-block layout-block-${block.type}`;
+            element.dataset.layoutBlockId = block.id;
+            element.tabIndex = 0;
+            element.setAttribute(
+                "aria-label",
+                `${layoutBlockLabel(block)}. Drag to move. Use Shift and arrow keys to resize.`
+            );
+
+            positionLayoutElement(element, block);
+
+            const content = document.createElement("div");
+            content.className = "layout-block-content";
+
+            if (block.type === "media") {
+                const media = mediaForLayoutBlock(block);
+
+                if (media) {
+                    const image = document.createElement("img");
+                    image.src = getMediaUrl(media);
+                    image.alt = media.alt_text || "Project image";
+                    image.loading = "lazy";
+                    image.style.objectFit = block.fit || "contain";
+                    content.appendChild(image);
+                }
+            } else if (block.type === "spacer") {
+                content.textContent = "Space";
+            } else {
+                content.textContent = block.text || "";
+            }
+
+            const label = document.createElement("span");
+            label.className = "layout-block-label";
+            label.textContent = layoutBlockLabel(block);
+
+            const resize = document.createElement("button");
+            resize.type = "button";
+            resize.className = "layout-resize-handle";
+            resize.setAttribute(
+                "aria-label",
+                `Resize ${layoutBlockLabel(block)}`
+            );
+
+            element.append(content, label, resize);
+            element.classList.toggle(
+                "is-selected",
+                block.id === selectedLayoutBlockId
+            );
+
+            element.addEventListener("click", () => {
+                selectLayoutBlock(block.id);
+            });
+
+            element.addEventListener("pointerdown", event => {
+                if (event.target.closest(".layout-resize-handle")) {
+                    return;
+                }
+
+                startLayoutPointer(
+                    event,
+                    block,
+                    "move",
+                    element
+                );
+            });
+
+            element.addEventListener("keydown", event => {
+                moveLayoutBlockWithKeyboard(event, block);
+            });
+
+            resize.addEventListener("pointerdown", event => {
+                event.stopPropagation();
+                startLayoutPointer(
+                    event,
+                    block,
+                    "resize",
+                    element
+                );
+            });
+
+            pageLayoutCanvas.appendChild(element);
+        });
+
+        renderLayoutInspector();
+    }
+
+    function addContentLayoutBlock(type) {
+        const block = {
+            id: newLayoutBlockId(type),
+            type,
+            x: 0,
+            y: currentLayoutBottom() + 1,
+            w: 12,
+            h: type === "text" ? 4 : 2
+        };
+
+        if (type === "heading") {
+            block.text = "New Section";
+        }
+
+        if (type === "text") {
+            block.text = "Add your text here.";
+        }
+
+        editingPageLayout.blocks.push(block);
+        selectedLayoutBlockId = block.id;
+        markPageLayoutDirty();
+        renderPageLayout();
+
+        if (type === "heading" || type === "text") {
+            window.setTimeout(() => {
+                layoutBlockText?.focus();
+                layoutBlockText?.select();
+            }, 0);
+        }
+    }
+
+    function appendMediaLayoutBlocks(mediaItems) {
+        if (!mediaItems.length) {
+            return 0;
+        }
+
+        const startRow = currentLayoutBottom() + 1;
+
+        mediaItems.forEach((media, index) => {
+            editingPageLayout.blocks.push({
+                id: newLayoutBlockId("media"),
+                type: "media",
+                media_id: Number(media.id),
+                fit: "contain",
+                x: (index % 2) * 6,
+                y: startRow + Math.floor(index / 2) * 6,
+                w: 6,
+                h: 5
+            });
+        });
+
+        selectedLayoutBlockId =
+            editingPageLayout.blocks.at(-1)?.id || null;
+        markPageLayoutDirty();
+        renderPageLayout();
+        return mediaItems.length;
+    }
+
+    function addMissingMediaToLayout() {
+        const usedMediaIds = new Set(
+            editingPageLayout.blocks
+                .filter(block => block.type === "media")
+                .map(block => Number(block.media_id))
+        );
+
+        const missing = sortedMedia(editingProject).filter(
+            media => !usedMediaIds.has(Number(media.id))
+        );
+
+        if (!appendMediaLayoutBlocks(missing)) {
+            showToast("Every project image is already on the custom page.");
+            return;
+        }
+
+        showToast(
+            `${missing.length} ${missing.length === 1 ? "image was" : "images were"} added to the page.`
+        );
+    }
+
+    function updateSelectedLayoutPosition(field, value) {
+        const block = selectedLayoutBlock();
+
+        if (!block) {
+            return;
+        }
+
+        if (field === "x") {
+            block.x = layoutNumber(
+                Number(value) - 1,
+                block.x,
+                0,
+                PAGE_LAYOUT_COLUMNS - block.w
+            );
+        }
+
+        if (field === "y") {
+            block.y = layoutNumber(
+                Number(value) - 1,
+                block.y,
+                0,
+                500
+            );
+        }
+
+        if (field === "w") {
+            block.w = layoutNumber(
+                value,
+                block.w,
+                1,
+                PAGE_LAYOUT_COLUMNS - block.x
+            );
+        }
+
+        if (field === "h") {
+            block.h = layoutNumber(
+                value,
+                block.h,
+                1,
+                24
+            );
+        }
+
+        markPageLayoutDirty();
+        renderPageLayout();
+    }
+
+    customLayoutEnabled?.addEventListener("change", () => {
+        if (
+            customLayoutEnabled.checked &&
+            !editingPageLayout.blocks.length
+        ) {
+            editingPageLayout = galleryTemplate(
+                editingProject || {
+                    gallery_layout: projectLayout?.value,
+                    media: []
+                }
+            );
+        }
+
+        selectedLayoutBlockId = null;
+        markPageLayoutDirty();
+        renderPageLayout();
+    });
+
+    addLayoutHeadingButton?.addEventListener("click", () => {
+        addContentLayoutBlock("heading");
+    });
+
+    addLayoutTextButton?.addEventListener("click", () => {
+        addContentLayoutBlock("text");
+    });
+
+    addLayoutSpacerButton?.addEventListener("click", () => {
+        addContentLayoutBlock("spacer");
+    });
+
+    addLayoutMediaButton?.addEventListener(
+        "click",
+        addMissingMediaToLayout
+    );
+
+    resetPageLayoutButton?.addEventListener("click", () => {
+        if (
+            editingPageLayout.blocks.length &&
+            !window.confirm(
+                "Replace this custom arrangement with a fresh layout based on the selected Gallery Layout?"
+            )
+        ) {
+            return;
+        }
+
+        editingPageLayout = galleryTemplate(editingProject);
+        selectedLayoutBlockId = null;
+        markPageLayoutDirty();
+        renderPageLayout();
+    });
+
+    removeLayoutBlockButton?.addEventListener("click", () => {
+        if (!selectedLayoutBlockId) {
+            return;
+        }
+
+        editingPageLayout.blocks = editingPageLayout.blocks.filter(
+            block => block.id !== selectedLayoutBlockId
+        );
+        selectedLayoutBlockId = null;
+        markPageLayoutDirty();
+        renderPageLayout();
+    });
+
+    layoutBlockText?.addEventListener("input", () => {
+        const block = selectedLayoutBlock();
+
+        if (
+            !block ||
+            (block.type !== "heading" && block.type !== "text")
+        ) {
+            return;
+        }
+
+        block.text = layoutBlockText.value.slice(
+            0,
+            block.type === "heading" ? 160 : 1200
+        );
+
+        const selectedElement = Array.from(
+            pageLayoutCanvas?.querySelectorAll("[data-layout-block-id]") || []
+        ).find(
+            element => element.dataset.layoutBlockId === block.id
+        );
+
+        const content = selectedElement?.querySelector(
+            ".layout-block-content"
+        );
+
+        if (content) {
+            content.textContent = block.text;
+        }
+
+        markPageLayoutDirty();
+    });
+
+    layoutBlockFit?.addEventListener("change", () => {
+        const block = selectedLayoutBlock();
+
+        if (!block || block.type !== "media") {
+            return;
+        }
+
+        block.fit = layoutBlockFit.value === "cover"
+            ? "cover"
+            : "contain";
+        markPageLayoutDirty();
+        renderPageLayout();
+    });
+
+    [
+        [layoutBlockX, "x"],
+        [layoutBlockY, "y"],
+        [layoutBlockWidth, "w"],
+        [layoutBlockHeight, "h"]
+    ].forEach(([input, field]) => {
+        input?.addEventListener("change", () => {
+            updateSelectedLayoutPosition(field, input.value);
+        });
+    });
+
+
     /* PROJECT EDITOR */
 
     function setEditorMode(mode) {
@@ -1006,6 +1862,7 @@ document.addEventListener("DOMContentLoaded", () => {
             : "Save Project";
 
         projectMediaSection.hidden = creating;
+        pageLayoutSection.hidden = creating;
         createProjectMediaNote.hidden = !creating;
     }
 
@@ -1019,6 +1876,22 @@ document.addEventListener("DOMContentLoaded", () => {
         projectLayout.value = project?.gallery_layout || "smart";
         projectVisible.checked = Number(project?.is_published) === 1;
 
+        const savedPageLayout = normalizeClientPageLayout(
+            project?.page_layout,
+            project || { media: [] }
+        );
+
+        editingPageLayout = savedPageLayout;
+        selectedLayoutBlockId = null;
+        pageLayoutDirty = false;
+
+        if (customLayoutEnabled) {
+            customLayoutEnabled.checked = Boolean(
+                project?.page_layout &&
+                savedPageLayout.blocks.length
+            );
+        }
+
         if (projectMediaFile) {
             projectMediaFile.value = "";
         }
@@ -1028,6 +1901,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         updateLayoutDescription();
+        renderPageLayout();
     }
 
     function openProjectEditor(slug) {
@@ -1043,6 +1917,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setEditorMode("edit");
         fillProjectFields(project);
         renderProjectMedia();
+        renderPageLayout();
 
         if (!projectEditor.open) {
             projectEditor.showModal();
@@ -1061,7 +1936,8 @@ document.addEventListener("DOMContentLoaded", () => {
         fillProjectFields({
             gallery_layout: "smart",
             is_published: 0,
-            media: []
+            media: [],
+            page_layout: null
         });
 
         if (!projectEditor.open) {
@@ -1081,12 +1957,28 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     function closeProjectEditor() {
+        if (
+            pageLayoutDirty &&
+            projectEditor?.open &&
+            !window.confirm(
+                "Leave without saving your page layout changes?"
+            )
+        ) {
+            return;
+        }
+
         if (projectEditor?.open) {
             projectEditor.close();
         }
 
         editingProject = null;
         editorMode = "edit";
+        editingPageLayout = {
+            version: 1,
+            blocks: []
+        };
+        selectedLayoutBlockId = null;
+        pageLayoutDirty = false;
         document.body.classList.remove("editor-open");
     }
 
@@ -1115,7 +2007,13 @@ document.addEventListener("DOMContentLoaded", () => {
             year: yearValue ? Number(yearValue) : null,
             role: projectRole.value.trim() || null,
             gallery_layout: projectLayout.value,
-            is_published: projectVisible.checked
+            is_published: projectVisible.checked,
+            page_layout: customLayoutEnabled?.checked
+                ? {
+                    version: 1,
+                    blocks: editingPageLayout.blocks
+                }
+                : null
         };
     }
 
@@ -1182,6 +2080,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 setEditorMode("edit");
                 fillProjectFields(editingProject);
                 renderProjectMedia();
+                renderPageLayout();
 
                 showToast("Project created! Now add images, then turn on visibility when you're ready.");
             } else {
@@ -1193,6 +2092,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
                 renderProjects();
+                pageLayoutDirty = false;
                 closeProjectEditor();
                 showToast("Project changes saved!");
             }
@@ -1308,6 +2208,24 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        const validMediaIds = new Set(
+            media.map(item => Number(item.id))
+        );
+
+        const previousBlockCount = editingPageLayout.blocks.length;
+        editingPageLayout.blocks = editingPageLayout.blocks.filter(
+            block =>
+                block.type !== "media" ||
+                validMediaIds.has(Number(block.media_id))
+        );
+
+        if (
+            customLayoutEnabled?.checked &&
+            editingPageLayout.blocks.length !== previousBlockCount
+        ) {
+            markPageLayoutDirty();
+        }
+
         editingProject = {
             ...editingProject,
             media
@@ -1320,6 +2238,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         renderProjectMedia();
+        renderPageLayout();
         renderProjects();
     }
 
@@ -1379,6 +2298,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 ...sortedMedia(editingProject),
                 data.media
             ]);
+
+            if (customLayoutEnabled?.checked) {
+                appendMediaLayoutBlocks([data.media]);
+            }
 
             projectMediaFile.value = "";
             projectMediaAlt.value = "";

@@ -24,6 +24,16 @@ const ALLOWED_GALLERY_LAYOUTS = [
     "featured"
 ];
 
+const ALLOWED_PAGE_BLOCK_TYPES = [
+    "media",
+    "heading",
+    "text",
+    "spacer"
+];
+
+const MAX_PAGE_LAYOUT_BLOCKS = 200;
+const MAX_PAGE_LAYOUT_BYTES = 100 * 1024;
+
 
 /* RESPONSE HELPERS */
 
@@ -463,6 +473,184 @@ function cleanGalleryLayout(value, fallback = "smart") {
     return ALLOWED_GALLERY_LAYOUTS.includes(value)
         ? value
         : fallback;
+}
+
+function parsePageLayout(value) {
+    if (!value) {
+        return null;
+    }
+
+    try {
+        const layout = typeof value === "string"
+            ? JSON.parse(value)
+            : value;
+
+        if (
+            !layout ||
+            layout.version !== 1 ||
+            !Array.isArray(layout.blocks)
+        ) {
+            return null;
+        }
+
+        return layout;
+    } catch {
+        return null;
+    }
+}
+
+function projectResponse(project) {
+    if (!project) {
+        return project;
+    }
+
+    const {
+        page_layout_json: pageLayoutJson,
+        ...response
+    } = project;
+
+    return {
+        ...response,
+        page_layout: parsePageLayout(pageLayoutJson)
+    };
+}
+
+function cleanPageLayout(value, allowedMediaIds) {
+    if (value === null || value === false) {
+        return {
+            layout: null,
+            json: null
+        };
+    }
+
+    if (
+        !value ||
+        typeof value !== "object" ||
+        !Array.isArray(value.blocks)
+    ) {
+        return {
+            error: "The custom page layout is invalid."
+        };
+    }
+
+    if (value.blocks.length > MAX_PAGE_LAYOUT_BLOCKS) {
+        return {
+            error: "The custom page layout has too many blocks."
+        };
+    }
+
+    const blockIds = new Set();
+    const blocks = [];
+
+    for (let index = 0; index < value.blocks.length; index++) {
+        const block = value.blocks[index];
+
+        if (
+            !block ||
+            typeof block !== "object" ||
+            !ALLOWED_PAGE_BLOCK_TYPES.includes(block.type)
+        ) {
+            return {
+                error: "The custom page layout contains an invalid block."
+            };
+        }
+
+        let id = cleanText(
+            block.id,
+            `block-${index + 1}`,
+            80
+        );
+
+        if (blockIds.has(id)) {
+            id = `${id}-${index + 1}`.slice(0, 80);
+        }
+
+        blockIds.add(id);
+
+        const x = Math.round(
+            clampNumber(block.x, 0, 0, 11)
+        );
+
+        const y = Math.round(
+            clampNumber(block.y, 0, 0, 500)
+        );
+
+        const width = Math.round(
+            clampNumber(block.w, 12, 1, 12 - x)
+        );
+
+        const height = Math.round(
+            clampNumber(block.h, 4, 1, 24)
+        );
+
+        const cleaned = {
+            id,
+            type: block.type,
+            x,
+            y,
+            w: width,
+            h: height
+        };
+
+        if (block.type === "media") {
+            const mediaId = Number(block.media_id);
+
+            if (
+                !Number.isInteger(mediaId) ||
+                mediaId <= 0 ||
+                !allowedMediaIds.has(mediaId)
+            ) {
+                return {
+                    error: "The custom page layout references an image that is no longer in this project."
+                };
+            }
+
+            cleaned.media_id = mediaId;
+            cleaned.fit = block.fit === "cover"
+                ? "cover"
+                : "contain";
+        }
+
+        if (
+            block.type === "heading" ||
+            block.type === "text"
+        ) {
+            const maxLength = block.type === "heading"
+                ? 160
+                : 1200;
+
+            cleaned.text = cleanText(
+                block.text,
+                block.type === "heading"
+                    ? "New Section"
+                    : "Add your text here.",
+                maxLength
+            );
+        }
+
+        blocks.push(cleaned);
+    }
+
+    const layout = {
+        version: 1,
+        blocks
+    };
+
+    const jsonValue = JSON.stringify(layout);
+    const byteLength = new TextEncoder()
+        .encode(jsonValue)
+        .byteLength;
+
+    if (byteLength > MAX_PAGE_LAYOUT_BYTES) {
+        return {
+            error: "The custom page layout is too large to save."
+        };
+    }
+
+    return {
+        layout,
+        json: jsonValue
+    };
 }
 
 function slugify(value) {
@@ -982,6 +1170,7 @@ async function getProjectsFromDatabase(
                 year,
                 role,
                 gallery_layout,
+                page_layout_json,
                 sort_order,
                 is_published,
                 created_at,
@@ -1032,7 +1221,7 @@ async function getProjectsFromDatabase(
 
     return projectResult.results.map(
         project => ({
-            ...project,
+            ...projectResponse(project),
             media:
                 mediaByProject.get(project.id) || []
         })
@@ -1243,6 +1432,7 @@ async function handleCreateProject(
                     year,
                     role,
                     gallery_layout,
+                    page_layout_json,
                     sort_order,
                     is_published
                 )
@@ -1290,7 +1480,7 @@ async function handleCreateProject(
         return json({
             success: true,
             project: {
-                ...project,
+                ...projectResponse(project),
                 media: []
             }
         }, 201);
@@ -1423,6 +1613,43 @@ async function handleUpdateProject(
             current.is_published
         );
 
+        let pageLayoutJson = current.page_layout_json || null;
+
+        if (
+            Object.prototype.hasOwnProperty.call(
+                body,
+                "page_layout"
+            )
+        ) {
+            const mediaResult = await env.DB
+                .prepare(`
+                    SELECT id
+                    FROM project_media
+                    WHERE project_id = ?
+                `)
+                .bind(numericId)
+                .all();
+
+            const allowedMediaIds = new Set(
+                mediaResult.results.map(
+                    media => Number(media.id)
+                )
+            );
+
+            const cleanedLayout = cleanPageLayout(
+                body.page_layout,
+                allowedMediaIds
+            );
+
+            if (cleanedLayout.error) {
+                return json({
+                    error: cleanedLayout.error
+                }, 400);
+            }
+
+            pageLayoutJson = cleanedLayout.json;
+        }
+
         await env.DB
             .prepare(`
                 UPDATE projects
@@ -1433,6 +1660,7 @@ async function handleUpdateProject(
                     year = ?,
                     role = ?,
                     gallery_layout = ?,
+                    page_layout_json = ?,
                     sort_order = ?,
                     is_published = ?,
                     updated_at = CURRENT_TIMESTAMP
@@ -1445,6 +1673,7 @@ async function handleUpdateProject(
                 year,
                 role,
                 galleryLayout,
+                pageLayoutJson,
                 sortOrder,
                 isPublished,
                 numericId
@@ -1462,6 +1691,7 @@ async function handleUpdateProject(
                     year,
                     role,
                     gallery_layout,
+                    page_layout_json,
                     sort_order,
                     is_published,
                     created_at,
@@ -1491,7 +1721,7 @@ async function handleUpdateProject(
         return json({
             success: true,
             project: {
-                ...updated,
+                ...projectResponse(updated),
                 media: mediaResult.results
             }
         });

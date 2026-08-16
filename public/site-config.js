@@ -1,15 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    /* CMS STYLES */
-
-    if (!document.querySelector('link[data-cms-styles]')) {
-        const cmsStyles = document.createElement("link");
-        cmsStyles.rel = "stylesheet";
-        cmsStyles.href = "/cms-styles.css";
-        cmsStyles.dataset.cmsStyles = "true";
-        document.head.appendChild(cmsStyles);
-    }
-
-
     /* FONTS */
 
     const GOOGLE_FONTS = new Map([
@@ -78,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const aboutDialog = document.querySelector("[data-about-dialog]");
     const openAboutButton = document.querySelector("[data-open-about]");
     const closeAboutButton = document.querySelector("[data-close-about]");
-    const projectsToolbar = projectsDialog?.querySelector(".dialog-toolbar");
 
     const heroKicker = document.querySelector(".hero-kicker");
     const heroTitle = document.querySelector(".hero-title");
@@ -330,7 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let nextProjectButton = null;
     let projectCounter = null;
 
-    if (projectsToolbar && closeProjectsButton) {
+    if (publicProjectList) {
         projectSwitcher = document.createElement("div");
         projectSwitcher.className = "project-switcher";
         projectSwitcher.setAttribute(
@@ -358,9 +346,9 @@ document.addEventListener("DOMContentLoaded", () => {
             nextProjectButton
         );
 
-        projectsToolbar.insertBefore(
-            projectSwitcher,
-            closeProjectsButton
+        publicProjectList.insertAdjacentElement(
+            "afterend",
+            projectSwitcher
         );
     }
 
@@ -668,6 +656,164 @@ document.addEventListener("DOMContentLoaded", () => {
         meta.appendChild(row);
     }
 
+    function pageLayoutNumber(value, fallback, min, max) {
+        const number = Number(value);
+
+        if (!Number.isFinite(number)) {
+            return fallback;
+        }
+
+        return Math.min(
+            Math.max(Math.round(number), min),
+            max
+        );
+    }
+
+    function createCustomProjectLayout(project, media) {
+        const layout = project?.page_layout;
+
+        if (
+            !layout ||
+            layout.version !== 1 ||
+            !Array.isArray(layout.blocks) ||
+            !layout.blocks.length
+        ) {
+            return null;
+        }
+
+        const mediaById = new Map(
+            media.map(item => [
+                Number(item.id),
+                item
+            ])
+        );
+
+        const allowedTypes = new Set([
+            "media",
+            "heading",
+            "text",
+            "spacer"
+        ]);
+
+        const blocks = layout.blocks
+            .filter(block =>
+                block &&
+                allowedTypes.has(block.type)
+            )
+            .map((block, index) => {
+                const x = pageLayoutNumber(
+                    block.x,
+                    0,
+                    0,
+                    11
+                );
+
+                return {
+                    ...block,
+                    x,
+                    y: pageLayoutNumber(block.y, 0, 0, 500),
+                    w: pageLayoutNumber(block.w, 12, 1, 12 - x),
+                    h: pageLayoutNumber(block.h, 4, 1, 24),
+                    sourceOrder: index
+                };
+            })
+            .sort((a, b) =>
+                a.y - b.y ||
+                a.x - b.x ||
+                a.sourceOrder - b.sourceOrder
+            );
+
+        const canvas = document.createElement("div");
+        canvas.className = "cms-layout-canvas";
+
+        let renderedBlocks = 0;
+        let bottomRow = 0;
+
+        blocks.forEach((block, index) => {
+            let element;
+
+            if (block.type === "media") {
+                const item = mediaById.get(
+                    Number(block.media_id)
+                );
+
+                if (!item) {
+                    return;
+                }
+
+                element = document.createElement("figure");
+                element.className = "cms-layout-block cms-layout-media";
+                element.dataset.mediaId = String(item.id);
+
+                const image = document.createElement("img");
+                image.src = getMediaUrl(item);
+                image.alt = item.alt_text ||
+                    `${project.title} project image`;
+                image.loading = "lazy";
+                image.decoding = "async";
+                image.style.objectFit = block.fit === "cover"
+                    ? "cover"
+                    : "contain";
+
+                prepareGalleryImage(image);
+                element.appendChild(image);
+            } else if (block.type === "heading") {
+                element = document.createElement("section");
+                element.className = "cms-layout-block cms-layout-heading";
+
+                const heading = document.createElement("h4");
+                heading.textContent = block.text || "Project Section";
+                element.appendChild(heading);
+            } else if (block.type === "text") {
+                element = document.createElement("section");
+                element.className = "cms-layout-block cms-layout-text";
+
+                const text = document.createElement("p");
+                text.textContent = block.text || "";
+                element.appendChild(text);
+            } else {
+                element = document.createElement("div");
+                element.className = "cms-layout-block cms-layout-spacer";
+                element.setAttribute("aria-hidden", "true");
+            }
+
+            element.style.setProperty("--layout-x", String(block.x));
+            element.style.setProperty("--layout-y", String(block.y));
+            element.style.setProperty("--layout-w", String(block.w));
+            element.style.setProperty("--layout-h", String(block.h));
+            element.style.setProperty("--layout-order", String(index));
+            element.style.left =
+                `${(block.x / 12) * 100}%`;
+            element.style.top =
+                `${block.y * 3.5}rem`;
+            element.style.width =
+                `${(block.w / 12) * 100}%`;
+            element.style.height =
+                `${block.h * 3.5}rem`;
+            element.style.order = String(index);
+
+            canvas.appendChild(element);
+            renderedBlocks++;
+            bottomRow = Math.max(
+                bottomRow,
+                block.y + block.h
+            );
+        });
+
+        if (!renderedBlocks) {
+            return null;
+        }
+
+        canvas.style.setProperty(
+            "--layout-rows",
+            String(Math.max(bottomRow, 1))
+        );
+        canvas.style.minHeight =
+            `${Math.max(bottomRow, 1) * 3.5}rem`;
+
+        return canvas;
+    }
+
     function createProjectGallery(project) {
         const gallery = document.createElement("div");
         const layout = project.gallery_layout || "smart";
@@ -685,6 +831,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     Number(a.id) - Number(b.id);
             })
             : [];
+
+        const customLayout = createCustomProjectLayout(
+            project,
+            media
+        );
+
+        if (customLayout) {
+            gallery.classList.add("gallery-layout-custom");
+            gallery.appendChild(customLayout);
+            return gallery;
+        }
 
         if (!media.length) {
             const empty = document.createElement("div");

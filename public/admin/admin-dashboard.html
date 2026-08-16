@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="./admin-stylesheet.css">
+    <link rel="stylesheet" href="./admin-stylesheet.css?v=20260816-4">
 </head>
 
 <body>
@@ -515,6 +515,89 @@
                     <div class="project-media-list" data-project-media-list></div>
                 </section>
 
+                <section class="editor-section page-layout-editor" data-page-layout-section>
+                    <div class="editor-section-heading">
+                        <div>
+                            <p class="panel-kicker">Optional Page Builder</p>
+                            <h3>Place Images &amp; Sections</h3>
+                            <p>Arrange images, publication pages, presentation slides, headings and text on a flexible twelve-column canvas.</p>
+                        </div>
+
+                        <span class="project-media-count" data-page-layout-status>Gallery Mode</span>
+                    </div>
+
+                    <label class="page-layout-toggle">
+                        <input type="checkbox" id="project-custom-layout-enabled">
+                        <span>
+                            <strong>Use a custom page layout</strong>
+                            <small>Leave this off to keep using Publication, Grid, Full Width, Smart Gallery or Featured + Grid exactly as before.</small>
+                        </span>
+                    </label>
+
+                    <div class="page-layout-builder" data-page-layout-builder hidden>
+                        <div class="page-layout-toolbar" aria-label="Page builder tools">
+                            <button type="button" data-add-layout-heading>Add Section</button>
+                            <button type="button" data-add-layout-text>Add Text</button>
+                            <button type="button" data-add-layout-spacer>Add Space</button>
+                            <button type="button" data-add-layout-media>Add Missing Images</button>
+                            <button type="button" class="layout-reset-button" data-reset-page-layout>Arrange from Gallery</button>
+                        </div>
+
+                        <p class="page-layout-help">
+                            Drag blocks to place them. Use the corner handle to resize. Select a block for precise controls. Changes save only when you choose <strong>Save Project</strong>.
+                        </p>
+
+                        <div class="page-layout-workspace">
+                            <div class="page-layout-canvas-shell">
+                                <div class="page-layout-column-guide" aria-hidden="true">
+                                    <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+                                    <span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
+                                </div>
+                                <div class="page-layout-canvas" data-page-layout-canvas tabindex="0" aria-label="Custom project page canvas"></div>
+                            </div>
+
+                            <aside class="page-layout-inspector" data-page-layout-inspector hidden>
+                                <p class="panel-kicker">Selected Block</p>
+                                <h4 data-layout-inspector-title>Block</h4>
+
+                                <div class="admin-field" data-layout-text-field hidden>
+                                    <label for="layout-block-text">Content</label>
+                                    <textarea id="layout-block-text" rows="4" maxlength="1200"></textarea>
+                                </div>
+
+                                <div class="admin-field" data-layout-fit-field hidden>
+                                    <label for="layout-block-fit">Image Fit</label>
+                                    <select id="layout-block-fit">
+                                        <option value="contain">Show the whole image</option>
+                                        <option value="cover">Crop to fill the block</option>
+                                    </select>
+                                </div>
+
+                                <div class="layout-position-grid">
+                                    <div class="admin-field">
+                                        <label for="layout-block-x">Column</label>
+                                        <input type="number" id="layout-block-x" min="1" max="12">
+                                    </div>
+                                    <div class="admin-field">
+                                        <label for="layout-block-y">Row</label>
+                                        <input type="number" id="layout-block-y" min="1" max="501">
+                                    </div>
+                                    <div class="admin-field">
+                                        <label for="layout-block-width">Width</label>
+                                        <input type="number" id="layout-block-width" min="1" max="12">
+                                    </div>
+                                    <div class="admin-field">
+                                        <label for="layout-block-height">Height</label>
+                                        <input type="number" id="layout-block-height" min="1" max="24">
+                                    </div>
+                                </div>
+
+                                <button class="layout-remove-button" type="button" data-remove-layout-block>Remove from Layout</button>
+                            </aside>
+                        </div>
+                    </div>
+                </section>
+
 
                 <div class="create-project-media-note" data-create-project-media-note hidden>
                     <strong>Create the project first.</strong>
@@ -533,6 +616,6 @@
 
     <div class="admin-toast" data-admin-toast role="status" aria-live="polite"></div>
 
-    <script src="./admin-dashboard.js?v=20260816-3"></script>
+    <script src="./admin-dashboard.js?v=20260816-4"></script>
 </body>
 </html>
