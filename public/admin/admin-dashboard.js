@@ -1,68 +1,287 @@
 document.addEventListener("DOMContentLoaded", () => {
+    /* FONTS */
+
+    const GOOGLE_FONTS = new Map([
+        [
+            "Playfair Display",
+            "Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400"
+        ],
+        [
+            "Cormorant Garamond",
+            "Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400"
+        ],
+        [
+            "DM Serif Display",
+            "DM+Serif+Display:ital@0;1"
+        ],
+        [
+            "Libre Baskerville",
+            "Libre+Baskerville:ital,wght@0,400;0,700;1,400"
+        ],
+        [
+            "Cardo",
+            "Cardo:ital,wght@0,400;0,700;1,400"
+        ],
+        [
+            "Lato",
+            "Lato:wght@300;400;700;900"
+        ],
+        [
+            "Inter",
+            "Inter:wght@300;400;500;600;700;800"
+        ],
+        [
+            "Montserrat",
+            "Montserrat:wght@300;400;500;600;700;800"
+        ],
+        [
+            "Nunito",
+            "Nunito:wght@300;400;500;600;700;800"
+        ],
+        [
+            "Source Sans 3",
+            "Source+Sans+3:wght@300;400;500;600;700;800"
+        ],
+        [
+            "Hind",
+            "Hind:wght@300;400;500;600;700"
+        ]
+    ]);
+
+    const loadedFonts = new Set([
+        "Playfair Display",
+        "Lato"
+    ]);
+
+    function loadGoogleFont(fontName) {
+        if (
+            !fontName ||
+            loadedFonts.has(fontName)
+        ) {
+            return;
+        }
+
+        const googleName =
+            GOOGLE_FONTS.get(fontName);
+
+        if (!googleName) {
+            return;
+        }
+
+        const link =
+            document.createElement("link");
+
+        link.rel = "stylesheet";
+        link.href =
+            `https://fonts.googleapis.com/css2?family=${googleName}&display=swap`;
+
+        document.head.appendChild(link);
+        loadedFonts.add(fontName);
+    }
+
+    function fontStack(fontName, type) {
+        if (type === "display") {
+            return `"${fontName}", Georgia, serif`;
+        }
+
+        return `"${fontName}", Arial, sans-serif`;
+    }
+
+
     /* ACCOUNT */
 
-    const usernameElements = document.querySelectorAll(
-        "[data-admin-username], [data-account-username]"
-    );
+    const usernameElements =
+        document.querySelectorAll(
+            "[data-admin-username], [data-account-username]"
+        );
 
-    const avatar = document.querySelector("[data-user-avatar]");
-    const logoutButtons = document.querySelectorAll("[data-logout]");
-    const toast = document.querySelector("[data-admin-toast]");
+    const avatar =
+        document.querySelector(
+            "[data-user-avatar]"
+        );
+
+    const logoutButtons =
+        document.querySelectorAll(
+            "[data-logout]"
+        );
+
+    const toast =
+        document.querySelector(
+            "[data-admin-toast]"
+        );
+
 
     /* NAVIGATION */
 
-    const navigationLinks = document.querySelectorAll(".admin-nav-link");
+    const navigationLinks =
+        document.querySelectorAll(
+            ".admin-nav-link"
+        );
+
 
     /* HOMEPAGE */
 
-    const heroKicker = document.querySelector("#hero-kicker");
-    const heroTitle = document.querySelector("#hero-title");
-    const heroDescription = document.querySelector("#hero-description");
+    const heroKicker =
+        document.querySelector(
+            "#hero-kicker"
+        );
 
-    const saveSettingsButton = document.querySelector(
-        "[data-save-settings]"
-    );
+    const heroTitle =
+        document.querySelector(
+            "#hero-title"
+        );
 
-    const homepageBadge = document.querySelector(
-        "#homepage .coming-soon-badge"
-    );
+    const heroDescription =
+        document.querySelector(
+            "#hero-description"
+        );
+
+    const displayFont =
+        document.querySelector(
+            "#display-font"
+        );
+
+    const bodyFont =
+        document.querySelector(
+            "#body-font"
+        );
+
+    const displayFontPreview =
+        document.querySelector(
+            "[data-display-font-preview]"
+        );
+
+    const bodyFontPreview =
+        document.querySelector(
+            "[data-body-font-preview]"
+        );
+
+    const saveSettingsButton =
+        document.querySelector(
+            "[data-save-settings]"
+        );
+
+    const homepageBadge =
+        document.querySelector(
+            "#homepage .coming-soon-badge"
+        );
 
     let currentSettings = null;
 
+
     /* PROJECTS */
 
-    const projectList = document.querySelector("[data-project-list]");
-    const projectCount = document.querySelector("[data-project-count]");
-    const projectSummary = document.querySelector("[data-project-summary]");
+    const projectList =
+        document.querySelector(
+            "[data-project-list]"
+        );
 
-    const projectEditor = document.querySelector(
-        "[data-project-editor]"
-    );
+    const projectCount =
+        document.querySelector(
+            "[data-project-count]"
+        );
 
-    const projectEditorForm = document.querySelector(
-        "[data-project-editor-form]"
-    );
+    const projectSummary =
+        document.querySelector(
+            "[data-project-summary]"
+        );
 
-    const closeProjectButtons = document.querySelectorAll(
-        "[data-close-project-editor]"
-    );
+    const mediaCount =
+        document.querySelector(
+            "[data-media-count]"
+        );
 
-    const saveProjectButton = document.querySelector(
-        "[data-save-project]"
-    );
+    const mediaCountLarge =
+        document.querySelector(
+            "[data-media-count-large]"
+        );
 
-    const projectId = document.querySelector("#project-id");
-    const projectTitle = document.querySelector("#project-title");
-    const projectKicker = document.querySelector("#project-kicker");
-    const projectDescription = document.querySelector(
-        "#project-description"
-    );
-    const projectYear = document.querySelector("#project-year");
-    const projectRole = document.querySelector("#project-role");
-    const projectVisible = document.querySelector("#project-visible");
+    const projectEditor =
+        document.querySelector(
+            "[data-project-editor]"
+        );
+
+    const projectEditorForm =
+        document.querySelector(
+            "[data-project-editor-form]"
+        );
+
+    const closeProjectButtons =
+        document.querySelectorAll(
+            "[data-close-project-editor]"
+        );
+
+    const saveProjectButton =
+        document.querySelector(
+            "[data-save-project]"
+        );
+
+    const projectId =
+        document.querySelector(
+            "#project-id"
+        );
+
+    const projectTitle =
+        document.querySelector(
+            "#project-title"
+        );
+
+    const projectKicker =
+        document.querySelector(
+            "#project-kicker"
+        );
+
+    const projectDescription =
+        document.querySelector(
+            "#project-description"
+        );
+
+    const projectYear =
+        document.querySelector(
+            "#project-year"
+        );
+
+    const projectRole =
+        document.querySelector(
+            "#project-role"
+        );
+
+    const projectVisible =
+        document.querySelector(
+            "#project-visible"
+        );
+
+
+    /* PROJECT MEDIA */
+
+    const projectMediaFile =
+        document.querySelector(
+            "#project-media-file"
+        );
+
+    const projectMediaAlt =
+        document.querySelector(
+            "#project-media-alt"
+        );
+
+    const uploadProjectMediaButton =
+        document.querySelector(
+            "[data-upload-project-media]"
+        );
+
+    const projectMediaList =
+        document.querySelector(
+            "[data-project-media-list]"
+        );
+
+    const projectMediaCount =
+        document.querySelector(
+            "[data-project-media-count]"
+        );
 
     let projects = [];
     let editingProject = null;
+
 
     /* MESSAGES */
 
@@ -76,34 +295,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
         window.setTimeout(() => {
             toast.classList.remove("visible");
-        }, 3000);
+        }, 3200);
     }
+
+
+    /* LOGIN EXPIRED */
+
+    function handleExpiredLogin() {
+        showToast(
+            "Your login expired. Please sign in again."
+        );
+
+        window.setTimeout(() => {
+            window.location.href =
+                "../admin-login.html";
+        }, 1200);
+    }
+
 
     /* USERNAME */
 
     function setUsername(username) {
-        usernameElements.forEach((element) => {
-            element.textContent = username;
-        });
+        usernameElements.forEach(
+            (element) => {
+                element.textContent =
+                    username;
+            }
+        );
 
         if (avatar) {
-            avatar.textContent = username
-                .charAt(0)
-                .toUpperCase();
+            avatar.textContent =
+                username
+                    .charAt(0)
+                    .toUpperCase();
         }
     }
+
 
     /* SESSION */
 
     async function checkSession() {
         try {
-            const response = await fetch("/api/admin/session", {
-                method: "GET",
-                credentials: "include",
-                headers: {
-                    "Accept": "application/json"
+            const response = await fetch(
+                "/api/admin/session",
+                {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    },
+                    cache: "no-store"
                 }
-            });
+            );
 
             if (!response.ok) {
                 throw new Error(
@@ -111,7 +355,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!data.authenticated) {
                 window.location.href =
@@ -120,7 +365,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 return false;
             }
 
-            setUsername(data.username);
+            setUsername(
+                data.username
+            );
 
             return true;
         } catch (error) {
@@ -142,13 +389,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+
     /* LOG OUT */
 
     async function logout() {
-        logoutButtons.forEach((button) => {
-            button.disabled = true;
-            button.textContent = "Logging Out...";
-        });
+        logoutButtons.forEach(
+            (button) => {
+                button.disabled = true;
+                button.textContent =
+                    "Logging Out...";
+            }
+        );
 
         try {
             const response = await fetch(
@@ -157,7 +408,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     method: "POST",
                     credentials: "include",
                     headers: {
-                        "Accept": "application/json"
+                        "Accept":
+                            "application/json"
                     }
                 }
             );
@@ -180,53 +432,148 @@ document.addEventListener("DOMContentLoaded", () => {
                 "We couldn't log you out. Please try again."
             );
 
-            logoutButtons.forEach((button) => {
-                button.disabled = false;
-                button.textContent = "Log Out";
-            });
+            logoutButtons.forEach(
+                (button) => {
+                    button.disabled = false;
+                    button.textContent =
+                        "Log Out";
+                }
+            );
         }
     }
 
-    logoutButtons.forEach((button) => {
-        button.addEventListener(
-            "click",
-            logout
-        );
-    });
+    logoutButtons.forEach(
+        (button) => {
+            button.addEventListener(
+                "click",
+                logout
+            );
+        }
+    );
 
-    /* HOMEPAGE FORM */
 
-    function setHomepageFormReady(ready) {
+    /* FONT SELECT */
+
+    function makeSureFontExists(
+        select,
+        value
+    ) {
+        if (
+            !select ||
+            !value
+        ) {
+            return;
+        }
+
+        const exists =
+            Array.from(
+                select.options
+            ).some(
+                option =>
+                    option.value === value
+            );
+
+        if (exists) {
+            return;
+        }
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value = value;
+        option.textContent = value;
+
+        select.appendChild(option);
+    }
+
+    function updateFontPreviews() {
+        const heading =
+            displayFont?.value ||
+            "Playfair Display";
+
+        const regular =
+            bodyFont?.value ||
+            "Lato";
+
+        loadGoogleFont(heading);
+        loadGoogleFont(regular);
+
+        if (displayFontPreview) {
+            displayFontPreview.style.fontFamily =
+                fontStack(
+                    heading,
+                    "display"
+                );
+        }
+
+        if (bodyFontPreview) {
+            bodyFontPreview.style.fontFamily =
+                fontStack(
+                    regular,
+                    "body"
+                );
+        }
+    }
+
+    displayFont?.addEventListener(
+        "change",
+        updateFontPreviews
+    );
+
+    bodyFont?.addEventListener(
+        "change",
+        updateFontPreviews
+    );
+
+
+    /* HOMEPAGE READY */
+
+    function setHomepageFormReady(
+        ready
+    ) {
         if (heroKicker) {
-            heroKicker.disabled = !ready;
+            heroKicker.disabled =
+                !ready;
         }
 
         if (heroTitle) {
-            heroTitle.disabled = !ready;
+            heroTitle.disabled =
+                !ready;
         }
 
-        /*
-         * The public homepage does not currently show
-         * the description, so this stays locked.
-         */
         if (heroDescription) {
-            heroDescription.disabled = true;
+            heroDescription.disabled =
+                true;
+        }
+
+        if (displayFont) {
+            displayFont.disabled =
+                !ready;
+        }
+
+        if (bodyFont) {
+            bodyFont.disabled =
+                !ready;
         }
 
         if (saveSettingsButton) {
-            saveSettingsButton.disabled = !ready;
+            saveSettingsButton.disabled =
+                !ready;
 
             if (ready) {
-                saveSettingsButton.classList.remove(
-                    "disabled-button"
-                );
+                saveSettingsButton
+                    .classList
+                    .remove(
+                        "disabled-button"
+                    );
 
-                saveSettingsButton.classList.add(
-                    "primary-link-button"
-                );
-
-                saveSettingsButton.textContent =
-                    "Save Homepage Changes";
+                saveSettingsButton
+                    .classList
+                    .add(
+                        "primary-link-button"
+                    );
             }
         }
 
@@ -237,6 +584,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     : "Loading...";
         }
     }
+
 
     /* LOAD HOMEPAGE */
 
@@ -250,7 +598,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     method: "GET",
                     credentials: "include",
                     headers: {
-                        "Accept": "application/json"
+                        "Accept":
+                            "application/json"
                     },
                     cache: "no-store"
                 }
@@ -262,7 +611,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!data.settings) {
                 throw new Error(
@@ -270,25 +620,48 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
 
-            currentSettings = data.settings;
+            currentSettings =
+                data.settings;
 
-            if (heroKicker) {
-                heroKicker.value =
-                    currentSettings.hero_kicker || "";
-            }
+            heroKicker.value =
+                currentSettings.hero_kicker ||
+                "";
 
-            if (heroTitle) {
-                heroTitle.value =
-                    currentSettings.hero_title || "";
-            }
+            heroTitle.value =
+                currentSettings.hero_title ||
+                "";
 
-            if (heroDescription) {
-                heroDescription.value = "";
+            heroDescription.value =
+                "";
 
-                heroDescription.placeholder =
-                    "This isn't shown on the homepage right now.";
-            }
+            heroDescription.placeholder =
+                "This isn't shown on the homepage right now.";
 
+            const savedDisplayFont =
+                currentSettings.display_font ||
+                "Playfair Display";
+
+            const savedBodyFont =
+                currentSettings.body_font ||
+                "Lato";
+
+            makeSureFontExists(
+                displayFont,
+                savedDisplayFont
+            );
+
+            makeSureFontExists(
+                bodyFont,
+                savedBodyFont
+            );
+
+            displayFont.value =
+                savedDisplayFont;
+
+            bodyFont.value =
+                savedBodyFont;
+
+            updateFontPreviews();
             setHomepageFormReady(true);
         } catch (error) {
             console.error(
@@ -307,37 +680,37 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+
     /* VALIDATE HOMEPAGE */
 
     function validateHomepageSettings() {
-        const kicker =
-            heroKicker?.value.trim() || "";
-
-        const title =
-            heroTitle?.value.trim() || "";
-
-        if (!kicker) {
+        if (
+            !heroKicker.value.trim()
+        ) {
             showToast(
                 "Add the small text above your heading before saving."
             );
 
-            heroKicker?.focus();
+            heroKicker.focus();
 
             return false;
         }
 
-        if (!title) {
+        if (
+            !heroTitle.value.trim()
+        ) {
             showToast(
                 "Your main heading can't be empty."
             );
 
-            heroTitle?.focus();
+            heroTitle.focus();
 
             return false;
         }
 
         return true;
     }
+
 
     /* SAVE HOMEPAGE */
 
@@ -349,14 +722,18 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        if (!validateHomepageSettings()) {
+        if (
+            !validateHomepageSettings()
+        ) {
             return;
         }
 
-        const originalButtonText =
+        const originalText =
             saveSettingsButton.textContent;
 
-        saveSettingsButton.disabled = true;
+        saveSettingsButton.disabled =
+            true;
+
         saveSettingsButton.textContent =
             "Saving...";
 
@@ -367,37 +744,44 @@ document.addEventListener("DOMContentLoaded", () => {
                     method: "PUT",
                     credentials: "include",
                     headers: {
-                        "Accept": "application/json",
+                        "Accept":
+                            "application/json",
                         "Content-Type":
                             "application/json"
                     },
                     body: JSON.stringify({
                         hero_kicker:
-                            heroKicker.value.trim(),
+                            heroKicker
+                                .value
+                                .trim(),
 
                         hero_title:
-                            heroTitle.value.trim(),
+                            heroTitle
+                                .value
+                                .trim(),
 
                         hero_description:
-                            currentSettings.hero_description
+                            currentSettings
+                                .hero_description,
+
+                        display_font:
+                            displayFont.value,
+
+                        body_font:
+                            bodyFont.value
                     })
                 }
             );
 
-            if (response.status === 401) {
-                showToast(
-                    "Your login expired. Please sign in again."
-                );
-
-                window.setTimeout(() => {
-                    window.location.href =
-                        "../admin-login.html";
-                }, 1200);
-
+            if (
+                response.status === 401
+            ) {
+                handleExpiredLogin();
                 return;
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
@@ -407,23 +791,20 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (data.settings) {
-                currentSettings = data.settings;
+                currentSettings =
+                    data.settings;
             }
 
-            if (homepageBadge) {
-                homepageBadge.textContent =
-                    "Saved";
-            }
+            homepageBadge.textContent =
+                "Saved";
 
             showToast(
-                "Homepage changes saved!"
+                "Homepage and fonts saved!"
             );
 
             window.setTimeout(() => {
-                if (homepageBadge) {
-                    homepageBadge.textContent =
-                        "Ready to Edit";
-                }
+                homepageBadge.textContent =
+                    "Ready to Edit";
             }, 2000);
         } catch (error) {
             console.error(
@@ -435,9 +816,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 "Something went wrong while saving. Your changes are still here, so you can try again."
             );
         } finally {
-            saveSettingsButton.disabled = false;
+            saveSettingsButton.disabled =
+                false;
+
             saveSettingsButton.textContent =
-                originalButtonText;
+                originalText;
         }
     }
 
@@ -446,66 +829,184 @@ document.addEventListener("DOMContentLoaded", () => {
         saveHomepageSettings
     );
 
+
+    /* MEDIA URL */
+
+    function getMediaUrl(media) {
+        if (media?.url) {
+            return media.url;
+        }
+
+        if (!media?.r2_key) {
+            return "";
+        }
+
+        const encodedKey =
+            media.r2_key
+                .split("/")
+                .map(
+                    part =>
+                        encodeURIComponent(part)
+                )
+                .join("/");
+
+        return `/media/${encodedKey}`;
+    }
+
+
+    /* SORT MEDIA */
+
+    function sortedMedia(project) {
+        if (
+            !Array.isArray(
+                project?.media
+            )
+        ) {
+            return [];
+        }
+
+        return [
+            ...project.media
+        ].sort(
+            (a, b) => {
+                const orderA =
+                    Number(
+                        a.sort_order
+                    ) || 0;
+
+                const orderB =
+                    Number(
+                        b.sort_order
+                    ) || 0;
+
+                if (
+                    orderA !== orderB
+                ) {
+                    return (
+                        orderA -
+                        orderB
+                    );
+                }
+
+                return (
+                    Number(a.id) -
+                    Number(b.id)
+                );
+            }
+        );
+    }
+
+
     /* PROJECT PREVIEW */
 
-    function makeProjectPreview(description) {
+    function makeProjectPreview(
+        description
+    ) {
         if (!description) {
             return "No project description has been added yet.";
         }
 
-        const cleaned = description
-            .replace(/\s+/g, " ")
-            .trim();
+        const cleaned =
+            description
+                .replace(/\s+/g, " ")
+                .trim();
 
-        if (cleaned.length <= 220) {
+        if (
+            cleaned.length <= 220
+        ) {
             return cleaned;
         }
 
-        return `${cleaned.slice(0, 217)}...`;
+        return (
+            `${cleaned.slice(
+                0,
+                217
+            )}...`
+        );
     }
+
 
     /* PROJECT SUMMARY */
 
     function updateProjectSummary() {
+        const visibleProjects =
+            projects.filter(
+                project =>
+                    Number(
+                        project.is_published
+                    ) === 1
+            );
+
         if (projectCount) {
             projectCount.textContent =
-                String(projects.length);
+                String(
+                    projects.length
+                );
+        }
+
+        const totalMedia =
+            projects.reduce(
+                (total, project) =>
+                    total +
+                    (
+                        Array.isArray(
+                            project.media
+                        )
+                            ? project.media.length
+                            : 0
+                    ),
+                0
+            );
+
+        if (mediaCount) {
+            mediaCount.textContent =
+                String(totalMedia);
+        }
+
+        if (mediaCountLarge) {
+            mediaCountLarge.textContent =
+                String(totalMedia);
         }
 
         if (!projectSummary) {
             return;
         }
 
-        const visibleProjects = projects.filter(
-            project =>
-                Number(project.is_published) === 1
-        );
-
-        if (visibleProjects.length === 0) {
+        if (
+            visibleProjects.length === 0
+        ) {
             projectSummary.textContent =
                 "No projects are currently visible";
+
             return;
         }
 
-        const names = visibleProjects.map(
-            project => project.title
-        );
+        const names =
+            visibleProjects.map(
+                project =>
+                    project.title
+            );
 
         if (names.length === 1) {
             projectSummary.textContent =
                 names[0];
+
             return;
         }
 
         if (names.length === 2) {
             projectSummary.textContent =
                 `${names[0]} and ${names[1]}`;
+
             return;
         }
 
         projectSummary.textContent =
-            `${names.slice(0, -1).join(", ")}, and ${names.at(-1)}`;
+            `${names
+                .slice(0, -1)
+                .join(", ")}, and ${names.at(-1)}`;
     }
+
 
     /* RENDER PROJECTS */
 
@@ -516,54 +1017,74 @@ document.addEventListener("DOMContentLoaded", () => {
 
         projectList.replaceChildren();
 
-        const sortedProjects = [...projects].sort(
+        const sortedProjects = [
+            ...projects
+        ].sort(
             (a, b) => {
                 const orderA =
-                    Number(a.sort_order) || 0;
+                    Number(
+                        a.sort_order
+                    ) || 0;
 
                 const orderB =
-                    Number(b.sort_order) || 0;
+                    Number(
+                        b.sort_order
+                    ) || 0;
 
-                if (orderA !== orderB) {
-                    return orderA - orderB;
+                if (
+                    orderA !== orderB
+                ) {
+                    return (
+                        orderA -
+                        orderB
+                    );
                 }
 
-                return Number(a.id) - Number(b.id);
+                return (
+                    Number(a.id) -
+                    Number(b.id)
+                );
             }
         );
 
-        if (sortedProjects.length === 0) {
-            const emptyCard =
-                document.createElement("article");
+        if (
+            sortedProjects.length === 0
+        ) {
+            const card =
+                document.createElement(
+                    "article"
+                );
 
-            emptyCard.className =
-                "project-admin-card project-loading-card";
+            card.className =
+                "project-admin-card";
 
-            const message =
-                document.createElement("div");
+            const content =
+                document.createElement(
+                    "div"
+                );
 
-            message.className =
+            content.className =
                 "project-admin-content";
 
             const heading =
-                document.createElement("h3");
+                document.createElement(
+                    "h3"
+                );
 
             heading.textContent =
                 "No Projects Found";
 
-            const description =
-                document.createElement("p");
-
-            description.textContent =
-                "There aren't any portfolio projects in the website database yet.";
-
-            message.append(
-                heading,
-                description
+            content.appendChild(
+                heading
             );
 
-            emptyCard.appendChild(message);
-            projectList.appendChild(emptyCard);
+            card.appendChild(
+                content
+            );
+
+            projectList.appendChild(
+                card
+            );
 
             updateProjectSummary();
 
@@ -573,40 +1094,51 @@ document.addEventListener("DOMContentLoaded", () => {
         sortedProjects.forEach(
             (project, index) => {
                 const card =
-                    document.createElement("article");
+                    document.createElement(
+                        "article"
+                    );
 
                 card.className =
                     "project-admin-card";
 
                 if (
-                    Number(project.is_published) !== 1
+                    Number(
+                        project.is_published
+                    ) !== 1
                 ) {
                     card.classList.add(
                         "project-is-hidden"
                     );
                 }
 
-                card.dataset.projectSlug =
-                    project.slug;
-
                 const number =
-                    document.createElement("div");
+                    document.createElement(
+                        "div"
+                    );
 
                 number.className =
                     "project-admin-number";
 
                 number.textContent =
-                    String(index + 1)
-                        .padStart(2, "0");
+                    String(
+                        index + 1
+                    ).padStart(
+                        2,
+                        "0"
+                    );
 
                 const content =
-                    document.createElement("div");
+                    document.createElement(
+                        "div"
+                    );
 
                 content.className =
                     "project-admin-content";
 
                 const type =
-                    document.createElement("p");
+                    document.createElement(
+                        "p"
+                    );
 
                 type.className =
                     "project-admin-type";
@@ -616,14 +1148,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Portfolio Project";
 
                 const title =
-                    document.createElement("h3");
+                    document.createElement(
+                        "h3"
+                    );
 
                 title.textContent =
                     project.title ||
                     "Untitled Project";
 
                 const description =
-                    document.createElement("p");
+                    document.createElement(
+                        "p"
+                    );
 
                 description.textContent =
                     makeProjectPreview(
@@ -637,73 +1173,82 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
                 const meta =
-                    document.createElement("div");
+                    document.createElement(
+                        "div"
+                    );
 
                 meta.className =
                     "project-admin-meta";
 
-                const roleGroup =
-                    document.createElement("div");
+                const role =
+                    document.createElement(
+                        "div"
+                    );
 
-                const roleLabel =
-                    document.createElement("span");
+                role.innerHTML = `
+                    <span>My Role</span>
+                    <strong></strong>
+                `;
 
-                roleLabel.textContent =
-                    "My Role";
-
-                const roleValue =
-                    document.createElement("strong");
-
-                roleValue.textContent =
+                role.querySelector(
+                    "strong"
+                ).textContent =
                     project.role ||
                     "Not listed";
 
-                roleGroup.append(
-                    roleLabel,
-                    roleValue
-                );
+                const images =
+                    document.createElement(
+                        "div"
+                    );
 
-                const visibilityGroup =
-                    document.createElement("div");
+                images.innerHTML = `
+                    <span>Uploads</span>
+                    <strong></strong>
+                `;
 
-                const visibilityLabel =
-                    document.createElement("span");
+                images.querySelector(
+                    "strong"
+                ).textContent =
+                    `${sortedMedia(project).length} Images`;
 
-                visibilityLabel.textContent =
-                    "Website";
+                const visible =
+                    document.createElement(
+                        "div"
+                    );
 
-                const visibilityValue =
-                    document.createElement("strong");
+                visible.innerHTML = `
+                    <span>Website</span>
+                    <strong></strong>
+                `;
 
-                visibilityValue.textContent =
+                visible.querySelector(
+                    "strong"
+                ).textContent =
                     Number(
                         project.is_published
                     ) === 1
                         ? "Visible"
                         : "Hidden";
 
-                visibilityGroup.append(
-                    visibilityLabel,
-                    visibilityValue
-                );
-
                 meta.append(
-                    roleGroup,
-                    visibilityGroup
+                    role,
+                    images,
+                    visible
                 );
 
                 const editButton =
-                    document.createElement("button");
+                    document.createElement(
+                        "button"
+                    );
 
                 editButton.className =
                     "project-edit-button";
 
-                editButton.type = "button";
+                editButton.type =
+                    "button";
+
                 editButton.textContent =
                     "Edit Project";
-
-                editButton.dataset.projectEdit =
-                    project.slug;
 
                 editButton.addEventListener(
                     "click",
@@ -721,20 +1266,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     editButton
                 );
 
-                projectList.appendChild(card);
+                projectList.appendChild(
+                    card
+                );
             }
         );
 
         updateProjectSummary();
     }
 
+
     /* LOAD PROJECTS */
 
     async function loadProjects() {
-        if (!projectList) {
-            return;
-        }
-
         try {
             const response = await fetch(
                 "/api/admin/projects",
@@ -749,10 +1293,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             );
 
-            if (response.status === 401) {
-                window.location.href =
-                    "../admin-login.html";
-
+            if (
+                response.status === 401
+            ) {
+                handleExpiredLogin();
                 return;
             }
 
@@ -762,13 +1306,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
-            projects = Array.isArray(
-                data.projects
-            )
-                ? data.projects
-                : [];
+            projects =
+                Array.isArray(
+                    data.projects
+                )
+                    ? data.projects
+                    : [];
 
             renderProjects();
         } catch (error) {
@@ -777,30 +1323,615 @@ document.addEventListener("DOMContentLoaded", () => {
                 error
             );
 
-            projectList.innerHTML = `
-                <article class="project-admin-card project-loading-card">
-                    <div class="project-admin-content">
-                        <p class="project-admin-type">Portfolio</p>
-                        <h3>Couldn't Load Projects</h3>
-                        <p>Refresh the page and try again.</p>
-                    </div>
-                </article>
-            `;
-
             showToast(
                 "We couldn't load your projects. Try refreshing the page."
             );
         }
     }
 
+
+    /* RENDER PROJECT MEDIA */
+
+    function renderProjectMedia() {
+        if (
+            !projectMediaList ||
+            !editingProject
+        ) {
+            return;
+        }
+
+        projectMediaList.replaceChildren();
+
+        const media =
+            sortedMedia(
+                editingProject
+            );
+
+        if (projectMediaCount) {
+            projectMediaCount.textContent =
+                `${media.length} ${
+                    media.length === 1
+                        ? "Image"
+                        : "Images"
+                }`;
+        }
+
+        if (
+            media.length === 0
+        ) {
+            const empty =
+                document.createElement(
+                    "div"
+                );
+
+            empty.className =
+                "project-media-empty";
+
+            const title =
+                document.createElement(
+                    "strong"
+                );
+
+            title.textContent =
+                "No Website Manager uploads yet";
+
+            const text =
+                document.createElement(
+                    "p"
+                );
+
+            text.textContent =
+                "Upload an image above and it will appear here.";
+
+            empty.append(
+                title,
+                text
+            );
+
+            projectMediaList.appendChild(
+                empty
+            );
+
+            return;
+        }
+
+        media.forEach(
+            (item, index) => {
+                const card =
+                    document.createElement(
+                        "article"
+                    );
+
+                card.className =
+                    "project-media-item";
+
+                const preview =
+                    document.createElement(
+                        "div"
+                    );
+
+                preview.className =
+                    "project-media-item-preview";
+
+                const image =
+                    document.createElement(
+                        "img"
+                    );
+
+                image.src =
+                    getMediaUrl(item);
+
+                image.alt =
+                    item.alt_text ||
+                    "Project image";
+
+                image.loading =
+                    "lazy";
+
+                preview.appendChild(
+                    image
+                );
+
+                const info =
+                    document.createElement(
+                        "div"
+                    );
+
+                info.className =
+                    "project-media-item-info";
+
+                const position =
+                    document.createElement(
+                        "strong"
+                    );
+
+                position.textContent =
+                    `Image ${index + 1}`;
+
+                const alt =
+                    document.createElement(
+                        "span"
+                    );
+
+                alt.textContent =
+                    item.alt_text ||
+                    "No image description";
+
+                info.append(
+                    position,
+                    alt
+                );
+
+                const controls =
+                    document.createElement(
+                        "div"
+                    );
+
+                controls.className =
+                    "project-media-controls";
+
+                const up =
+                    document.createElement(
+                        "button"
+                    );
+
+                up.type = "button";
+                up.textContent = "Move Up";
+                up.disabled =
+                    index === 0;
+
+                up.addEventListener(
+                    "click",
+                    () => {
+                        moveProjectMedia(
+                            item.id,
+                            -1
+                        );
+                    }
+                );
+
+                const down =
+                    document.createElement(
+                        "button"
+                    );
+
+                down.type = "button";
+                down.textContent =
+                    "Move Down";
+
+                down.disabled =
+                    index ===
+                    media.length - 1;
+
+                down.addEventListener(
+                    "click",
+                    () => {
+                        moveProjectMedia(
+                            item.id,
+                            1
+                        );
+                    }
+                );
+
+                const remove =
+                    document.createElement(
+                        "button"
+                    );
+
+                remove.type = "button";
+                remove.className =
+                    "remove-media-button";
+
+                remove.textContent =
+                    "Remove";
+
+                remove.addEventListener(
+                    "click",
+                    () => {
+                        deleteProjectMedia(
+                            item
+                        );
+                    }
+                );
+
+                controls.append(
+                    up,
+                    down,
+                    remove
+                );
+
+                card.append(
+                    preview,
+                    info,
+                    controls
+                );
+
+                projectMediaList.appendChild(
+                    card
+                );
+            }
+        );
+    }
+
+
+    /* UPDATE PROJECT MEDIA */
+
+    function updateEditingProjectMedia(
+        media
+    ) {
+        if (!editingProject) {
+            return;
+        }
+
+        editingProject = {
+            ...editingProject,
+            media
+        };
+
+        projects =
+            projects.map(
+                project =>
+                    project.id ===
+                    editingProject.id
+                        ? editingProject
+                        : project
+            );
+
+        renderProjectMedia();
+        renderProjects();
+    }
+
+
+    /* UPLOAD IMAGE */
+
+    async function uploadProjectMedia() {
+        if (
+            !editingProject ||
+            !uploadProjectMediaButton
+        ) {
+            return;
+        }
+
+        const file =
+            projectMediaFile
+                ?.files?.[0];
+
+        if (!file) {
+            showToast(
+                "Choose an image first."
+            );
+
+            projectMediaFile?.focus();
+
+            return;
+        }
+
+        if (
+            file.size >
+            20 * 1024 * 1024
+        ) {
+            showToast(
+                "Images must be 20 MB or smaller."
+            );
+
+            return;
+        }
+
+        const originalText =
+            uploadProjectMediaButton
+                .textContent;
+
+        uploadProjectMediaButton.disabled =
+            true;
+
+        uploadProjectMediaButton.textContent =
+            "Uploading...";
+
+        const formData =
+            new FormData();
+
+        formData.append(
+            "file",
+            file
+        );
+
+        formData.append(
+            "alt_text",
+            projectMediaAlt
+                ?.value
+                .trim() ||
+                ""
+        );
+
+        try {
+            const response = await fetch(
+                `/api/admin/projects/${editingProject.id}/media`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    body: formData
+                }
+            );
+
+            if (
+                response.status === 401
+            ) {
+                handleExpiredLogin();
+                return;
+            }
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error ||
+                    "Unable to upload image."
+                );
+            }
+
+            const currentMedia =
+                sortedMedia(
+                    editingProject
+                );
+
+            updateEditingProjectMedia([
+                ...currentMedia,
+                data.media
+            ]);
+
+            projectMediaFile.value =
+                "";
+
+            projectMediaAlt.value =
+                "";
+
+            showToast(
+                "Image uploaded!"
+            );
+        } catch (error) {
+            console.error(
+                "Unable to upload image:",
+                error
+            );
+
+            showToast(
+                error.message ||
+                "We couldn't upload that image."
+            );
+        } finally {
+            uploadProjectMediaButton.disabled =
+                false;
+
+            uploadProjectMediaButton.textContent =
+                originalText;
+        }
+    }
+
+    uploadProjectMediaButton
+        ?.addEventListener(
+            "click",
+            uploadProjectMedia
+        );
+
+
+    /* MOVE IMAGE */
+
+    async function moveProjectMedia(
+        mediaId,
+        direction
+    ) {
+        if (!editingProject) {
+            return;
+        }
+
+        const current =
+            sortedMedia(
+                editingProject
+            );
+
+        const index =
+            current.findIndex(
+                media =>
+                    Number(media.id) ===
+                    Number(mediaId)
+            );
+
+        if (index === -1) {
+            return;
+        }
+
+        const newIndex =
+            index + direction;
+
+        if (
+            newIndex < 0 ||
+            newIndex >= current.length
+        ) {
+            return;
+        }
+
+        const reordered = [
+            ...current
+        ];
+
+        [
+            reordered[index],
+            reordered[newIndex]
+        ] = [
+            reordered[newIndex],
+            reordered[index]
+        ];
+
+        updateEditingProjectMedia(
+            reordered.map(
+                (media, order) => ({
+                    ...media,
+                    sort_order: order
+                })
+            )
+        );
+
+        try {
+            const response = await fetch(
+                `/api/admin/projects/${editingProject.id}/media/order`,
+                {
+                    method: "PUT",
+                    credentials: "include",
+                    headers: {
+                        "Accept":
+                            "application/json",
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        media_ids:
+                            reordered.map(
+                                media =>
+                                    media.id
+                            )
+                    })
+                }
+            );
+
+            if (
+                response.status === 401
+            ) {
+                handleExpiredLogin();
+                return;
+            }
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error ||
+                    "Unable to reorder images."
+                );
+            }
+
+            if (
+                Array.isArray(
+                    data.media
+                )
+            ) {
+                updateEditingProjectMedia(
+                    data.media
+                );
+            }
+
+            showToast(
+                "Image order saved!"
+            );
+        } catch (error) {
+            console.error(
+                "Unable to reorder images:",
+                error
+            );
+
+            updateEditingProjectMedia(
+                current
+            );
+
+            showToast(
+                "We couldn't save that image order."
+            );
+        }
+    }
+
+
+    /* DELETE IMAGE */
+
+    async function deleteProjectMedia(
+        media
+    ) {
+        if (
+            !editingProject ||
+            !media
+        ) {
+            return;
+        }
+
+        const confirmed =
+            window.confirm(
+                "Remove this uploaded image from the project?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `/api/admin/media/${media.id}`,
+                {
+                    method: "DELETE",
+                    credentials: "include",
+                    headers: {
+                        "Accept":
+                            "application/json"
+                    }
+                }
+            );
+
+            if (
+                response.status === 401
+            ) {
+                handleExpiredLogin();
+                return;
+            }
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error ||
+                    "Unable to remove image."
+                );
+            }
+
+            updateEditingProjectMedia(
+                sortedMedia(
+                    editingProject
+                ).filter(
+                    item =>
+                        Number(item.id) !==
+                        Number(media.id)
+                )
+            );
+
+            showToast(
+                "Image removed."
+            );
+        } catch (error) {
+            console.error(
+                "Unable to remove image:",
+                error
+            );
+
+            showToast(
+                error.message ||
+                "We couldn't remove that image."
+            );
+        }
+    }
+
+
     /* OPEN PROJECT EDITOR */
 
     function openProjectEditor(slug) {
-        const project = projects.find(
-            item => item.slug === slug
-        );
+        const project =
+            projects.find(
+                item =>
+                    item.slug === slug
+            );
 
-        if (!project || !projectEditor) {
+        if (
+            !project ||
+            !projectEditor
+        ) {
             return;
         }
 
@@ -825,7 +1956,21 @@ document.addEventListener("DOMContentLoaded", () => {
             project.role || "";
 
         projectVisible.checked =
-            Number(project.is_published) === 1;
+            Number(
+                project.is_published
+            ) === 1;
+
+        if (projectMediaFile) {
+            projectMediaFile.value =
+                "";
+        }
+
+        if (projectMediaAlt) {
+            projectMediaAlt.value =
+                "";
+        }
+
+        renderProjectMedia();
 
         if (!projectEditor.open) {
             projectEditor.showModal();
@@ -840,12 +1985,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 0);
     }
 
+
     /* CLOSE PROJECT EDITOR */
 
     function closeProjectEditor() {
         if (
-            projectEditor &&
-            projectEditor.open
+            projectEditor?.open
         ) {
             projectEditor.close();
         }
@@ -857,17 +2002,20 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-    closeProjectButtons.forEach((button) => {
-        button.addEventListener(
-            "click",
-            closeProjectEditor
-        );
-    });
+    closeProjectButtons.forEach(
+        (button) => {
+            button.addEventListener(
+                "click",
+                closeProjectEditor
+            );
+        }
+    );
 
     projectEditor?.addEventListener(
         "cancel",
         (event) => {
             event.preventDefault();
+
             closeProjectEditor();
         }
     );
@@ -875,30 +2023,15 @@ document.addEventListener("DOMContentLoaded", () => {
     projectEditor?.addEventListener(
         "click",
         (event) => {
-            if (event.target === projectEditor) {
+            if (
+                event.target ===
+                projectEditor
+            ) {
                 closeProjectEditor();
             }
         }
     );
 
-    /* VALIDATE PROJECT */
-
-    function validateProject() {
-        const title =
-            projectTitle?.value.trim() || "";
-
-        if (!title) {
-            showToast(
-                "Your project needs a name."
-            );
-
-            projectTitle?.focus();
-
-            return false;
-        }
-
-        return true;
-    }
 
     /* SAVE PROJECT */
 
@@ -912,19 +2045,32 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        if (!validateProject()) {
+        if (
+            !projectTitle.value.trim()
+        ) {
+            showToast(
+                "Your project needs a name."
+            );
+
+            projectTitle.focus();
+
             return;
         }
 
-        const originalButtonText =
-            saveProjectButton.textContent;
+        const originalText =
+            saveProjectButton
+                .textContent;
 
-        saveProjectButton.disabled = true;
+        saveProjectButton.disabled =
+            true;
+
         saveProjectButton.textContent =
             "Saving...";
 
         const yearValue =
-            projectYear.value.trim();
+            projectYear
+                .value
+                .trim();
 
         try {
             const response = await fetch(
@@ -940,23 +2086,33 @@ document.addEventListener("DOMContentLoaded", () => {
                     },
                     body: JSON.stringify({
                         title:
-                            projectTitle.value.trim(),
+                            projectTitle
+                                .value
+                                .trim(),
 
                         kicker:
-                            projectKicker.value.trim() ||
+                            projectKicker
+                                .value
+                                .trim() ||
                             null,
 
                         description:
-                            projectDescription.value.trim() ||
+                            projectDescription
+                                .value
+                                .trim() ||
                             null,
 
                         year:
                             yearValue
-                                ? Number(yearValue)
+                                ? Number(
+                                    yearValue
+                                )
                                 : null,
 
                         role:
-                            projectRole.value.trim() ||
+                            projectRole
+                                .value
+                                .trim() ||
                             null,
 
                         is_published:
@@ -965,20 +2121,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             );
 
-            if (response.status === 401) {
-                showToast(
-                    "Your login expired. Please sign in again."
-                );
-
-                window.setTimeout(() => {
-                    window.location.href =
-                        "../admin-login.html";
-                }, 1200);
-
+            if (
+                response.status === 401
+            ) {
+                handleExpiredLogin();
                 return;
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
@@ -988,13 +2139,18 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (data.project) {
-                projects = projects.map(
-                    project =>
-                        project.id ===
-                        data.project.id
-                            ? data.project
-                            : project
-                );
+                const updatedProject = {
+                    ...data.project
+                };
+
+                projects =
+                    projects.map(
+                        project =>
+                            project.id ===
+                            updatedProject.id
+                                ? updatedProject
+                                : project
+                    );
             }
 
             renderProjects();
@@ -1010,12 +2166,14 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             showToast(
-                "Something went wrong while saving the project. Your changes are still here, so you can try again."
+                "Something went wrong while saving the project. Your changes are still here."
             );
         } finally {
-            saveProjectButton.disabled = false;
+            saveProjectButton.disabled =
+                false;
+
             saveProjectButton.textContent =
-                originalButtonText;
+                originalText;
         }
     }
 
@@ -1024,26 +2182,29 @@ document.addEventListener("DOMContentLoaded", () => {
         saveProject
     );
 
+
     /* NAVIGATION */
 
-    navigationLinks.forEach((link) => {
-        link.addEventListener(
-            "click",
-            () => {
-                navigationLinks.forEach(
-                    navLink => {
-                        navLink.classList.remove(
-                            "active"
-                        );
-                    }
-                );
+    navigationLinks.forEach(
+        (link) => {
+            link.addEventListener(
+                "click",
+                () => {
+                    navigationLinks.forEach(
+                        item =>
+                            item.classList.remove(
+                                "active"
+                            )
+                    );
 
-                link.classList.add(
-                    "active"
-                );
-            }
-        );
-    });
+                    link.classList.add(
+                        "active"
+                    );
+                }
+            );
+        }
+    );
+
 
     /* START */
 

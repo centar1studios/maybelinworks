@@ -10,12 +10,13 @@
     <link rel="icon" type="image/png" href="../assets/maygarcia_logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link  href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./admin-stylesheet.css">
 </head>
-<body>
 
+<body>
     <div class="admin-layout">
+
         <!-- SIDEBAR -->
         <aside class="admin-sidebar">
             <div class="sidebar-top">
@@ -27,7 +28,7 @@
                     </div>
                 </a>
 
-                <nav class="admin-nav" aria-label="Website Manager Navigation">
+                <nav class="admin-nav"aria-label="Website Manager Navigation">
                     <a href="#overview" class="admin-nav-link active">Overview</a>
                     <a href="#homepage" class="admin-nav-link">Homepage</a>
                     <a href="#projects" class="admin-nav-link">Projects</a>
@@ -45,9 +46,9 @@
 
         <!-- MAIN -->
         <main class="admin-main">
+
             <!-- TOP BAR -->
             <header class="admin-topbar">
-
                 <div>
                     <p class="admin-eyebrow">Maybelin Works</p>
                     <h1>Website Manager</h1>
@@ -70,7 +71,9 @@
                         <div>
                             <p class="section-kicker">Your Website</p>
                             <h2>Welcome back!</h2>
-                            <p class="section-description"> This is where you can manage the content shown on your portfolio website.</p>
+                            <p class="section-description">
+                                This is where you can manage the content
+                                shown on your portfolio website.</p>
                         </div>
                         <a class="primary-link-button" href="../index.html" target="_blank" rel="noreferrer">View My Website</a>
                     </div>
@@ -79,26 +82,27 @@
                         <article class="overview-card highlight-card">
                             <p class="overview-label">Website</p>
                             <h3>Maybelin Works</h3>
-                            <p>Your portfolio is online and ready for content updates.</p>
+                            <p>Your portfolio is online and ready
+                                for updates.</p>
                             <span class="status-badge">Online</span>
                         </article>
 
                         <article class="overview-card">
                             <p class="overview-label">Portfolio Projects</p>
                             <p class="overview-number" data-project-count>2</p>
-                            <p class="overview-note" data-project-summary>Fenix and Casa Guadalupe</p>
+                            <p class="overview-note" data-project-summary>Loading projects...</p>
                         </article>
 
                         <article class="overview-card">
-                            <p class="overview-label">Homepage Background</p>
-                            <p class="overview-value">Video</p>
-                            <p class="overview-note">Currently active</p>
+                            <p class="overview-label">Project Uploads</p>
+                            <p class="overview-number" data-media-count>0</p>
+                            <p class="overview-note">Images managed here</p>
                         </article>
 
                         <article class="overview-card">
                             <p class="overview-label">Website Editing</p>
                             <p class="overview-value">Ready</p>
-                            <p class="overview-note">Homepage and project text can be edited</p>
+                            <p class="overview-note">Text, fonts, visibility and project images</p>
                         </article>
                     </div>
                 </section>
@@ -110,17 +114,15 @@
                             <p class="section-kicker">Homepage</p>
                             <h2>What visitors see first</h2>
                             <p class="section-description">
-                                Change the main words people see when
-                                they first visit your website.</p>
+                                Change your homepage wording and the
+                                fonts used across your website.</p>
                         </div>
                         <span class="coming-soon-badge">Loading...</span>
                     </div>
 
                     <div class="settings-grid">
-
-                        <!-- MAIN HOMEPAGE TEXT -->
+                        <!-- HOMEPAGE TEXT -->
                         <article class="dashboard-panel large-panel">
-
                             <div class="panel-heading">
                                 <div>
                                     <p class="panel-kicker">Main Text</p>
@@ -137,22 +139,70 @@
 
                                 <div class="admin-field full-field">
                                     <label for="hero-title">Main Heading</label>
-                                    <textarea id="hero-title" rows="3" disabled></textarea>
+                                    <textarea id="hero-title" rows="4" disabled></textarea>
                                 </div>
 
                                 <div class="admin-field full-field">
                                     <label for="hero-description">Extra Description</label>
-                                    <textarea id="hero-description" rows="4" placeholder="This isn't shown on the homepage right now." disabled
-                                    ></textarea>
+                                    <textarea id="hero-description" rows="4" placeholder="This isn't shown on the homepage right now." disabled></textarea>
                                 </div>
                             </div>
 
                             <div class="panel-footer">
-                                <p>Save your changes here and the
-                                    homepage will update automatically.</p>
+                                <p>Your saved changes appear on the public website automatically.</p>
                                 <button class="disabled-button" type="button" data-save-settings disabled>Save Homepage Changes</button>
                             </div>
                         </article>
+
+                        <!-- FONTS -->
+                        <article class="dashboard-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Website Style</p>
+                                    <h3>Fonts</h3>
+                                </div>
+                                <span class="panel-status">Editable</span>
+                            </div>
+
+                            <div class="font-controls">
+                                <div class="admin-field">
+                                    <label for="display-font">Heading Font</label>
+                                    <select id="display-font"disabled>
+                                        <option value="Playfair Display">Playfair Display </option>
+                                        <option value="Cormorant Garamond">Cormorant Garamond </option>
+                                        <option value="DM Serif Display">DM Serif Display</option>
+                                        <option value="Libre Baskerville">Libre Baskerville</option>
+                                        <option value="Cardo">Cardo</option>
+                                        <option value="Lato">Lato</option>
+                                        <option value="Montserrat">Montserrat</option>
+                                    </select>
+                                </div>
+
+                                <div class="font-live-preview">
+                                    <span>Preview</span>
+                                    <p class="font-display-preview" data-display-font-preview>Maybelin Works</p>
+                                </div>
+
+                                <div class="admin-field">
+                                    <label for="body-font">Regular Text Font</label>
+                                    <select id="body-font" disabled>
+                                        <option value="Lato">Lato</option>
+                                        <option value="Inter">Inter</option>
+                                        <option value="Montserrat">Montserrat</option>
+                                        <option value="Nunito">Nunito</option>
+                                        <option value="Source Sans 3">Source Sans 3</option>
+                                        <option value="Hind">Hind</option>
+                                        <option value="Libre Baskerville">Libre Baskerville</option>
+                                    </select>
+                                </div>
+
+                                <div class="font-live-preview">
+                                    <span>Preview</span>
+                                    <p class="font-body-preview" data-body-font-preview>Art, identity, curiosity and thoughtful design.</p>
+                                </div>
+                            </div>
+                        </article>
+
 
                         <!-- COLORS -->
                         <article class="dashboard-panel">
@@ -176,7 +226,7 @@
                                     <span class="color-preview" style="background: #8DF688;" aria-hidden="true"></span>
                                     <div>
                                         <p>Lime Green</p>
-                                        <span>Highlight color</span>
+                                        <span>Highlight</span>
                                     </div>
                                 </div>
 
@@ -192,50 +242,28 @@
                                     <span class="color-preview" style="background: #57585D;" aria-hidden="true"></span>
                                     <div>
                                         <p>Charcoal</p>
-                                        <span>Neutral color</span>
+                                        <span>Neutral</span>
                                     </div>
                                 </div>
 
                                 <div class="color-row">
                                     <span class="color-preview" style="background: #F650BD;" aria-hidden="true"></span>
+
                                     <div>
                                         <p>Pink</p>
-                                        <span>Accent color</span>
+                                        <span>Accent</span>
                                     </div>
                                 </div>
                             </div>
                         </article>
 
-                        <!-- FONTS -->
-                        <article class="dashboard-panel">
-                            <div class="panel-heading">
-                                <div>
-                                    <p class="panel-kicker">Website Style</p>
-                                    <h3>Fonts</h3>
-                                </div>
-                            </div>
-
-                            <div class="font-preview">
-                                <div>
-                                    <span>Headings</span>
-                                    <p class="font-display-preview">Playfair Display</p>
-                                </div>
-
-                                <div>
-                                    <span>Regular Text</span>
-                                    <p class="font-body-preview">Lato</p>
-                                </div>
-                            </div>
-                        </article>
-
                         <!-- BACKGROUND -->
-                        <article class="dashboard-panel background-panel">
+                        <article class="dashboard-panel">
                             <div class="panel-heading">
                                 <div>
                                     <p class="panel-kicker">Homepage</p>
                                     <h3>Background</h3>
                                 </div>
-
                                 <span class="panel-status">Active</span>
                             </div>
 
@@ -245,34 +273,25 @@
                                     <strong>Video</strong>
                                 </div>
                             </div>
-
                             <p class="panel-note">
                                 Your homepage currently uses a looping
                                 video behind the main text.</p>
-
-                            <p class="panel-note">
-                                Replacing the background will be added
-                                later.</p>
                         </article>
                     </div>
                 </section>
 
                 <!-- PROJECTS -->
-                <section class="dashboard-section" id="projects">
-
+                <section class="dashboard-section" id="projects" >
                     <div class="section-heading">
                         <div>
                             <p class="section-kicker">Portfolio</p>
                             <h2>Your Projects</h2>
                             <p class="section-description">
-                                Change a project's name, description,
-                                year, role, or whether it appears on
-                                the website.</p>
+                                Edit project information and manage
+                                images uploaded through Website Manager.</p>
                         </div>
-
                         <button class="disabled-button" type="button" data-add-project disabled>+ Add a Project</button>
                     </div>
-
 
                     <div class="project-admin-list" data-project-list>
                         <article class="project-admin-card project-loading-card">
@@ -286,92 +305,90 @@
                         </article>
                     </div>
 
-                    <p class="feature-note">
-                        Project text and visibility can now be edited.
-                        Adding new projects and managing their images
-                        will come next.</p>
+                    <p class="feature-note">Adding entirely new projects comes next.</p>
                 </section>
 
                 <!-- MEDIA -->
                 <section class="dashboard-section" id="media">
                     <div class="section-heading">
                         <div>
-                            <p class="section-kicker">
-                                Images &amp; Media</p>
+                            <p class="section-kicker">Images &amp; Media</p>
                             <h2>Your Website Files</h2>
                             <p class="section-description">
-                                A simple overview of the images and
-                                videos currently being used on your
-                                website.</p>
+                                Project uploads are now managed from
+                                each project's Edit Project window.</p>
                         </div>
 
-                        <button class="disabled-button" type="button" data-upload-media disabled>Upload an Image or Video</button>
+                        <a href="#projects"class="primary-link-button">Manage Project Images</a>
                     </div>
 
                     <div class="media-grid">
-                        <!-- LOGO -->
                         <article class="media-card">
                             <div class="media-preview logo-preview">
                                 <img src="../assets/maygarcia_logo.png" alt="Maybelin Works logo">
                             </div>
 
                             <div class="media-info">
-                                <strong>Website Logo</strong>
-                                <span>Used for Maybelin Works branding</span>
+                                <strong>Website Logo </strong>
+                                <span>Existing website file</span>
                             </div>
+
                         </article>
 
-                        <!-- PHOTO -->
                         <article class="media-card">
                             <div class="media-preview">
                                 <img src="../assets/may_photo.jpg" alt="Headshot of Maybelin Garcia Romero" loading="lazy">
                             </div>
 
                             <div class="media-info">
-                                <strong>About Me Photo</strong>
-                                <span>Shown in the Information section</span>
+                                <strong>
+                                    About Me Photo</strong>
+                                <span>Existing website file</span>
                             </div>
                         </article>
 
-                        <!-- FENIX -->
                         <article class="media-card">
                             <div class="media-preview">
                                 <img src="../assets/fenix_pub/page_01.png" alt="Fenix publication cover" loading="lazy">
                             </div>
 
                             <div class="media-info">
-                                <strong>Fenix</strong>
-                                <span>Publication pages and project images</span>
+                                <strong>Fenix Gallery</strong>
+                                <span> Original gallery remains in place </span>
                             </div>
                         </article>
 
-                        <!-- CASA -->
                         <article class="media-card">
                             <div class="media-preview">
                                 <img src="../assets/casa/casa_square.png" alt="Casa Guadalupe logo" loading="lazy">
                             </div>
-
                             <div class="media-info">
-                                <strong>Casa Guadalupe</strong>
-                                <span>Logo and presentation images</span>
+                                <strong>Casa Guadalupe Gallery</strong>
+                                <span>Original gallery remains in place</span>
                             </div>
                         </article>
 
-                        <!-- VIDEO -->
-                        <article class="media-card empty-media-card">
+
+                        <article class="media-card managed-media-card">
                             <div class="media-preview">
-                                <div class="media-empty-icon">▶</div>
+                                <div class="managed-media-count">
+                                    <strong data-media-count-large>0</strong>
+                                    <span>Uploaded</span>
+                                </div>
                             </div>
 
                             <div class="media-info">
-                                <strong>Homepage Video</strong>
-                                <span>Used behind the main homepage text</span>
+                                <strong>
+                                    Website Manager Uploads</strong>
+                                <span>Stored securely in Cloudflare R2</span>
                             </div>
                         </article>
                     </div>
+
                     <p class="feature-note">
-                        Uploading and replacing website files will
-                        be added later.
+                        The original Fenix and Casa galleries are still
+                        built into the site. New uploads appear as an
+                        Additional Images section for that project.
                     </p>
                 </section>
 
@@ -383,18 +400,17 @@
                             <h2>Your Login</h2>
                             <p class="section-description">
                                 Information about your current Website
-                                Manager session.
-                            </p>
+                                Manager session.</p>
                         </div>
                     </div>
+
 
                     <article class="dashboard-panel account-panel">
                         <div class="account-detail">
                             <span>Signed in as</span>
-                            <strong data-account-username>
-                                Loading...
-                            </strong>
+                            <strong data-account-username>Loading...</strong>
                         </div>
+
 
                         <div class="account-detail">
                             <span>Login lasts for</span>
@@ -407,7 +423,7 @@
                         </div>
 
                         <div class="account-actions">
-                            <button class="logout-button" type="button" data-logout >Log Out</button>
+                            <button class="logout-button" type="button" data-logout>Log Out</button>
                         </div>
                     </article>
                 </section>
@@ -428,57 +444,106 @@
                 <div>
                     <p class="panel-kicker">Portfolio Project</p>
                     <h2 id="project-editor-title">Edit Project</h2>
-                    <p>Make your changes below and save when
-                        you're finished.</p>
+                    <p>Change the project details and manage
+                        images from one place.</p>
                 </div>
-                <button class="project-editor-close"  type="button" data-close-project-editor>Close</button>
+
+                <button class="project-editor-close" type="button" data-close-project-editor>Close</button>
+
             </div>
+
 
             <div class="project-editor-body">
                 <input type="hidden" id="project-id">
-                <div class="project-editor-grid">
-                    <div class="admin-field full-field">
-                        <label for="project-title">Project Name</label>
-                        <input type="text" id="project-title" maxlength="200" required>
+
+                <!-- PROJECT DETAILS -->
+                <section class="editor-section">
+                    <div class="editor-section-heading">
+                        <div>
+                            <p class="panel-kicker">Project Details</p>
+                            <h3>Information</h3>
+                        </div>
                     </div>
 
-                    <div class="admin-field full-field">
-                        <label for="project-kicker">Short Label</label>
-                        <input type="text" id="project-kicker" maxlength="200" placeholder="Example: Educational Publication">
-                        <small>This appears above the project name. </small>
+                    <div class="project-editor-grid">
+                        <div class="admin-field full-field">
+                            <label for="project-title">Project Name</label>
+                            <input type="text" id="project-title" maxlength="200" required>
+                        </div>
+
+                        <div class="admin-field full-field">
+                            <label for="project-kicker">Short Label</label>
+                            <input type="text" id="project-kicker" maxlength="200" placeholder="Example: Educational Publication">
+                            <small>This appears above the project name.</small>
+                        </div>
+
+                        <div class="admin-field full-field">
+                            <label for="project-description">Project Story</label>
+                            <textarea id="project-description" rows="10" maxlength="10000" placeholder="Tell visitors about this project..."></textarea>
+                            <small>Leave a blank line between paragraphs.</small>
+                        </div>
+
+
+                        <div class="admin-field">
+                            <label for="project-year">Year</label>
+                            <input type="number" id="project-year" min="1900" max="2100" placeholder="Optional">
+                        </div>
+
+                        <div class="admin-field">
+                            <label for="project-role">My Role</label>
+                            <input type="text" id="project-role" maxlength="500" placeholder="Example: Editorial Design">
+                        </div>
                     </div>
 
-                    <div class="admin-field full-field">
-                        <label for="project-description">Project Story</label>
-                        <textarea id="project-description" rows="10" maxlength="10000" placeholder="Tell visitors about this project..."></textarea>
-                        <small>Leave a blank line between paragraphs.</small>
+                    <label class="project-visibility-option">
+                        <input type="checkbox" id="project-visible">
+                        <span>
+                            <strong>Show this project on the website</strong>
+                            <small>Turn this off to temporarily hide the project from visitors.
+                            </small>
+                        </span>
+                    </label>
+                </section>
+
+                <!-- PROJECT IMAGES -->
+                <section class="editor-section project-media-editor">
+                    <div class="editor-section-heading">
+                        <div>
+                            <p class="panel-kicker">Project Images</p>
+                            <h3>Uploaded Images</h3>
+                            <p>Upload new work, change its order, or remove it from this project.</p>
+                        </div>
+                        <span class="project-media-count" data-project-media-count>0 Images</span>
                     </div>
 
-                    <div class="admin-field">
-                        <label for="project-year">Year</label>
-                        <input type="number" id="project-year" min="1900" max="2100" placeholder="Optional">
+                    <div class="project-media-upload">
+                        <div class="admin-field">
+                            <label for="project-media-file">Choose an Image</label>
+                            <input type="file" id="project-media-file" accept="image/jpeg,image/png,image/webp,image/avif,.jpg,.jpeg,.png,.webp,.avif">
+                            <small>JPG, PNG, WebP or AVIF. Maximum 20 MB.</small>
+                        </div>
+
+                        <div class="admin-field">
+                            <label for="project-media-alt">Image Description</label>
+                            <input type="text" id="project-media-alt" maxlength="500" placeholder="Example: Fenix publication cover">
+                            <small> alt images for accessibility</small>
+                        </div>
+
+                        <button class="media-upload-button" type="button" data-upload-project-media>Upload Image</button>
                     </div>
 
-                    <div class="admin-field">
-                        <label for="project-role"> My Role</label>
-                        <input type="text" id="project-role" maxlength="500" placeholder="Example: Editorial Design">
+                    <div class="project-media-list" data-project-media-list>
                     </div>
-                </div>
 
-                <label class="project-visibility-option">
-                    <input type="checkbox" id="project-visible">
-                    <span>
-                        <strong>Show this project on the website</strong>
-                        <small>Turn this off if you want to temporarily
-                            hide the project from visitors.</small>
-                    </span>
-                </label>
-
-                <div class="project-editor-note">
-                    <strong>Images stay the same for now.</strong>
-                    <span>Image uploading and rearranging will be added
-                        separately so it's easy to use.</span>
-                </div>
+                    <div class="project-editor-note">
+                        <strong>About the original gallery</strong>
+                        <span>
+                            The existing Fenix and Casa images are still
+                            built into the website. Images uploaded here
+                            are added to an Additional Images section.
+                        </span>
+                    </div>
+                </section>
             </div>
 
             <div class="project-editor-actions">
@@ -489,13 +554,7 @@
     </dialog>
 
     <!-- MESSAGE -->
-    <div
-        class="admin-toast"
-        data-admin-toast
-        role="status"
-        aria-live="polite"
-    ></div>
-
+    <div class="admin-toast" data-admin-toast role="status" aria-live="polite"></div>
     <script src="./admin-dashboard.js"></script>
 </body>
 </html>
