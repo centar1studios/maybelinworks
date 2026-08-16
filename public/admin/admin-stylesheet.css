@@ -1353,6 +1353,43 @@ body.editor-open {
     background: var(--surface-soft);
 }
 
+.page-layout-preset-bar {
+    display: grid;
+    grid-template-columns: minmax(170px, 0.7fr) minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 13px;
+    border: 1px solid rgba(141, 246, 136, 0.55);
+    border-radius: 10px;
+    background: rgba(141, 246, 136, 0.08);
+}
+
+.page-layout-preset-bar p {
+    align-self: center;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.45;
+}
+
+.page-layout-preset-bar button {
+    min-height: 42px;
+    padding: 9px 13px;
+    border: 1px solid var(--dark-green);
+    border-radius: 8px;
+    background: var(--dark-green);
+    color: #FFFFFF;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.page-layout-preset-bar button:hover {
+    border-color: var(--pink);
+    background: var(--pink);
+    color: var(--dark-green);
+}
+
 .page-layout-toolbar {
     display: flex;
     flex-wrap: wrap;
@@ -1857,6 +1894,11 @@ body.editor-open {
 
     .page-layout-inspector {
         position: static;
+    }
+
+    .page-layout-preset-bar {
+        grid-template-columns: 1fr;
+        align-items: stretch;
     }
 }
 

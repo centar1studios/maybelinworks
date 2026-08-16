@@ -669,6 +669,198 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
+    function createPagedProjectLayout(
+        project,
+        blocks,
+        mediaById,
+        preset
+    ) {
+        const mediaItems = blocks
+            .filter(block => block.type === "media")
+            .map(block => mediaById.get(Number(block.media_id)))
+            .filter(Boolean);
+
+        if (!mediaItems.length) {
+            return null;
+        }
+
+        const isBook = preset === "book";
+        const viewer = document.createElement("section");
+        viewer.className = isBook
+            ? "cms-paged-layout cms-book-reader"
+            : "cms-paged-layout cms-slide-deck";
+        viewer.tabIndex = 0;
+        viewer.setAttribute(
+            "aria-label",
+            isBook
+                ? `${project.title} publication reader`
+                : `${project.title} presentation`
+        );
+
+        const headingBlock = blocks.find(
+            block => block.type === "heading" && block.text
+        );
+
+        if (headingBlock) {
+            const heading = document.createElement("h4");
+            heading.className = "cms-paged-heading";
+            heading.textContent = headingBlock.text;
+            viewer.appendChild(heading);
+        }
+
+        const textBlocks = blocks.filter(
+            block => block.type === "text" && block.text
+        );
+
+        if (textBlocks.length) {
+            const intro = document.createElement("div");
+            intro.className = "cms-paged-intro";
+
+            textBlocks.forEach(block => {
+                const paragraph = document.createElement("p");
+                paragraph.textContent = block.text;
+                intro.appendChild(paragraph);
+            });
+
+            viewer.appendChild(intro);
+        }
+
+        const stage = document.createElement("div");
+        stage.className = isBook
+            ? "cms-paged-stage cms-book-stage"
+            : "cms-paged-stage cms-slide-stage";
+
+        const groups = [];
+
+        if (isBook) {
+            groups.push({
+                items: [mediaItems[0]],
+                label: "Front Cover"
+            });
+
+            for (let index = 1; index < mediaItems.length - 1; index += 2) {
+                const spread = mediaItems.slice(
+                    index,
+                    Math.min(index + 2, mediaItems.length - 1)
+                );
+
+                groups.push({
+                    items: spread,
+                    label: spread.length === 2
+                        ? `Pages ${index + 1}–${index + 2}`
+                        : `Page ${index + 1}`
+                });
+            }
+
+            if (mediaItems.length > 1) {
+                groups.push({
+                    items: [mediaItems.at(-1)],
+                    label: "Back Cover"
+                });
+            }
+        } else {
+            mediaItems.forEach((item, index) => {
+                groups.push({
+                    items: [item],
+                    label: `Slide ${index + 1}`
+                });
+            });
+        }
+
+        const panels = groups.map((group, groupIndex) => {
+            const panel = document.createElement("figure");
+            panel.className = isBook ? "cms-book-spread" : "cms-slide";
+            panel.hidden = groupIndex !== 0;
+            panel.dataset.panelLabel = group.label;
+
+            if (isBook && group.items.length === 1) {
+                panel.classList.add("is-single-page");
+            }
+
+            group.items.forEach((item, itemIndex) => {
+                const page = document.createElement("div");
+                page.className = isBook ? "cms-book-page" : "cms-slide-page";
+
+                const image = document.createElement("img");
+                image.src = getMediaUrl(item);
+                image.alt = item.alt_text ||
+                    `${project.title} ${isBook ? "publication page" : "slide"}`;
+                image.loading = groupIndex === 0 && itemIndex === 0
+                    ? "eager"
+                    : "lazy";
+                image.decoding = "async";
+
+                prepareGalleryImage(image);
+                page.appendChild(image);
+                panel.appendChild(page);
+            });
+
+            stage.appendChild(panel);
+            return panel;
+        });
+
+        const navigation = document.createElement("div");
+        navigation.className = "cms-paged-navigation";
+
+        const previous = document.createElement("button");
+        previous.type = "button";
+        previous.textContent = isBook
+            ? "← Previous Pages"
+            : "← Previous Slide";
+
+        const counter = document.createElement("span");
+        counter.className = "cms-paged-counter";
+        counter.setAttribute("aria-live", "polite");
+
+        const next = document.createElement("button");
+        next.type = "button";
+        next.textContent = isBook ? "Next Pages →" : "Next Slide →";
+
+        let activeIndex = 0;
+
+        const updateViewer = nextIndex => {
+            activeIndex = Math.min(
+                Math.max(nextIndex, 0),
+                panels.length - 1
+            );
+
+            panels.forEach((panel, index) => {
+                panel.hidden = index !== activeIndex;
+            });
+
+            previous.disabled = activeIndex === 0;
+            next.disabled = activeIndex === panels.length - 1;
+            counter.textContent =
+                `${groups[activeIndex].label} • ${activeIndex + 1} / ${panels.length}`;
+        };
+
+        previous.addEventListener("click", () => {
+            updateViewer(activeIndex - 1);
+        });
+
+        next.addEventListener("click", () => {
+            updateViewer(activeIndex + 1);
+        });
+
+        viewer.addEventListener("keydown", event => {
+            if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                updateViewer(activeIndex - 1);
+            }
+
+            if (event.key === "ArrowRight") {
+                event.preventDefault();
+                updateViewer(activeIndex + 1);
+            }
+        });
+
+        navigation.append(previous, counter, next);
+        viewer.append(stage, navigation);
+        updateViewer(0);
+
+        return viewer;
+    }
+
     function createCustomProjectLayout(project, media) {
         const layout = project?.page_layout;
 
@@ -722,6 +914,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 a.x - b.x ||
                 a.sourceOrder - b.sourceOrder
             );
+
+        const preset = ["book", "slides"].includes(layout.preset)
+            ? layout.preset
+            : "canvas";
+
+        if (preset === "book" || preset === "slides") {
+            return createPagedProjectLayout(
+                project,
+                blocks,
+                mediaById,
+                preset
+            );
+        }
 
         const canvas = document.createElement("div");
         canvas.className = "cms-layout-canvas";

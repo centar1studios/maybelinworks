@@ -31,6 +31,13 @@ const ALLOWED_PAGE_BLOCK_TYPES = [
     "spacer"
 ];
 
+const ALLOWED_PAGE_LAYOUT_PRESETS = [
+    "canvas",
+    "grid",
+    "book",
+    "slides"
+];
+
 const MAX_PAGE_LAYOUT_BLOCKS = 200;
 const MAX_PAGE_LAYOUT_BYTES = 100 * 1024;
 
@@ -493,7 +500,14 @@ function parsePageLayout(value) {
             return null;
         }
 
-        return layout;
+        return {
+            ...layout,
+            preset: ALLOWED_PAGE_LAYOUT_PRESETS.includes(
+                layout.preset
+            )
+                ? layout.preset
+                : "canvas"
+        };
     } catch {
         return null;
     }
@@ -633,6 +647,11 @@ function cleanPageLayout(value, allowedMediaIds) {
 
     const layout = {
         version: 1,
+        preset: ALLOWED_PAGE_LAYOUT_PRESETS.includes(
+            value.preset
+        )
+            ? value.preset
+            : "canvas",
         blocks
     };
 

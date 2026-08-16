@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="./admin-stylesheet.css?v=20260816-4">
+    <link rel="stylesheet" href="./admin-stylesheet.css?v=20260816-5">
 </head>
 
 <body>
@@ -535,12 +535,27 @@
                     </label>
 
                     <div class="page-layout-builder" data-page-layout-builder hidden>
+                        <div class="page-layout-preset-bar">
+                            <div class="admin-field">
+                                <label for="project-page-preset">Page Type</label>
+                                <select id="project-page-preset">
+                                    <option value="canvas">Freeform Canvas</option>
+                                    <option value="grid">Portfolio Grid</option>
+                                    <option value="book">Book / Zine Reader</option>
+                                    <option value="slides">Presentation / Slides</option>
+                                </select>
+                            </div>
+
+                            <p data-page-preset-description>Place images, headings and text anywhere on the page.</p>
+                            <button type="button" data-apply-page-preset>Apply Preset</button>
+                        </div>
+
                         <div class="page-layout-toolbar" aria-label="Page builder tools">
                             <button type="button" data-add-layout-heading>Add Section</button>
                             <button type="button" data-add-layout-text>Add Text</button>
                             <button type="button" data-add-layout-spacer>Add Space</button>
                             <button type="button" data-add-layout-media>Add Missing Images</button>
-                            <button type="button" class="layout-reset-button" data-reset-page-layout>Arrange from Gallery</button>
+                            <button type="button" class="layout-reset-button" data-reset-page-layout>Rebuild Preset</button>
                         </div>
 
                         <p class="page-layout-help">
@@ -616,6 +631,6 @@
 
     <div class="admin-toast" data-admin-toast role="status" aria-live="polite"></div>
 
-    <script src="./admin-dashboard.js?v=20260816-4"></script>
+    <script src="./admin-dashboard.js?v=20260816-5"></script>
 </body>
 </html>

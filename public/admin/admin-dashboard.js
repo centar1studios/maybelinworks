@@ -51,6 +51,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const PAGE_LAYOUT_COLUMNS = 12;
     const PAGE_LAYOUT_ROW_HEIGHT = 36;
 
+    const PAGE_LAYOUT_PRESETS = {
+        canvas: {
+            label: "Freeform Canvas",
+            description:
+                "Place images, section headings, text and space anywhere on a twelve-column page."
+        },
+        grid: {
+            label: "Portfolio Grid",
+            description:
+                "Arrange images in a clean two-column grid, then drag or resize individual pieces if needed."
+        },
+        book: {
+            label: "Book / Zine Reader",
+            description:
+                "Show a front cover, page spreads in order, and a back cover with previous and next page controls."
+        },
+        slides: {
+            label: "Presentation / Slides",
+            description:
+                "Show one presentation slide at a time with previous, next and slide-count controls."
+        }
+    };
+
     function loadGoogleFont(fontName) {
         if (!fontName || loadedFonts.has(fontName)) {
             return;
@@ -149,6 +172,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const customLayoutEnabled = document.querySelector("#project-custom-layout-enabled");
     const pageLayoutStatus = document.querySelector("[data-page-layout-status]");
     const pageLayoutBuilder = document.querySelector("[data-page-layout-builder]");
+    const pageLayoutPreset = document.querySelector("#project-page-preset");
+    const pagePresetDescription = document.querySelector("[data-page-preset-description]");
+    const applyPagePresetButton = document.querySelector("[data-apply-page-preset]");
     const pageLayoutCanvas = document.querySelector("[data-page-layout-canvas]");
     const pageLayoutInspector = document.querySelector("[data-page-layout-inspector]");
     const layoutInspectorTitle = document.querySelector("[data-layout-inspector-title]");
@@ -177,6 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let editorMode = "edit";
     let editingPageLayout = {
         version: 1,
+        preset: "canvas",
         blocks: []
     };
     let selectedLayoutBlockId = null;
@@ -1049,9 +1076,17 @@ document.addEventListener("DOMContentLoaded", () => {
         ) {
             return {
                 version: 1,
+                preset: "canvas",
                 blocks: []
             };
         }
+
+        const preset = Object.prototype.hasOwnProperty.call(
+            PAGE_LAYOUT_PRESETS,
+            value.preset
+        )
+            ? value.preset
+            : "canvas";
 
         const mediaIds = new Set(
             sortedMedia(project).map(
@@ -1129,11 +1164,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return {
             version: 1,
+            preset,
             blocks
         };
     }
 
-    function galleryTemplate(project) {
+    function suggestedPagePreset(project) {
+        const suggestions = {
+            publication: "book",
+            full: "slides",
+            grid: "grid"
+        };
+
+        return suggestions[project?.gallery_layout] || "canvas";
+    }
+
+    function updatePagePresetDescription() {
+        const preset = PAGE_LAYOUT_PRESETS[
+            pageLayoutPreset?.value
+        ] || PAGE_LAYOUT_PRESETS.canvas;
+
+        if (pagePresetDescription) {
+            pagePresetDescription.textContent = preset.description;
+        }
+    }
+
+    function galleryTemplate(project, requestedPreset = "canvas") {
+        const preset = Object.prototype.hasOwnProperty.call(
+            PAGE_LAYOUT_PRESETS,
+            requestedPreset
+        )
+            ? requestedPreset
+            : "canvas";
+
         const layout = project?.gallery_layout || projectLayout?.value || "smart";
         const media = sortedMedia(project);
         const headingByLayout = {
@@ -1144,15 +1207,99 @@ document.addEventListener("DOMContentLoaded", () => {
             featured: "Featured Work"
         };
 
+        const headingByPreset = {
+            grid: "Portfolio Grid",
+            book: "Publication",
+            slides: "Presentation"
+        };
+
         const blocks = [{
             id: newLayoutBlockId("heading"),
             type: "heading",
-            text: headingByLayout[layout] || "Project Gallery",
+            text: headingByPreset[preset] ||
+                headingByLayout[layout] ||
+                "Project Gallery",
             x: 0,
             y: 0,
             w: 12,
             h: 2
         }];
+
+        const addMediaBlock = (item, x, y, width, height) => {
+            blocks.push({
+                id: newLayoutBlockId("media"),
+                type: "media",
+                media_id: Number(item.id),
+                fit: "contain",
+                x,
+                y,
+                w: width,
+                h: height
+            });
+        };
+
+        if (preset === "book") {
+            let bookRow = 3;
+
+            if (media[0]) {
+                addMediaBlock(media[0], 3, bookRow, 6, 8);
+                bookRow += 9;
+            }
+
+            const insidePages = media.slice(1, -1);
+
+            insidePages.forEach((item, index) => {
+                addMediaBlock(
+                    item,
+                    (index % 2) * 6,
+                    bookRow + Math.floor(index / 2) * 9,
+                    6,
+                    8
+                );
+            });
+
+            bookRow += Math.ceil(insidePages.length / 2) * 9;
+
+            if (media.length > 1) {
+                addMediaBlock(media.at(-1), 3, bookRow, 6, 8);
+            }
+
+            return {
+                version: 1,
+                preset,
+                blocks
+            };
+        }
+
+        if (preset === "slides") {
+            media.forEach((item, index) => {
+                addMediaBlock(item, 0, 3 + index * 8, 12, 7);
+            });
+
+            return {
+                version: 1,
+                preset,
+                blocks
+            };
+        }
+
+        if (preset === "grid") {
+            media.forEach((item, index) => {
+                addMediaBlock(
+                    item,
+                    (index % 2) * 6,
+                    3 + Math.floor(index / 2) * 6,
+                    6,
+                    5
+                );
+            });
+
+            return {
+                version: 1,
+                preset,
+                blocks
+            };
+        }
 
         let row = 3;
         let pairIndex = 0;
@@ -1180,20 +1327,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            blocks.push({
-                id: newLayoutBlockId("media"),
-                type: "media",
-                media_id: Number(item.id),
-                fit: "contain",
-                x,
-                y,
-                w: width,
-                h: height
-            });
+            addMediaBlock(item, x, y, width, height);
         });
 
         return {
             version: 1,
+            preset,
             blocks
         };
     }
@@ -1221,8 +1360,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (pageLayoutStatus) {
+            const preset = PAGE_LAYOUT_PRESETS[
+                editingPageLayout.preset
+            ] || PAGE_LAYOUT_PRESETS.canvas;
+
             pageLayoutStatus.textContent = enabled
-                ? (pageLayoutDirty ? "Unsaved Layout" : "Custom Layout")
+                ? (pageLayoutDirty ? "Unsaved Layout" : preset.label)
                 : "Gallery Mode";
         }
     }
@@ -1629,16 +1772,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const startRow = currentLayoutBottom() + 1;
 
+        const preset = editingPageLayout.preset || "canvas";
+        const fullWidth = preset === "slides";
+        const tallPages = preset === "book";
+        const width = fullWidth ? 12 : 6;
+        const height = fullWidth ? 7 : (tallPages ? 8 : 5);
+        const rowSpan = height + 1;
+
         mediaItems.forEach((media, index) => {
+            const column = fullWidth ? 0 : index % 2;
+            const rowIndex = fullWidth ? index : Math.floor(index / 2);
+
             editingPageLayout.blocks.push({
                 id: newLayoutBlockId("media"),
                 type: "media",
                 media_id: Number(media.id),
                 fit: "contain",
-                x: (index % 2) * 6,
-                y: startRow + Math.floor(index / 2) * 6,
-                w: 6,
-                h: 5
+                x: column * 6,
+                y: startRow + rowIndex * rowSpan,
+                w: width,
+                h: height
             });
         });
 
@@ -1722,11 +1875,23 @@ document.addEventListener("DOMContentLoaded", () => {
             customLayoutEnabled.checked &&
             !editingPageLayout.blocks.length
         ) {
+            const preset = suggestedPagePreset(
+                editingProject || {
+                    gallery_layout: projectLayout?.value
+                }
+            );
+
+            if (pageLayoutPreset) {
+                pageLayoutPreset.value = preset;
+            }
+
+            updatePagePresetDescription();
             editingPageLayout = galleryTemplate(
                 editingProject || {
                     gallery_layout: projectLayout?.value,
                     media: []
-                }
+                },
+                preset
             );
         }
 
@@ -1752,17 +1917,46 @@ document.addEventListener("DOMContentLoaded", () => {
         addMissingMediaToLayout
     );
 
-    resetPageLayoutButton?.addEventListener("click", () => {
+    pageLayoutPreset?.addEventListener(
+        "change",
+        updatePagePresetDescription
+    );
+
+    applyPagePresetButton?.addEventListener("click", () => {
+        const preset = pageLayoutPreset?.value || "canvas";
+        const presetLabel = PAGE_LAYOUT_PRESETS[preset]?.label ||
+            PAGE_LAYOUT_PRESETS.canvas.label;
+
         if (
             editingPageLayout.blocks.length &&
             !window.confirm(
-                "Replace this custom arrangement with a fresh layout based on the selected Gallery Layout?"
+                `Apply the ${presetLabel} preset? This rearranges the current custom page.`
             )
         ) {
             return;
         }
 
-        editingPageLayout = galleryTemplate(editingProject);
+        editingPageLayout = galleryTemplate(editingProject, preset);
+        selectedLayoutBlockId = null;
+        markPageLayoutDirty();
+        renderPageLayout();
+        showToast(`${presetLabel} is ready to edit.`);
+    });
+
+    resetPageLayoutButton?.addEventListener("click", () => {
+        if (
+            editingPageLayout.blocks.length &&
+            !window.confirm(
+                "Rebuild this page using the currently selected Page Type?"
+            )
+        ) {
+            return;
+        }
+
+        editingPageLayout = galleryTemplate(
+            editingProject,
+            pageLayoutPreset?.value || editingPageLayout.preset
+        );
         selectedLayoutBlockId = null;
         markPageLayoutDirty();
         renderPageLayout();
@@ -1892,6 +2086,14 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
 
+        if (pageLayoutPreset) {
+            pageLayoutPreset.value = project?.page_layout
+                ? savedPageLayout.preset
+                : suggestedPagePreset(project);
+        }
+
+        updatePagePresetDescription();
+
         if (projectMediaFile) {
             projectMediaFile.value = "";
         }
@@ -1975,6 +2177,7 @@ document.addEventListener("DOMContentLoaded", () => {
         editorMode = "edit";
         editingPageLayout = {
             version: 1,
+            preset: "canvas",
             blocks: []
         };
         selectedLayoutBlockId = null;
@@ -2011,6 +2214,7 @@ document.addEventListener("DOMContentLoaded", () => {
             page_layout: customLayoutEnabled?.checked
                 ? {
                     version: 1,
+                    preset: editingPageLayout.preset || "canvas",
                     blocks: editingPageLayout.blocks
                 }
                 : null
