@@ -438,8 +438,23 @@ dialog[open] {
 }
 
 /* PORTFOLIO */
+
+[data-projects-dialog][open] {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    overflow: hidden;
+}
+
+[data-projects-dialog] > .dialog-toolbar {
+    position: relative;
+    top: auto;
+}
+
 .portfolio-dialog-content {
-    padding: clamp(2.5rem, 5vw, 5.5rem) 1.5rem 6rem;
+    min-height: 0;
+    padding: clamp(2.5rem, 5vw, 5.5rem) 1.5rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .portfolio-intro {
@@ -1497,28 +1512,27 @@ body.dialog-open {
 /* PROJECT SWITCHER */
 
 .project-switcher {
-    width: min(100%, 42rem);
-    display: flex;
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    justify-content: center;
     gap: 1rem;
-    margin: 2.5rem auto 0;
-    padding: 1rem 1.25rem;
-    border: 1px solid rgba(246, 80, 189, 0.28);
-    border-radius: 14px;
-    background: linear-gradient(
-        145deg,
-        var(--dark-green),
-        var(--purple)
-    );
-    box-shadow: 0 16px 35px rgba(42, 63, 56, 0.14);
+    margin: 0;
+    padding: 1.15rem 1.5rem;
+    border-top: 2px solid var(--pink);
+    background: rgba(42, 63, 56, 0.98);
+    color: var(--light-text);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .project-switcher-button {
-    padding: 0.55rem 0.8rem;
-    border: 1px solid rgba(141, 246, 136, 0.45);
-    border-radius: 8px;
-    background: rgba(141, 246, 136, 0.06);
+    width: fit-content;
+    padding: 0;
+    border: 0;
+    background: transparent;
     color: var(--lime);
     font-family: var(--font-body);
     font-size: 0.68rem;
@@ -1535,10 +1549,13 @@ body.dialog-open {
 }
 
 .project-switcher-button:hover {
-    border-color: var(--pink);
-    background: rgba(246, 80, 189, 0.1);
+    background: transparent;
     color: var(--pink);
-    transform: translateY(-1px);
+    transform: none;
+}
+
+.project-switcher-button:last-child {
+    justify-self: end;
 }
 
 .project-switcher-button:focus-visible {
@@ -1582,9 +1599,8 @@ body.dialog-open {
 @media (max-width: 760px) {
     .project-switcher {
         width: 100%;
-        justify-content: space-between;
-        margin-top: 1.5rem;
-        padding: 0.85rem;
+        margin: 0;
+        padding: 1rem;
     }
 
     .project-switcher-button {

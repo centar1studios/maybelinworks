@@ -53,9 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const PAGE_LAYOUT_PRESETS = {
         canvas: {
-            label: "Freeform Canvas",
+            label: "Custom Layout",
             description:
-                "Place images, section headings, text and space anywhere on a twelve-column page."
+                "Arrange images, section headings, text and spacing on a flexible project page."
         },
         grid: {
             label: "Portfolio Grid",
@@ -1045,7 +1045,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    /* OPTIONAL PAGE BUILDER */
+    /* PROJECT PAGE EDITOR */
 
     function layoutNumber(value, fallback, min, max) {
         const number = Number(value);
@@ -1366,7 +1366,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             pageLayoutStatus.textContent = enabled
                 ? (pageLayoutDirty ? "Unsaved Layout" : preset.label)
-                : "Gallery Mode";
+                : "Gallery Layout";
         }
     }
 
@@ -1930,7 +1930,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (
             editingPageLayout.blocks.length &&
             !window.confirm(
-                `Apply the ${presetLabel} preset? This rearranges the current custom page.`
+                `Apply the ${presetLabel}? This rearranges the current project page.`
             )
         ) {
             return;
@@ -2048,8 +2048,8 @@ document.addEventListener("DOMContentLoaded", () => {
             : "Edit Project";
 
         projectEditorIntro.textContent = creating
-            ? "Add the project details first. After it is created, you can upload its images without closing this window."
-            : "Change project details and manage images from one place.";
+            ? "Enter the project details below."
+            : "Update project details, images and page layout.";
 
         saveProjectButton.textContent = creating
             ? "Create Project"

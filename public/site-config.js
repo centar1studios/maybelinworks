@@ -346,10 +346,14 @@ document.addEventListener("DOMContentLoaded", () => {
             nextProjectButton
         );
 
-        publicProjectList.insertAdjacentElement(
-            "afterend",
-            projectSwitcher
-        );
+        if (projectsDialog) {
+            projectsDialog.appendChild(projectSwitcher);
+        } else {
+            publicProjectList.insertAdjacentElement(
+                "afterend",
+                projectSwitcher
+            );
+        }
     }
 
     function normalizeProjectIndex(index) {
@@ -1053,11 +1057,11 @@ document.addEventListener("DOMContentLoaded", () => {
             empty.className = "project-gallery-empty";
 
             const heading = document.createElement("strong");
-            heading.textContent = "Gallery coming soon";
+            heading.textContent = "Project Gallery";
 
             const text = document.createElement("span");
             text.textContent =
-                "This project is published, but it does not have any images yet.";
+                "No images have been added to this project yet.";
 
             empty.append(heading, text);
             gallery.appendChild(empty);

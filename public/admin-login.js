@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             showMessage(
-                "You're signed in! Opening your Website Manager...",
+                "You're signed in! Opening your Portfolio Manager...",
                 true
             );
 

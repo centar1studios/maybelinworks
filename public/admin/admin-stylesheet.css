@@ -395,7 +395,7 @@ button:disabled {
 
 /* STATUS */
 
-.coming-soon-badge,
+.editor-status-badge,
 .status-badge,
 .panel-status,
 .project-media-count {
@@ -407,7 +407,7 @@ button:disabled {
     font-weight: 700;
 }
 
-.coming-soon-badge {
+.editor-status-badge {
     padding: 7px 11px;
     background: rgba(141, 246, 136, 0.12);
     color: var(--dark-green);
@@ -1305,7 +1305,7 @@ body.editor-open {
 }
 
 
-/* OPTIONAL PAGE BUILDER */
+/* PROJECT PAGE EDITOR */
 
 .page-layout-editor [hidden] {
     display: none !important;
