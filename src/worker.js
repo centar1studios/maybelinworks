@@ -8,6 +8,9 @@ const ALLOWED_BACKGROUND_TYPES = [
     "video"
 ];
 
+
+/* RESPONSE HELPERS */
+
 function json(data, status = 200, headers = {}) {
     return new Response(JSON.stringify(data), {
         status,
@@ -18,6 +21,9 @@ function json(data, status = 200, headers = {}) {
         }
     });
 }
+
+
+/* SESSION HELPERS */
 
 function base64UrlEncodeBytes(bytes) {
     let binary = "";
@@ -65,15 +71,22 @@ function getCookie(request, name) {
     }
 
     for (const cookie of cookieHeader.split(";")) {
-        const [key, ...valueParts] = cookie.trim().split("=");
+        const [key, ...valueParts] = cookie
+            .trim()
+            .split("=");
 
         if (key === name) {
-            return decodeURIComponent(valueParts.join("="));
+            return decodeURIComponent(
+                valueParts.join("=")
+            );
         }
     }
 
     return null;
 }
+
+
+/* SESSION SECURITY */
 
 async function getHmacKey(secret) {
     return crypto.subtle.importKey(
@@ -102,7 +115,11 @@ async function signPayload(payload, secret) {
     );
 }
 
-async function verifySignature(payload, signature, secret) {
+async function verifySignature(
+    payload,
+    signature,
+    secret
+) {
     try {
         let base64 = signature
             .replace(/-/g, "+")
@@ -132,12 +149,30 @@ async function verifySignature(payload, signature, secret) {
     }
 }
 
-function validAdminCredentials(username, password, env) {
+
+/* ADMIN ACCOUNTS */
+
+function validAdminCredentials(
+    username,
+    password,
+    env
+) {
     const validAdmin1 =
+        Boolean(
+            env.ADMIN_USERNAME_1 &&
+            env.ADMIN_PASSWORD_1
+        ) &&
         username === env.ADMIN_USERNAME_1 &&
         password === env.ADMIN_PASSWORD_1;
 
+    const admin2Configured =
+        Boolean(
+            env.ADMIN_USERNAME_2 &&
+            env.ADMIN_PASSWORD_2
+        );
+
     const validAdmin2 =
+        admin2Configured &&
         username === env.ADMIN_USERNAME_2 &&
         password === env.ADMIN_PASSWORD_2;
 
@@ -145,22 +180,38 @@ function validAdminCredentials(username, password, env) {
 }
 
 function validAdminUsername(username, env) {
-    return (
-        username === env.ADMIN_USERNAME_1 ||
-        username === env.ADMIN_USERNAME_2
-    );
+    const validAdmin1 =
+        Boolean(env.ADMIN_USERNAME_1) &&
+        username === env.ADMIN_USERNAME_1;
+
+    const admin2Configured =
+        Boolean(
+            env.ADMIN_USERNAME_2 &&
+            env.ADMIN_PASSWORD_2
+        );
+
+    const validAdmin2 =
+        admin2Configured &&
+        username === env.ADMIN_USERNAME_2;
+
+    return validAdmin1 || validAdmin2;
 }
+
+
+/* CREATE SESSION */
 
 async function createSession(username, env) {
     const expires =
-        Math.floor(Date.now() / 1000) + SESSION_DURATION;
+        Math.floor(Date.now() / 1000) +
+        SESSION_DURATION;
 
     const sessionData = JSON.stringify({
         username,
         expires
     });
 
-    const payload = base64UrlEncodeText(sessionData);
+    const payload =
+        base64UrlEncodeText(sessionData);
 
     const signature = await signPayload(
         payload,
@@ -169,6 +220,9 @@ async function createSession(username, env) {
 
     return `${payload}.${signature}`;
 }
+
+
+/* READ SESSION */
 
 async function readSession(request, env) {
     const session = getCookie(
@@ -180,17 +234,19 @@ async function readSession(request, env) {
         return null;
     }
 
-    const [payload, signature] = session.split(".");
+    const [payload, signature] =
+        session.split(".");
 
     if (!payload || !signature) {
         return null;
     }
 
-    const signatureValid = await verifySignature(
-        payload,
-        signature,
-        env.SESSION_SECRET
-    );
+    const signatureValid =
+        await verifySignature(
+            payload,
+            signature,
+            env.SESSION_SECRET
+        );
 
     if (!signatureValid) {
         return null;
@@ -220,7 +276,12 @@ async function readSession(request, env) {
         return null;
     }
 
-    if (!validAdminUsername(data.username, env)) {
+    if (
+        !validAdminUsername(
+            data.username,
+            env
+        )
+    ) {
         return null;
     }
 
@@ -234,11 +295,18 @@ async function requireAdmin(request, env) {
     return readSession(request, env);
 }
 
+
+/* VALIDATION */
+
 function validHexColor(value) {
     return /^#[0-9a-fA-F]{6}$/.test(value);
 }
 
-function cleanText(value, fallback, maxLength) {
+function cleanText(
+    value,
+    fallback,
+    maxLength
+) {
     if (typeof value !== "string") {
         return fallback;
     }
@@ -252,7 +320,11 @@ function cleanText(value, fallback, maxLength) {
     return cleaned.slice(0, maxLength);
 }
 
-function cleanNullableText(value, fallback, maxLength) {
+function cleanNullableText(
+    value,
+    fallback,
+    maxLength
+) {
     if (value === null) {
         return null;
     }
@@ -270,7 +342,12 @@ function cleanNullableText(value, fallback, maxLength) {
     return cleaned.slice(0, maxLength);
 }
 
-function clampNumber(value, fallback, min, max) {
+function clampNumber(
+    value,
+    fallback,
+    min,
+    max
+) {
     const number = Number(value);
 
     if (!Number.isFinite(number)) {
@@ -296,16 +373,14 @@ async function handleLogin(request, env) {
     if (
         !env.ADMIN_USERNAME_1 ||
         !env.ADMIN_PASSWORD_1 ||
-        !env.ADMIN_USERNAME_2 ||
-        !env.ADMIN_PASSWORD_2 ||
         !env.SESSION_SECRET
     ) {
         console.error(
-            "Missing admin authentication secrets."
+            "Missing required admin authentication secrets."
         );
 
         return json({
-            error: "Admin authentication is not configured."
+            error: "Website login is not configured."
         }, 500);
     }
 
@@ -431,7 +506,10 @@ function handleLogout(request) {
 
 /* SITE SETTINGS */
 
-async function handleGetSettings(request, env) {
+async function handleGetSettings(
+    request,
+    env
+) {
     if (request.method !== "GET") {
         return json({
             error: "Method not allowed."
@@ -493,7 +571,10 @@ async function handleGetSettings(request, env) {
 
 /* UPDATE SITE SETTINGS */
 
-async function handleUpdateSettings(request, env) {
+async function handleUpdateSettings(
+    request,
+    env
+) {
     if (request.method !== "PUT") {
         return json({
             error: "Method not allowed."
@@ -604,18 +685,20 @@ async function handleUpdateSettings(request, env) {
                 ? body.background_type
                 : current.background_type;
 
-        const backgroundUrl = cleanNullableText(
-            body.background_url,
-            current.background_url,
-            2000
-        );
+        const backgroundUrl =
+            cleanNullableText(
+                body.background_url,
+                current.background_url,
+                2000
+            );
 
-        const backgroundOverlay = clampNumber(
-            body.background_overlay,
-            current.background_overlay,
-            0,
-            1
-        );
+        const backgroundOverlay =
+            clampNumber(
+                body.background_overlay,
+                current.background_overlay,
+                0,
+                1
+            );
 
         const backgroundBlur = Math.round(
             clampNumber(
@@ -706,7 +789,10 @@ async function handleUpdateSettings(request, env) {
 
 /* PROJECTS */
 
-async function handleGetProjects(request, env) {
+async function handleGetProjects(
+    request,
+    env
+) {
     if (request.method !== "GET") {
         return json({
             error: "Method not allowed."
@@ -762,7 +848,11 @@ async function handleGetProjects(request, env) {
         const mediaByProject = new Map();
 
         for (const media of mediaResult.results) {
-            if (!mediaByProject.has(media.project_id)) {
+            if (
+                !mediaByProject.has(
+                    media.project_id
+                )
+            ) {
                 mediaByProject.set(
                     media.project_id,
                     []
@@ -774,13 +864,16 @@ async function handleGetProjects(request, env) {
                 .push(media);
         }
 
-        const projects = projectResult.results.map(
-            project => ({
-                ...project,
-                media:
-                    mediaByProject.get(project.id) || []
-            })
-        );
+        const projects =
+            projectResult.results.map(
+                project => ({
+                    ...project,
+                    media:
+                        mediaByProject.get(
+                            project.id
+                        ) || []
+                })
+            );
 
         return json({
             projects
@@ -838,39 +931,57 @@ export default {
     async fetch(request, env) {
         const url = new URL(request.url);
 
-        if (url.pathname === "/api/admin/login") {
+        if (
+            url.pathname ===
+            "/api/admin/login"
+        ) {
             return handleLogin(
                 request,
                 env
             );
         }
 
-        if (url.pathname === "/api/admin/session") {
+        if (
+            url.pathname ===
+            "/api/admin/session"
+        ) {
             return handleSession(
                 request,
                 env
             );
         }
 
-        if (url.pathname === "/api/admin/logout") {
+        if (
+            url.pathname ===
+            "/api/admin/logout"
+        ) {
             return handleLogout(request);
         }
 
-        if (url.pathname === "/api/settings") {
+        if (
+            url.pathname ===
+            "/api/settings"
+        ) {
             return handleGetSettings(
                 request,
                 env
             );
         }
 
-        if (url.pathname === "/api/admin/settings") {
+        if (
+            url.pathname ===
+            "/api/admin/settings"
+        ) {
             return handleUpdateSettings(
                 request,
                 env
             );
         }
 
-        if (url.pathname === "/api/projects") {
+        if (
+            url.pathname ===
+            "/api/projects"
+        ) {
             return handleGetProjects(
                 request,
                 env
@@ -879,7 +990,9 @@ export default {
 
         if (
             url.pathname === "/admin" ||
-            url.pathname.startsWith("/admin/")
+            url.pathname.startsWith(
+                "/admin/"
+            )
         ) {
             return handleProtectedAdmin(
                 request,
