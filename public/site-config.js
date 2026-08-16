@@ -25,6 +25,10 @@ document.addEventListener("DOMContentLoaded", () => {
         "[data-close-about]"
     );
 
+    const projectsToolbar = projectsDialog?.querySelector(
+        ".dialog-toolbar"
+    );
+
     /* HOMEPAGE */
 
     const heroKicker = document.querySelector(
@@ -44,10 +48,11 @@ document.addEventListener("DOMContentLoaded", () => {
             new Date().getFullYear();
     }
 
-    /* PUBLIC PROJECTS */
+    /* PROJECTS */
 
-    const publicProjectList =
-        document.querySelector(".project-list");
+    const publicProjectList = document.querySelector(
+        ".project-list"
+    );
 
     const staticProjectArticles = Array.from(
         document.querySelectorAll(
@@ -55,8 +60,15 @@ document.addEventListener("DOMContentLoaded", () => {
         )
     );
 
-    const projectArticlesBySlug =
-        new Map();
+    const projectArticlesBySlug = new Map();
+
+    let availableProjectArticles = [
+        ...staticProjectArticles
+    ];
+
+    let currentProjectIndex = 0;
+
+    /* CONNECT STATIC PROJECTS TO DATABASE SLUGS */
 
     staticProjectArticles.forEach((article) => {
         const title = article
@@ -66,6 +78,9 @@ document.addEventListener("DOMContentLoaded", () => {
             .toLowerCase();
 
         if (title === "fenix") {
+            article.dataset.projectSlug =
+                "fenix";
+
             projectArticlesBySlug.set(
                 "fenix",
                 article
@@ -74,16 +89,287 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (
             title &&
-            title.includes(
-                "casa guadalupe"
-            )
+            title.includes("casa guadalupe")
         ) {
+            article.dataset.projectSlug =
+                "casa-guadalupe";
+
             projectArticlesBySlug.set(
                 "casa-guadalupe",
                 article
             );
         }
     });
+
+    /* PROJECT SWITCHER */
+
+    let projectSwitcher = null;
+    let previousProjectButton = null;
+    let nextProjectButton = null;
+    let projectCounter = null;
+
+    if (
+        projectsToolbar &&
+        closeProjectsButton
+    ) {
+        projectSwitcher =
+            document.createElement("div");
+
+        projectSwitcher.className =
+            "project-switcher";
+
+        projectSwitcher.setAttribute(
+            "aria-label",
+            "Project navigation"
+        );
+
+        previousProjectButton =
+            document.createElement("button");
+
+        previousProjectButton.className =
+            "project-switcher-button";
+
+        previousProjectButton.type =
+            "button";
+
+        previousProjectButton.innerHTML =
+            "&#8592; Previous Project";
+
+        nextProjectButton =
+            document.createElement("button");
+
+        nextProjectButton.className =
+            "project-switcher-button";
+
+        nextProjectButton.type =
+            "button";
+
+        nextProjectButton.innerHTML =
+            "Next Project &#8594;";
+
+        projectCounter =
+            document.createElement("span");
+
+        projectCounter.className =
+            "project-switcher-count";
+
+        projectCounter.setAttribute(
+            "aria-live",
+            "polite"
+        );
+
+        projectSwitcher.append(
+            previousProjectButton,
+            projectCounter,
+            nextProjectButton
+        );
+
+        projectsToolbar.insertBefore(
+            projectSwitcher,
+            closeProjectsButton
+        );
+    }
+
+    /* PROJECT INDEX */
+
+    function normalizeProjectIndex(index) {
+        const total =
+            availableProjectArticles.length;
+
+        if (total === 0) {
+            return 0;
+        }
+
+        return (
+            (index % total) +
+            total
+        ) % total;
+    }
+
+    /* PROJECT TITLE */
+
+    function getProjectTitle(article) {
+        return (
+            article
+                ?.querySelector(
+                    ".project-info h3"
+                )
+                ?.textContent
+                .trim() ||
+            "project"
+        );
+    }
+
+    /* UPDATE SWITCHER */
+
+    function updateProjectSwitcher() {
+        const total =
+            availableProjectArticles.length;
+
+        if (!projectSwitcher) {
+            return;
+        }
+
+        if (total === 0) {
+            projectSwitcher.hidden = true;
+            return;
+        }
+
+        projectSwitcher.hidden = false;
+
+        if (projectCounter) {
+            projectCounter.textContent =
+                `${currentProjectIndex + 1} / ${total}`;
+        }
+
+        const multipleProjects =
+            total > 1;
+
+        if (previousProjectButton) {
+            previousProjectButton.hidden =
+                !multipleProjects;
+
+            if (multipleProjects) {
+                const previousIndex =
+                    normalizeProjectIndex(
+                        currentProjectIndex - 1
+                    );
+
+                const previousTitle =
+                    getProjectTitle(
+                        availableProjectArticles[
+                            previousIndex
+                        ]
+                    );
+
+                previousProjectButton.setAttribute(
+                    "aria-label",
+                    `View previous project: ${previousTitle}`
+                );
+            }
+        }
+
+        if (nextProjectButton) {
+            nextProjectButton.hidden =
+                !multipleProjects;
+
+            if (multipleProjects) {
+                const nextIndex =
+                    normalizeProjectIndex(
+                        currentProjectIndex + 1
+                    );
+
+                const nextTitle =
+                    getProjectTitle(
+                        availableProjectArticles[
+                            nextIndex
+                        ]
+                    );
+
+                nextProjectButton.setAttribute(
+                    "aria-label",
+                    `View next project: ${nextTitle}`
+                );
+            }
+        }
+    }
+
+    /* SHOW PROJECT */
+
+    function showProject(
+        index,
+        scrollToProject = true
+    ) {
+        const total =
+            availableProjectArticles.length;
+
+        staticProjectArticles.forEach(
+            (article) => {
+                article.hidden = true;
+
+                article.classList.remove(
+                    "project-current"
+                );
+            }
+        );
+
+        if (total === 0) {
+            updateProjectSwitcher();
+            return;
+        }
+
+        currentProjectIndex =
+            normalizeProjectIndex(index);
+
+        const currentArticle =
+            availableProjectArticles[
+                currentProjectIndex
+            ];
+
+        currentArticle.hidden = false;
+
+        currentArticle.classList.add(
+            "project-current"
+        );
+
+        updateProjectSwitcher();
+
+        if (
+            scrollToProject &&
+            projectsDialog?.open
+        ) {
+            currentArticle.scrollIntoView({
+                behavior: "auto",
+                block: "start"
+            });
+        }
+    }
+
+    /* PREVIOUS PROJECT */
+
+    function showPreviousProject() {
+        if (
+            availableProjectArticles.length <=
+            1
+        ) {
+            return;
+        }
+
+        showProject(
+            currentProjectIndex - 1
+        );
+    }
+
+    /* NEXT PROJECT */
+
+    function showNextProject() {
+        if (
+            availableProjectArticles.length <=
+            1
+        ) {
+            return;
+        }
+
+        showProject(
+            currentProjectIndex + 1
+        );
+    }
+
+    previousProjectButton?.addEventListener(
+        "click",
+        showPreviousProject
+    );
+
+    nextProjectButton?.addEventListener(
+        "click",
+        showNextProject
+    );
+
+    /*
+     * Start with only the first static project
+     * visible while the database loads.
+     */
+    showProject(0, false);
 
     /* LOAD HOMEPAGE SETTINGS */
 
@@ -107,13 +393,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!data.settings) {
                 return;
             }
 
-            const settings = data.settings;
+            const settings =
+                data.settings;
 
             if (
                 heroKicker &&
@@ -150,19 +438,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const rows = Array.from(
-            meta.querySelectorAll(":scope > div")
+            meta.querySelectorAll(
+                ":scope > div"
+            )
         );
 
-        return rows.find((row) => {
-            const heading = row
-                .querySelector("dt")
-                ?.textContent
-                .trim()
-                .toLowerCase();
+        return (
+            rows.find((row) => {
+                const heading = row
+                    .querySelector("dt")
+                    ?.textContent
+                    .trim()
+                    .toLowerCase();
 
-            return heading ===
-                label.toLowerCase();
-        }) || null;
+                return (
+                    heading ===
+                    label.toLowerCase()
+                );
+            }) || null
+        );
     }
 
     /* UPDATE PROJECT META */
@@ -195,16 +489,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!row) {
             row =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             row.dataset.dynamicMeta =
                 "true";
 
             const term =
-                document.createElement("dt");
+                document.createElement(
+                    "dt"
+                );
 
             const description =
-                document.createElement("dd");
+                document.createElement(
+                    "dd"
+                );
 
             term.textContent = label;
 
@@ -243,16 +543,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const paragraphs = description
             .split(/\n\s*\n/)
-            .map(paragraph =>
+            .map((paragraph) =>
                 paragraph.trim()
             )
             .filter(Boolean);
 
         paragraphs.forEach((text) => {
             const paragraph =
-                document.createElement("p");
+                document.createElement(
+                    "p"
+                );
 
-            paragraph.textContent = text;
+            paragraph.textContent =
+                text;
 
             container.appendChild(
                 paragraph
@@ -260,7 +563,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /* APPLY PROJECT */
+    /* APPLY PROJECT DATA */
 
     function applyProjectData(
         article,
@@ -271,28 +574,30 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        article.hidden = false;
+        const number =
+            article.querySelector(
+                ".project-number"
+            );
 
-        const number = article.querySelector(
-            ".project-number"
-        );
+        const kicker =
+            article.querySelector(
+                ".project-kicker"
+            );
 
-        const kicker = article.querySelector(
-            ".project-kicker"
-        );
-
-        const title = article.querySelector(
-            ".project-info h3"
-        );
+        const title =
+            article.querySelector(
+                ".project-info h3"
+            );
 
         const description =
             article.querySelector(
                 ".project-description"
             );
 
-        const meta = article.querySelector(
-            ".project-meta"
-        );
+        const meta =
+            article.querySelector(
+                ".project-meta"
+            );
 
         if (number) {
             number.textContent =
@@ -337,7 +642,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-    /* LOAD PUBLIC PROJECTS */
+    /* LOAD PROJECTS */
 
     async function loadProjects() {
         if (
@@ -366,7 +671,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (
                 !Array.isArray(
@@ -376,20 +682,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            /*
-             * The public API only returns projects
-             * marked as visible.
-             */
-            projectArticlesBySlug.forEach(
-                (article) => {
-                    article.hidden = true;
-                }
-            );
-
-            let displayNumber = 1;
+            const publishedArticles = [];
 
             data.projects.forEach(
-                (project) => {
+                (project, index) => {
                     const article =
                         projectArticlesBySlug.get(
                             project.slug
@@ -402,29 +698,46 @@ document.addEventListener("DOMContentLoaded", () => {
                     applyProjectData(
                         article,
                         project,
-                        displayNumber
+                        index + 1
                     );
 
                     /*
-                     * This also keeps the public
-                     * order synced with D1.
+                     * Keep the project order
+                     * synced with D1.
                      */
                     publicProjectList.appendChild(
                         article
                     );
 
-                    displayNumber += 1;
+                    publishedArticles.push(
+                        article
+                    );
                 }
+            );
+
+            availableProjectArticles =
+                publishedArticles;
+
+            currentProjectIndex = 0;
+
+            showProject(
+                currentProjectIndex,
+                false
             );
         } catch (error) {
             /*
-             * Leave the original project text visible
-             * if the database cannot be reached.
+             * If D1 cannot be reached,
+             * keep the static portfolio usable.
              */
-            projectArticlesBySlug.forEach(
-                (article) => {
-                    article.hidden = false;
-                }
+            availableProjectArticles = [
+                ...staticProjectArticles
+            ];
+
+            currentProjectIndex = 0;
+
+            showProject(
+                currentProjectIndex,
+                false
             );
 
             console.warn(
@@ -436,28 +749,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* IMAGE LIGHTBOX */
 
-    const allGalleryImages = Array.from(
-        document.querySelectorAll(
-            ".project-gallery img"
-        )
-    );
+    const allGalleryImages =
+        Array.from(
+            document.querySelectorAll(
+                ".project-gallery img"
+            )
+        );
 
     let currentImageIndex = 0;
     let previousFocus = null;
 
     function getVisibleGalleryImages() {
-        return allGalleryImages.filter(
-            (image) => {
-                const project =
-                    image.closest(".project");
+        const currentProject =
+            availableProjectArticles[
+                currentProjectIndex
+            ];
 
-                return !project?.hidden;
-            }
+        if (!currentProject) {
+            return [];
+        }
+
+        return Array.from(
+            currentProject.querySelectorAll(
+                ".project-gallery img"
+            )
         );
     }
 
     const lightbox =
-        document.createElement("dialog");
+        document.createElement(
+            "dialog"
+        );
 
     lightbox.className =
         "portfolio-lightbox";
@@ -478,7 +800,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <button
                 class="portfolio-lightbox-close"
                 type="button"
-                data-lightbox-close>
+                data-lightbox-close
+            >
                 Close
             </button>
         </div>
@@ -516,7 +839,9 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
     `;
 
-    document.body.appendChild(lightbox);
+    document.body.appendChild(
+        lightbox
+    );
 
     const lightboxImage =
         lightbox.querySelector(
@@ -562,7 +887,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-    /* PROJECT DIALOG */
+    /* OPEN PROJECTS */
 
     if (
         openProjectsButton &&
@@ -571,11 +896,22 @@ document.addEventListener("DOMContentLoaded", () => {
         openProjectsButton.addEventListener(
             "click",
             () => {
+                /*
+                 * Read More always begins
+                 * with the first project.
+                 */
+                showProject(0, false);
+
                 projectsDialog.showModal();
+
+                projectsDialog.scrollTop = 0;
+
                 updateDialogState();
             }
         );
     }
+
+    /* CLOSE PROJECTS */
 
     if (
         closeProjectsButton &&
@@ -585,12 +921,13 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             () => {
                 projectsDialog.close();
+
                 updateDialogState();
             }
         );
     }
 
-    /* ABOUT DIALOG */
+    /* OPEN ABOUT */
 
     if (
         openAboutButton &&
@@ -600,10 +937,13 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             () => {
                 aboutDialog.showModal();
+
                 updateDialogState();
             }
         );
     }
+
+    /* CLOSE ABOUT */
 
     if (
         closeAboutButton &&
@@ -613,6 +953,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             () => {
                 aboutDialog.close();
+
                 updateDialogState();
             }
         );
@@ -742,7 +1083,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 currentImageIndex -
                 1 +
                 galleryImages.length
-            ) % galleryImages.length;
+            ) %
+            galleryImages.length;
 
         updateLightboxImage();
     }
@@ -763,7 +1105,8 @@ document.addEventListener("DOMContentLoaded", () => {
             (
                 currentImageIndex +
                 1
-            ) % galleryImages.length;
+            ) %
+            galleryImages.length;
 
         updateLightboxImage();
     }
@@ -798,7 +1141,9 @@ document.addEventListener("DOMContentLoaded", () => {
             image.addEventListener(
                 "click",
                 () => {
-                    openLightbox(image);
+                    openLightbox(
+                        image
+                    );
                 }
             );
 
@@ -859,65 +1204,102 @@ document.addEventListener("DOMContentLoaded", () => {
         "cancel",
         (event) => {
             event.preventDefault();
+
             closeLightbox();
         }
     );
 
-    /* KEYBOARD */
+    /* KEYBOARD NAVIGATION */
 
     document.addEventListener(
         "keydown",
         (event) => {
-            if (!lightbox.open) {
+            /*
+             * When an image is open,
+             * arrows change images.
+             */
+            if (lightbox.open) {
+                const galleryImages =
+                    getVisibleGalleryImages();
+
+                if (
+                    galleryImages.length ===
+                    0
+                ) {
+                    return;
+                }
+
+                if (
+                    event.key ===
+                    "ArrowLeft"
+                ) {
+                    event.preventDefault();
+
+                    showPreviousImage();
+                }
+
+                if (
+                    event.key ===
+                    "ArrowRight"
+                ) {
+                    event.preventDefault();
+
+                    showNextImage();
+                }
+
+                if (
+                    event.key ===
+                    "Home"
+                ) {
+                    event.preventDefault();
+
+                    currentImageIndex = 0;
+
+                    updateLightboxImage();
+                }
+
+                if (
+                    event.key ===
+                    "End"
+                ) {
+                    event.preventDefault();
+
+                    currentImageIndex =
+                        galleryImages.length -
+                        1;
+
+                    updateLightboxImage();
+                }
+
                 return;
             }
 
-            const galleryImages =
-                getVisibleGalleryImages();
-
+            /*
+             * When the Projects viewer is open,
+             * arrows change projects.
+             */
             if (
-                galleryImages.length === 0
+                projectsDialog?.open &&
+                availableProjectArticles.length >
+                    1
             ) {
-                return;
-            }
+                if (
+                    event.key ===
+                    "ArrowLeft"
+                ) {
+                    event.preventDefault();
 
-            if (
-                event.key ===
-                "ArrowLeft"
-            ) {
-                event.preventDefault();
-                showPreviousImage();
-            }
+                    showPreviousProject();
+                }
 
-            if (
-                event.key ===
-                "ArrowRight"
-            ) {
-                event.preventDefault();
-                showNextImage();
-            }
+                if (
+                    event.key ===
+                    "ArrowRight"
+                ) {
+                    event.preventDefault();
 
-            if (
-                event.key ===
-                "Home"
-            ) {
-                event.preventDefault();
-
-                currentImageIndex = 0;
-
-                updateLightboxImage();
-            }
-
-            if (
-                event.key ===
-                "End"
-            ) {
-                event.preventDefault();
-
-                currentImageIndex =
-                    galleryImages.length - 1;
-
-                updateLightboxImage();
+                    showNextProject();
+                }
             }
         }
     );

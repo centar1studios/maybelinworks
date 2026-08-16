@@ -1494,3 +1494,117 @@ body.dialog-open {
         font-size: 1.35rem;
     }
 }
+
+/* PROJECT SWITCHER */
+
+.project-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-left: auto;
+    margin-right: 1.5rem;
+}
+
+.project-switcher-button {
+    padding: 0.55rem 0.8rem;
+    border: 1px solid rgba(141, 246, 136, 0.45);
+    border-radius: 8px;
+    background: rgba(141, 246, 136, 0.06);
+    color: var(--lime);
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        color 180ms ease,
+        background 180ms ease,
+        border-color 180ms ease,
+        transform 180ms ease;
+}
+
+.project-switcher-button:hover {
+    border-color: var(--pink);
+    background: rgba(246, 80, 189, 0.1);
+    color: var(--pink);
+    transform: translateY(-1px);
+}
+
+.project-switcher-button:focus-visible {
+    outline: 2px solid var(--pink);
+    outline-offset: 3px;
+}
+
+.project-switcher-count {
+    min-width: 3.5rem;
+    color: rgba(255, 255, 255, 0.72);
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 0.1em;
+}
+
+.project[hidden] {
+    display: none !important;
+}
+
+.project-current {
+    animation: project-in 220ms ease both;
+    scroll-margin-top: 5.5rem;
+}
+
+@keyframes project-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* MOBILE PROJECT SWITCHER */
+
+@media (max-width: 760px) {
+    [data-projects-dialog] .dialog-toolbar {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .project-switcher {
+        order: 3;
+        width: 100%;
+        justify-content: space-between;
+        margin: 0;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(141, 246, 136, 0.2);
+    }
+
+    .project-switcher-button {
+        padding: 0.5rem 0.65rem;
+        font-size: 0.6rem;
+    }
+
+    .project-switcher-count {
+        min-width: auto;
+        font-size: 0.62rem;
+    }
+
+    .project-current {
+        scroll-margin-top: 8.5rem;
+    }
+}
+
+@media (max-width: 430px) {
+    .project-switcher-button {
+        max-width: 125px;
+        white-space: normal;
+        line-height: 1.25;
+    }
+}
