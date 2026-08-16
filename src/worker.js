@@ -2,7 +2,8 @@ import {
     handleGetMedia,
     handleUploadProjectMedia,
     handleDeleteProjectMedia,
-    handleReorderProjectMedia
+    handleReorderProjectMedia,
+    handleUploadAboutPhoto
 } from "./media.js";
 
 const COOKIE_NAME = "maybelin_admin";
@@ -13,6 +14,14 @@ const ALLOWED_BACKGROUND_TYPES = [
     "gradient",
     "image",
     "video"
+];
+
+const ALLOWED_GALLERY_LAYOUTS = [
+    "smart",
+    "publication",
+    "full",
+    "grid",
+    "featured"
 ];
 
 
@@ -350,6 +359,54 @@ function cleanNullableText(
     return cleaned.slice(0, maxLength);
 }
 
+function cleanEmail(value, fallback) {
+    const cleaned = cleanNullableText(
+        value,
+        fallback,
+        320
+    );
+
+    if (cleaned === null) {
+        return null;
+    }
+
+    if (
+        typeof cleaned !== "string" ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned)
+    ) {
+        return fallback;
+    }
+
+    return cleaned;
+}
+
+function cleanHttpUrl(value, fallback) {
+    const cleaned = cleanNullableText(
+        value,
+        fallback,
+        2000
+    );
+
+    if (cleaned === null) {
+        return null;
+    }
+
+    try {
+        const url = new URL(cleaned);
+
+        if (
+            url.protocol !== "https:" &&
+            url.protocol !== "http:"
+        ) {
+            return fallback;
+        }
+
+        return url.toString();
+    } catch {
+        return fallback;
+    }
+}
+
 function clampNumber(
     value,
     fallback,
@@ -400,6 +457,48 @@ function cleanBoolean(value, fallback) {
     }
 
     return fallback;
+}
+
+function cleanGalleryLayout(value, fallback = "smart") {
+    return ALLOWED_GALLERY_LAYOUTS.includes(value)
+        ? value
+        : fallback;
+}
+
+function slugify(value) {
+    return String(value || "project")
+        .trim()
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 80) || "project";
+}
+
+async function uniqueProjectSlug(env, title) {
+    const base = slugify(title);
+    let candidate = base;
+    let suffix = 2;
+
+    while (true) {
+        const existing = await env.DB
+            .prepare(`
+                SELECT id
+                FROM projects
+                WHERE slug = ?
+                LIMIT 1
+            `)
+            .bind(candidate)
+            .first();
+
+        if (!existing) {
+            return candidate;
+        }
+
+        candidate = `${base}-${suffix}`;
+        suffix++;
+    }
 }
 
 
@@ -548,6 +647,39 @@ function handleLogout(request) {
 
 /* SITE SETTINGS */
 
+async function getSiteSettings(env) {
+    return env.DB
+        .prepare(`
+            SELECT
+                id,
+                hero_kicker,
+                hero_title,
+                hero_description,
+                primary_color,
+                accent_green,
+                dark_plum,
+                cream_color,
+                display_font,
+                body_font,
+                background_type,
+                background_url,
+                background_overlay,
+                background_blur,
+                about_kicker,
+                about_title,
+                about_bio,
+                about_photo_key,
+                contact_email,
+                contact_phone,
+                instagram_url,
+                updated_at
+            FROM site_settings
+            WHERE id = 1
+            LIMIT 1
+        `)
+        .first();
+}
+
 async function handleGetSettings(
     request,
     env
@@ -565,29 +697,7 @@ async function handleGetSettings(
     }
 
     try {
-        const settings = await env.DB
-            .prepare(`
-                SELECT
-                    id,
-                    hero_kicker,
-                    hero_title,
-                    hero_description,
-                    primary_color,
-                    accent_green,
-                    dark_plum,
-                    cream_color,
-                    display_font,
-                    body_font,
-                    background_type,
-                    background_url,
-                    background_overlay,
-                    background_blur,
-                    updated_at
-                FROM site_settings
-                WHERE id = 1
-                LIMIT 1
-            `)
-            .first();
+        const settings = await getSiteSettings(env);
 
         if (!settings) {
             return json({
@@ -727,20 +837,18 @@ async function handleUpdateSettings(
                 ? body.background_type
                 : current.background_type;
 
-        const backgroundUrl =
-            cleanNullableText(
-                body.background_url,
-                current.background_url,
-                2000
-            );
+        const backgroundUrl = cleanNullableText(
+            body.background_url,
+            current.background_url,
+            2000
+        );
 
-        const backgroundOverlay =
-            clampNumber(
-                body.background_overlay,
-                current.background_overlay,
-                0,
-                1
-            );
+        const backgroundOverlay = clampNumber(
+            body.background_overlay,
+            current.background_overlay,
+            0,
+            1
+        );
 
         const backgroundBlur = Math.round(
             clampNumber(
@@ -749,6 +857,40 @@ async function handleUpdateSettings(
                 0,
                 50
             )
+        );
+
+        const aboutKicker = cleanText(
+            body.about_kicker,
+            current.about_kicker,
+            150
+        );
+
+        const aboutTitle = cleanText(
+            body.about_title,
+            current.about_title,
+            200
+        );
+
+        const aboutBio = cleanText(
+            body.about_bio,
+            current.about_bio,
+            20000
+        );
+
+        const contactEmail = cleanEmail(
+            body.contact_email,
+            current.contact_email
+        );
+
+        const contactPhone = cleanNullableText(
+            body.contact_phone,
+            current.contact_phone,
+            100
+        );
+
+        const instagramUrl = cleanHttpUrl(
+            body.instagram_url,
+            current.instagram_url
         );
 
         await env.DB
@@ -768,6 +910,12 @@ async function handleUpdateSettings(
                     background_url = ?,
                     background_overlay = ?,
                     background_blur = ?,
+                    about_kicker = ?,
+                    about_title = ?,
+                    about_bio = ?,
+                    contact_email = ?,
+                    contact_phone = ?,
+                    instagram_url = ?,
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = 1
             `)
@@ -784,33 +932,17 @@ async function handleUpdateSettings(
                 backgroundType,
                 backgroundUrl,
                 backgroundOverlay,
-                backgroundBlur
+                backgroundBlur,
+                aboutKicker,
+                aboutTitle,
+                aboutBio,
+                contactEmail,
+                contactPhone,
+                instagramUrl
             )
             .run();
 
-        const updated = await env.DB
-            .prepare(`
-                SELECT
-                    id,
-                    hero_kicker,
-                    hero_title,
-                    hero_description,
-                    primary_color,
-                    accent_green,
-                    dark_plum,
-                    cream_color,
-                    display_font,
-                    body_font,
-                    background_type,
-                    background_url,
-                    background_overlay,
-                    background_blur,
-                    updated_at
-                FROM site_settings
-                WHERE id = 1
-                LIMIT 1
-            `)
-            .first();
+        const updated = await getSiteSettings(env);
 
         return json({
             success: true,
@@ -849,6 +981,7 @@ async function getProjectsFromDatabase(
                 description,
                 year,
                 role,
+                gallery_layout,
                 sort_order,
                 is_published,
                 created_at,
@@ -885,11 +1018,7 @@ async function getProjectsFromDatabase(
     const mediaByProject = new Map();
 
     for (const media of mediaResult.results) {
-        if (
-            !mediaByProject.has(
-                media.project_id
-            )
-        ) {
+        if (!mediaByProject.has(media.project_id)) {
             mediaByProject.set(
                 media.project_id,
                 []
@@ -905,9 +1034,7 @@ async function getProjectsFromDatabase(
         project => ({
             ...project,
             media:
-                mediaByProject.get(
-                    project.id
-                ) || []
+                mediaByProject.get(project.id) || []
         })
     );
 }
@@ -932,11 +1059,10 @@ async function handleGetProjects(
     }
 
     try {
-        const projects =
-            await getProjectsFromDatabase(
-                env,
-                true
-            );
+        const projects = await getProjectsFromDatabase(
+            env,
+            true
+        );
 
         return json({
             projects
@@ -984,11 +1110,10 @@ async function handleGetAdminProjects(
     }
 
     try {
-        const projects =
-            await getProjectsFromDatabase(
-                env,
-                false
-            );
+        const projects = await getProjectsFromDatabase(
+            env,
+            false
+        );
 
         return json({
             projects
@@ -1001,6 +1126,182 @@ async function handleGetAdminProjects(
 
         return json({
             error: "Unable to load projects."
+        }, 500);
+    }
+}
+
+
+/* CREATE PROJECT */
+
+async function handleCreateProject(
+    request,
+    env
+) {
+    if (request.method !== "POST") {
+        return json({
+            error: "Method not allowed."
+        }, 405);
+    }
+
+    const session = await requireAdmin(
+        request,
+        env
+    );
+
+    if (!session) {
+        return json({
+            error: "Unauthorized."
+        }, 401);
+    }
+
+    if (!env.DB) {
+        return json({
+            error: "Database is not configured."
+        }, 500);
+    }
+
+    let body;
+
+    try {
+        body = await request.json();
+    } catch {
+        return json({
+            error: "Invalid request."
+        }, 400);
+    }
+
+    const title = cleanText(
+        body.title,
+        "",
+        200
+    );
+
+    if (!title) {
+        return json({
+            error: "Project name is required."
+        }, 400);
+    }
+
+    const kicker = cleanNullableText(
+        body.kicker,
+        null,
+        200
+    );
+
+    const description = cleanNullableText(
+        body.description,
+        null,
+        10000
+    );
+
+    const year = cleanYear(
+        body.year,
+        null
+    );
+
+    const role = cleanNullableText(
+        body.role,
+        null,
+        500
+    );
+
+    const galleryLayout = cleanGalleryLayout(
+        body.gallery_layout,
+        "smart"
+    );
+
+    const isPublished = cleanBoolean(
+        body.is_published,
+        0
+    );
+
+    try {
+        const slug = await uniqueProjectSlug(
+            env,
+            title
+        );
+
+        const orderResult = await env.DB
+            .prepare(`
+                SELECT
+                    COALESCE(MAX(sort_order), -1) + 1 AS next_order
+                FROM projects
+            `)
+            .first();
+
+        const sortOrder = Number(
+            orderResult?.next_order
+        ) || 0;
+
+        const insertResult = await env.DB
+            .prepare(`
+                INSERT INTO projects (
+                    slug,
+                    title,
+                    kicker,
+                    description,
+                    year,
+                    role,
+                    gallery_layout,
+                    sort_order,
+                    is_published
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `)
+            .bind(
+                slug,
+                title,
+                kicker,
+                description,
+                year,
+                role,
+                galleryLayout,
+                sortOrder,
+                isPublished
+            )
+            .run();
+
+        const newId = Number(
+            insertResult.meta?.last_row_id
+        );
+
+        const project = await env.DB
+            .prepare(`
+                SELECT
+                    id,
+                    slug,
+                    title,
+                    kicker,
+                    description,
+                    year,
+                    role,
+                    gallery_layout,
+                    sort_order,
+                    is_published,
+                    created_at,
+                    updated_at
+                FROM projects
+                WHERE id = ?
+                LIMIT 1
+            `)
+            .bind(newId)
+            .first();
+
+        return json({
+            success: true,
+            project: {
+                ...project,
+                media: []
+            }
+        }, 201);
+    } catch (error) {
+        console.error(
+            "Unable to create project:",
+            error
+        );
+
+        return json({
+            error: "Unable to create the project."
         }, 500);
     }
 }
@@ -1103,6 +1404,11 @@ async function handleUpdateProject(
             500
         );
 
+        const galleryLayout = cleanGalleryLayout(
+            body.gallery_layout,
+            current.gallery_layout || "smart"
+        );
+
         const sortOrder = Math.round(
             clampNumber(
                 body.sort_order,
@@ -1126,6 +1432,7 @@ async function handleUpdateProject(
                     description = ?,
                     year = ?,
                     role = ?,
+                    gallery_layout = ?,
                     sort_order = ?,
                     is_published = ?,
                     updated_at = CURRENT_TIMESTAMP
@@ -1137,6 +1444,7 @@ async function handleUpdateProject(
                 description,
                 year,
                 role,
+                galleryLayout,
                 sortOrder,
                 isPublished,
                 numericId
@@ -1153,6 +1461,7 @@ async function handleUpdateProject(
                     description,
                     year,
                     role,
+                    gallery_layout,
                     sort_order,
                     is_published,
                     created_at,
@@ -1241,95 +1550,75 @@ export default {
 
         /* PUBLIC MEDIA */
 
-        if (
-            url.pathname.startsWith(
-                "/media/"
-            )
-        ) {
+        if (url.pathname.startsWith("/media/")) {
             return handleGetMedia(
                 request,
                 env,
-                url.pathname.slice(
-                    "/media/".length
-                )
+                url.pathname.slice("/media/".length)
             );
         }
 
-        /* ADMIN LOGIN */
+        /* AUTH */
 
-        if (
-            url.pathname ===
-            "/api/admin/login"
-        ) {
-            return handleLogin(
-                request,
-                env
-            );
+        if (url.pathname === "/api/admin/login") {
+            return handleLogin(request, env);
         }
 
-        /* ADMIN SESSION */
-
-        if (
-            url.pathname ===
-            "/api/admin/session"
-        ) {
-            return handleSession(
-                request,
-                env
-            );
+        if (url.pathname === "/api/admin/session") {
+            return handleSession(request, env);
         }
 
-        /* ADMIN LOGOUT */
-
-        if (
-            url.pathname ===
-            "/api/admin/logout"
-        ) {
+        if (url.pathname === "/api/admin/logout") {
             return handleLogout(request);
         }
 
-        /* SITE SETTINGS */
+        /* SETTINGS */
 
-        if (
-            url.pathname ===
-            "/api/settings"
-        ) {
-            return handleGetSettings(
+        if (url.pathname === "/api/settings") {
+            return handleGetSettings(request, env);
+        }
+
+        if (url.pathname === "/api/admin/settings") {
+            return handleUpdateSettings(request, env);
+        }
+
+        /* ABOUT PHOTO */
+
+        if (url.pathname === "/api/admin/about/photo") {
+            const session = await requireAdmin(
                 request,
                 env
             );
-        }
 
-        /* UPDATE SITE SETTINGS */
+            if (!session) {
+                return json({
+                    error: "Unauthorized."
+                }, 401);
+            }
 
-        if (
-            url.pathname ===
-            "/api/admin/settings"
-        ) {
-            return handleUpdateSettings(
+            return handleUploadAboutPhoto(
                 request,
-                env
+                env,
+                session.username
             );
         }
 
         /* PUBLIC PROJECTS */
 
-        if (
-            url.pathname ===
-            "/api/projects"
-        ) {
-            return handleGetProjects(
-                request,
-                env
-            );
+        if (url.pathname === "/api/projects") {
+            return handleGetProjects(request, env);
         }
 
-        /* ADMIN PROJECTS */
+        /* ADMIN PROJECT COLLECTION */
 
-        if (
-            url.pathname ===
-            "/api/admin/projects"
-        ) {
+        if (url.pathname === "/api/admin/projects") {
+            if (request.method === "POST") {
+                return handleCreateProject(
+                    request,
+                    env
+                );
+            }
+
             return handleGetAdminProjects(
                 request,
                 env
@@ -1344,11 +1633,10 @@ export default {
             );
 
         if (projectMediaOrderMatch) {
-            const session =
-                await requireAdmin(
-                    request,
-                    env
-                );
+            const session = await requireAdmin(
+                request,
+                env
+            );
 
             if (!session) {
                 return json({
@@ -1371,11 +1659,10 @@ export default {
             );
 
         if (projectMediaMatch) {
-            const session =
-                await requireAdmin(
-                    request,
-                    env
-                );
+            const session = await requireAdmin(
+                request,
+                env
+            );
 
             if (!session) {
                 return json({
@@ -1399,11 +1686,10 @@ export default {
             );
 
         if (mediaDeleteMatch) {
-            const session =
-                await requireAdmin(
-                    request,
-                    env
-                );
+            const session = await requireAdmin(
+                request,
+                env
+            );
 
             if (!session) {
                 return json({
@@ -1437,17 +1723,13 @@ export default {
 
         if (
             url.pathname === "/admin" ||
-            url.pathname.startsWith(
-                "/admin/"
-            )
+            url.pathname.startsWith("/admin/")
         ) {
             return handleProtectedAdmin(
                 request,
                 env
             );
         }
-
-        /* STATIC WEBSITE */
 
         return env.ASSETS.fetch(request);
     }

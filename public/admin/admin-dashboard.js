@@ -1,2226 +1,545 @@
-document.addEventListener("DOMContentLoaded", () => {
-    /* FONTS */
-
-    const GOOGLE_FONTS = new Map([
-        [
-            "Playfair Display",
-            "Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400"
-        ],
-        [
-            "Cormorant Garamond",
-            "Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400"
-        ],
-        [
-            "DM Serif Display",
-            "DM+Serif+Display:ital@0;1"
-        ],
-        [
-            "Libre Baskerville",
-            "Libre+Baskerville:ital,wght@0,400;0,700;1,400"
-        ],
-        [
-            "Cardo",
-            "Cardo:ital,wght@0,400;0,700;1,400"
-        ],
-        [
-            "Lato",
-            "Lato:wght@300;400;700;900"
-        ],
-        [
-            "Inter",
-            "Inter:wght@300;400;500;600;700;800"
-        ],
-        [
-            "Montserrat",
-            "Montserrat:wght@300;400;500;600;700;800"
-        ],
-        [
-            "Nunito",
-            "Nunito:wght@300;400;500;600;700;800"
-        ],
-        [
-            "Source Sans 3",
-            "Source+Sans+3:wght@300;400;500;600;700;800"
-        ],
-        [
-            "Hind",
-            "Hind:wght@300;400;500;600;700"
-        ]
-    ]);
-
-    const loadedFonts = new Set([
-        "Playfair Display",
-        "Lato"
-    ]);
-
-    function loadGoogleFont(fontName) {
-        if (
-            !fontName ||
-            loadedFonts.has(fontName)
-        ) {
-            return;
-        }
-
-        const googleName =
-            GOOGLE_FONTS.get(fontName);
-
-        if (!googleName) {
-            return;
-        }
-
-        const link =
-            document.createElement("link");
-
-        link.rel = "stylesheet";
-        link.href =
-            `https://fonts.googleapis.com/css2?family=${googleName}&display=swap`;
-
-        document.head.appendChild(link);
-        loadedFonts.add(fontName);
-    }
-
-    function fontStack(fontName, type) {
-        if (type === "display") {
-            return `"${fontName}", Georgia, serif`;
-        }
-
-        return `"${fontName}", Arial, sans-serif`;
-    }
-
-
-    /* ACCOUNT */
-
-    const usernameElements =
-        document.querySelectorAll(
-            "[data-admin-username], [data-account-username]"
-        );
-
-    const avatar =
-        document.querySelector(
-            "[data-user-avatar]"
-        );
-
-    const logoutButtons =
-        document.querySelectorAll(
-            "[data-logout]"
-        );
-
-    const toast =
-        document.querySelector(
-            "[data-admin-toast]"
-        );
-
-
-    /* NAVIGATION */
-
-    const navigationLinks =
-        document.querySelectorAll(
-            ".admin-nav-link"
-        );
-
-
-    /* HOMEPAGE */
-
-    const heroKicker =
-        document.querySelector(
-            "#hero-kicker"
-        );
-
-    const heroTitle =
-        document.querySelector(
-            "#hero-title"
-        );
-
-    const heroDescription =
-        document.querySelector(
-            "#hero-description"
-        );
-
-    const displayFont =
-        document.querySelector(
-            "#display-font"
-        );
-
-    const bodyFont =
-        document.querySelector(
-            "#body-font"
-        );
-
-    const displayFontPreview =
-        document.querySelector(
-            "[data-display-font-preview]"
-        );
-
-    const bodyFontPreview =
-        document.querySelector(
-            "[data-body-font-preview]"
-        );
-
-    const saveSettingsButton =
-        document.querySelector(
-            "[data-save-settings]"
-        );
-
-    const homepageBadge =
-        document.querySelector(
-            "#homepage .coming-soon-badge"
-        );
-
-    let currentSettings = null;
-
-
-    /* PROJECTS */
-
-    const projectList =
-        document.querySelector(
-            "[data-project-list]"
-        );
-
-    const projectCount =
-        document.querySelector(
-            "[data-project-count]"
-        );
-
-    const projectSummary =
-        document.querySelector(
-            "[data-project-summary]"
-        );
-
-    const mediaCount =
-        document.querySelector(
-            "[data-media-count]"
-        );
-
-    const mediaCountLarge =
-        document.querySelector(
-            "[data-media-count-large]"
-        );
-
-    const projectEditor =
-        document.querySelector(
-            "[data-project-editor]"
-        );
-
-    const projectEditorForm =
-        document.querySelector(
-            "[data-project-editor-form]"
-        );
-
-    const closeProjectButtons =
-        document.querySelectorAll(
-            "[data-close-project-editor]"
-        );
-
-    const saveProjectButton =
-        document.querySelector(
-            "[data-save-project]"
-        );
-
-    const projectId =
-        document.querySelector(
-            "#project-id"
-        );
-
-    const projectTitle =
-        document.querySelector(
-            "#project-title"
-        );
-
-    const projectKicker =
-        document.querySelector(
-            "#project-kicker"
-        );
-
-    const projectDescription =
-        document.querySelector(
-            "#project-description"
-        );
-
-    const projectYear =
-        document.querySelector(
-            "#project-year"
-        );
-
-    const projectRole =
-        document.querySelector(
-            "#project-role"
-        );
-
-    const projectVisible =
-        document.querySelector(
-            "#project-visible"
-        );
-
-
-    /* PROJECT MEDIA */
-
-    const projectMediaFile =
-        document.querySelector(
-            "#project-media-file"
-        );
-
-    const projectMediaAlt =
-        document.querySelector(
-            "#project-media-alt"
-        );
-
-    const uploadProjectMediaButton =
-        document.querySelector(
-            "[data-upload-project-media]"
-        );
-
-    const projectMediaList =
-        document.querySelector(
-            "[data-project-media-list]"
-        );
-
-    const projectMediaCount =
-        document.querySelector(
-            "[data-project-media-count]"
-        );
-
-    let projects = [];
-    let editingProject = null;
-
-
-    /* MESSAGES */
-
-    function showToast(message) {
-        if (!toast) {
-            return;
-        }
-
-        toast.textContent = message;
-        toast.classList.add("visible");
-
-        window.setTimeout(() => {
-            toast.classList.remove("visible");
-        }, 3200);
-    }
-
-
-    /* LOGIN EXPIRED */
-
-    function handleExpiredLogin() {
-        showToast(
-            "Your login expired. Please sign in again."
-        );
-
-        window.setTimeout(() => {
-            window.location.href =
-                "../admin-login.html";
-        }, 1200);
-    }
-
-
-    /* USERNAME */
-
-    function setUsername(username) {
-        usernameElements.forEach(
-            (element) => {
-                element.textContent =
-                    username;
-            }
-        );
-
-        if (avatar) {
-            avatar.textContent =
-                username
-                    .charAt(0)
-                    .toUpperCase();
-        }
-    }
-
-
-    /* SESSION */
-
-    async function checkSession() {
-        try {
-            const response = await fetch(
-                "/api/admin/session",
-                {
-                    method: "GET",
-                    credentials: "include",
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    },
-                    cache: "no-store"
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error(
-                    "Unable to verify session."
-                );
-            }
-
-            const data =
-                await response.json();
-
-            if (!data.authenticated) {
-                window.location.href =
-                    "../admin-login.html";
-
-                return false;
-            }
-
-            setUsername(
-                data.username
-            );
-
-            return true;
-        } catch (error) {
-            console.error(
-                "Session check failed:",
-                error
-            );
-
-            showToast(
-                "We couldn't verify your login. Please sign in again."
-            );
-
-            window.setTimeout(() => {
-                window.location.href =
-                    "../admin-login.html";
-            }, 1200);
-
-            return false;
-        }
-    }
-
-
-    /* LOG OUT */
-
-    async function logout() {
-        logoutButtons.forEach(
-            (button) => {
-                button.disabled = true;
-                button.textContent =
-                    "Logging Out...";
-            }
-        );
-
-        try {
-            const response = await fetch(
-                "/api/admin/logout",
-                {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    }
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error(
-                    "Unable to log out."
-                );
-            }
-
-            window.location.href =
-                "../admin-login.html";
-        } catch (error) {
-            console.error(
-                "Logout failed:",
-                error
-            );
-
-            showToast(
-                "We couldn't log you out. Please try again."
-            );
-
-            logoutButtons.forEach(
-                (button) => {
-                    button.disabled = false;
-                    button.textContent =
-                        "Log Out";
-                }
-            );
-        }
-    }
-
-    logoutButtons.forEach(
-        (button) => {
-            button.addEventListener(
-                "click",
-                logout
-            );
-        }
-    );
-
-
-    /* FONT SELECT */
-
-    function makeSureFontExists(
-        select,
-        value
-    ) {
-        if (
-            !select ||
-            !value
-        ) {
-            return;
-        }
-
-        const exists =
-            Array.from(
-                select.options
-            ).some(
-                option =>
-                    option.value === value
-            );
-
-        if (exists) {
-            return;
-        }
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-        option.value = value;
-        option.textContent = value;
-
-        select.appendChild(option);
-    }
-
-    function updateFontPreviews() {
-        const heading =
-            displayFont?.value ||
-            "Playfair Display";
-
-        const regular =
-            bodyFont?.value ||
-            "Lato";
-
-        loadGoogleFont(heading);
-        loadGoogleFont(regular);
-
-        if (displayFontPreview) {
-            displayFontPreview.style.fontFamily =
-                fontStack(
-                    heading,
-                    "display"
-                );
-        }
-
-        if (bodyFontPreview) {
-            bodyFontPreview.style.fontFamily =
-                fontStack(
-                    regular,
-                    "body"
-                );
-        }
-    }
-
-    displayFont?.addEventListener(
-        "change",
-        updateFontPreviews
-    );
-
-    bodyFont?.addEventListener(
-        "change",
-        updateFontPreviews
-    );
-
-
-    /* HOMEPAGE READY */
-
-    function setHomepageFormReady(
-        ready
-    ) {
-        if (heroKicker) {
-            heroKicker.disabled =
-                !ready;
-        }
-
-        if (heroTitle) {
-            heroTitle.disabled =
-                !ready;
-        }
-
-        if (heroDescription) {
-            heroDescription.disabled =
-                true;
-        }
-
-        if (displayFont) {
-            displayFont.disabled =
-                !ready;
-        }
-
-        if (bodyFont) {
-            bodyFont.disabled =
-                !ready;
-        }
-
-        if (saveSettingsButton) {
-            saveSettingsButton.disabled =
-                !ready;
-
-            if (ready) {
-                saveSettingsButton
-                    .classList
-                    .remove(
-                        "disabled-button"
-                    );
-
-                saveSettingsButton
-                    .classList
-                    .add(
-                        "primary-link-button"
-                    );
-            }
-        }
-
-        if (homepageBadge) {
-            homepageBadge.textContent =
-                ready
-                    ? "Ready to Edit"
-                    : "Loading...";
-        }
-    }
-
-
-    /* LOAD HOMEPAGE */
-
-    async function loadHomepageSettings() {
-        setHomepageFormReady(false);
-
-        try {
-            const response = await fetch(
-                "/api/settings",
-                {
-                    method: "GET",
-                    credentials: "include",
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    },
-                    cache: "no-store"
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error(
-                    "Unable to load homepage settings."
-                );
-            }
-
-            const data =
-                await response.json();
-
-            if (!data.settings) {
-                throw new Error(
-                    "Homepage settings were not found."
-                );
-            }
-
-            currentSettings =
-                data.settings;
-
-            heroKicker.value =
-                currentSettings.hero_kicker ||
-                "";
-
-            heroTitle.value =
-                currentSettings.hero_title ||
-                "";
-
-            heroDescription.value =
-                "";
-
-            heroDescription.placeholder =
-                "This isn't shown on the homepage right now.";
-
-            const savedDisplayFont =
-                currentSettings.display_font ||
-                "Playfair Display";
-
-            const savedBodyFont =
-                currentSettings.body_font ||
-                "Lato";
-
-            makeSureFontExists(
-                displayFont,
-                savedDisplayFont
-            );
-
-            makeSureFontExists(
-                bodyFont,
-                savedBodyFont
-            );
-
-            displayFont.value =
-                savedDisplayFont;
-
-            bodyFont.value =
-                savedBodyFont;
-
-            updateFontPreviews();
-            setHomepageFormReady(true);
-        } catch (error) {
-            console.error(
-                "Homepage settings failed to load:",
-                error
-            );
-
-            if (homepageBadge) {
-                homepageBadge.textContent =
-                    "Couldn't Load";
-            }
-
-            showToast(
-                "We couldn't load the homepage settings. Try refreshing the page."
-            );
-        }
-    }
-
-
-    /* VALIDATE HOMEPAGE */
-
-    function validateHomepageSettings() {
-        if (
-            !heroKicker.value.trim()
-        ) {
-            showToast(
-                "Add the small text above your heading before saving."
-            );
-
-            heroKicker.focus();
-
-            return false;
-        }
-
-        if (
-            !heroTitle.value.trim()
-        ) {
-            showToast(
-                "Your main heading can't be empty."
-            );
-
-            heroTitle.focus();
-
-            return false;
-        }
-
-        return true;
-    }
-
-
-    /* SAVE HOMEPAGE */
-
-    async function saveHomepageSettings() {
-        if (
-            !currentSettings ||
-            !saveSettingsButton
-        ) {
-            return;
-        }
-
-        if (
-            !validateHomepageSettings()
-        ) {
-            return;
-        }
-
-        const originalText =
-            saveSettingsButton.textContent;
-
-        saveSettingsButton.disabled =
-            true;
-
-        saveSettingsButton.textContent =
-            "Saving...";
-
-        try {
-            const response = await fetch(
-                "/api/admin/settings",
-                {
-                    method: "PUT",
-                    credentials: "include",
-                    headers: {
-                        "Accept":
-                            "application/json",
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body: JSON.stringify({
-                        hero_kicker:
-                            heroKicker
-                                .value
-                                .trim(),
-
-                        hero_title:
-                            heroTitle
-                                .value
-                                .trim(),
-
-                        hero_description:
-                            currentSettings
-                                .hero_description,
-
-                        display_font:
-                            displayFont.value,
-
-                        body_font:
-                            bodyFont.value
-                    })
-                }
-            );
-
-            if (
-                response.status === 401
-            ) {
-                handleExpiredLogin();
-                return;
-            }
-
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error ||
-                    "Unable to save homepage changes."
-                );
-            }
-
-            if (data.settings) {
-                currentSettings =
-                    data.settings;
-            }
-
-            homepageBadge.textContent =
-                "Saved";
-
-            showToast(
-                "Homepage and fonts saved!"
-            );
-
-            window.setTimeout(() => {
-                homepageBadge.textContent =
-                    "Ready to Edit";
-            }, 2000);
-        } catch (error) {
-            console.error(
-                "Unable to save homepage:",
-                error
-            );
-
-            showToast(
-                "Something went wrong while saving. Your changes are still here, so you can try again."
-            );
-        } finally {
-            saveSettingsButton.disabled =
-                false;
-
-            saveSettingsButton.textContent =
-                originalText;
-        }
-    }
-
-    saveSettingsButton?.addEventListener(
-        "click",
-        saveHomepageSettings
-    );
-
-
-    /* MEDIA URL */
-
-    function getMediaUrl(media) {
-        if (media?.url) {
-            return media.url;
-        }
-
-        if (!media?.r2_key) {
-            return "";
-        }
-
-        const encodedKey =
-            media.r2_key
-                .split("/")
-                .map(
-                    part =>
-                        encodeURIComponent(part)
-                )
-                .join("/");
-
-        return `/media/${encodedKey}`;
-    }
-
-
-    /* SORT MEDIA */
-
-    function sortedMedia(project) {
-        if (
-            !Array.isArray(
-                project?.media
-            )
-        ) {
-            return [];
-        }
-
-        return [
-            ...project.media
-        ].sort(
-            (a, b) => {
-                const orderA =
-                    Number(
-                        a.sort_order
-                    ) || 0;
-
-                const orderB =
-                    Number(
-                        b.sort_order
-                    ) || 0;
-
-                if (
-                    orderA !== orderB
-                ) {
-                    return (
-                        orderA -
-                        orderB
-                    );
-                }
-
-                return (
-                    Number(a.id) -
-                    Number(b.id)
-                );
-            }
-        );
-    }
-
-
-    /* PROJECT PREVIEW */
-
-    function makeProjectPreview(
-        description
-    ) {
-        if (!description) {
-            return "No project description has been added yet.";
-        }
-
-        const cleaned =
-            description
-                .replace(/\s+/g, " ")
-                .trim();
-
-        if (
-            cleaned.length <= 220
-        ) {
-            return cleaned;
-        }
-
-        return (
-            `${cleaned.slice(
-                0,
-                217
-            )}...`
-        );
-    }
-
-
-    /* PROJECT SUMMARY */
-
-    function updateProjectSummary() {
-        const visibleProjects =
-            projects.filter(
-                project =>
-                    Number(
-                        project.is_published
-                    ) === 1
-            );
-
-        if (projectCount) {
-            projectCount.textContent =
-                String(
-                    projects.length
-                );
-        }
-
-        const totalMedia =
-            projects.reduce(
-                (total, project) =>
-                    total +
-                    (
-                        Array.isArray(
-                            project.media
-                        )
-                            ? project.media.length
-                            : 0
-                    ),
-                0
-            );
-
-        if (mediaCount) {
-            mediaCount.textContent =
-                String(totalMedia);
-        }
-
-        if (mediaCountLarge) {
-            mediaCountLarge.textContent =
-                String(totalMedia);
-        }
-
-        if (!projectSummary) {
-            return;
-        }
-
-        if (
-            visibleProjects.length === 0
-        ) {
-            projectSummary.textContent =
-                "No projects are currently visible";
-
-            return;
-        }
-
-        const names =
-            visibleProjects.map(
-                project =>
-                    project.title
-            );
-
-        if (names.length === 1) {
-            projectSummary.textContent =
-                names[0];
-
-            return;
-        }
-
-        if (names.length === 2) {
-            projectSummary.textContent =
-                `${names[0]} and ${names[1]}`;
-
-            return;
-        }
-
-        projectSummary.textContent =
-            `${names
-                .slice(0, -1)
-                .join(", ")}, and ${names.at(-1)}`;
-    }
-
-
-    /* RENDER PROJECTS */
-
-    function renderProjects() {
-        if (!projectList) {
-            return;
-        }
-
-        projectList.replaceChildren();
-
-        const sortedProjects = [
-            ...projects
-        ].sort(
-            (a, b) => {
-                const orderA =
-                    Number(
-                        a.sort_order
-                    ) || 0;
-
-                const orderB =
-                    Number(
-                        b.sort_order
-                    ) || 0;
-
-                if (
-                    orderA !== orderB
-                ) {
-                    return (
-                        orderA -
-                        orderB
-                    );
-                }
-
-                return (
-                    Number(a.id) -
-                    Number(b.id)
-                );
-            }
-        );
-
-        if (
-            sortedProjects.length === 0
-        ) {
-            const card =
-                document.createElement(
-                    "article"
-                );
-
-            card.className =
-                "project-admin-card";
-
-            const content =
-                document.createElement(
-                    "div"
-                );
-
-            content.className =
-                "project-admin-content";
-
-            const heading =
-                document.createElement(
-                    "h3"
-                );
-
-            heading.textContent =
-                "No Projects Found";
-
-            content.appendChild(
-                heading
-            );
-
-            card.appendChild(
-                content
-            );
-
-            projectList.appendChild(
-                card
-            );
-
-            updateProjectSummary();
-
-            return;
-        }
-
-        sortedProjects.forEach(
-            (project, index) => {
-                const card =
-                    document.createElement(
-                        "article"
-                    );
-
-                card.className =
-                    "project-admin-card";
-
-                if (
-                    Number(
-                        project.is_published
-                    ) !== 1
-                ) {
-                    card.classList.add(
-                        "project-is-hidden"
-                    );
-                }
-
-                const number =
-                    document.createElement(
-                        "div"
-                    );
-
-                number.className =
-                    "project-admin-number";
-
-                number.textContent =
-                    String(
-                        index + 1
-                    ).padStart(
-                        2,
-                        "0"
-                    );
-
-                const content =
-                    document.createElement(
-                        "div"
-                    );
-
-                content.className =
-                    "project-admin-content";
-
-                const type =
-                    document.createElement(
-                        "p"
-                    );
-
-                type.className =
-                    "project-admin-type";
-
-                type.textContent =
-                    project.kicker ||
-                    "Portfolio Project";
-
-                const title =
-                    document.createElement(
-                        "h3"
-                    );
-
-                title.textContent =
-                    project.title ||
-                    "Untitled Project";
-
-                const description =
-                    document.createElement(
-                        "p"
-                    );
-
-                description.textContent =
-                    makeProjectPreview(
-                        project.description
-                    );
-
-                content.append(
-                    type,
-                    title,
-                    description
-                );
-
-                const meta =
-                    document.createElement(
-                        "div"
-                    );
-
-                meta.className =
-                    "project-admin-meta";
-
-                const role =
-                    document.createElement(
-                        "div"
-                    );
-
-                role.innerHTML = `
-                    <span>My Role</span>
-                    <strong></strong>
-                `;
-
-                role.querySelector(
-                    "strong"
-                ).textContent =
-                    project.role ||
-                    "Not listed";
-
-                const images =
-                    document.createElement(
-                        "div"
-                    );
-
-                images.innerHTML = `
-                    <span>Uploads</span>
-                    <strong></strong>
-                `;
-
-                images.querySelector(
-                    "strong"
-                ).textContent =
-                    `${sortedMedia(project).length} Images`;
-
-                const visible =
-                    document.createElement(
-                        "div"
-                    );
-
-                visible.innerHTML = `
-                    <span>Website</span>
-                    <strong></strong>
-                `;
-
-                visible.querySelector(
-                    "strong"
-                ).textContent =
-                    Number(
-                        project.is_published
-                    ) === 1
-                        ? "Visible"
-                        : "Hidden";
-
-                meta.append(
-                    role,
-                    images,
-                    visible
-                );
-
-                const editButton =
-                    document.createElement(
-                        "button"
-                    );
-
-                editButton.className =
-                    "project-edit-button";
-
-                editButton.type =
-                    "button";
-
-                editButton.textContent =
-                    "Edit Project";
-
-                editButton.addEventListener(
-                    "click",
-                    () => {
-                        openProjectEditor(
-                            project.slug
-                        );
-                    }
-                );
-
-                card.append(
-                    number,
-                    content,
-                    meta,
-                    editButton
-                );
-
-                projectList.appendChild(
-                    card
-                );
-            }
-        );
-
-        updateProjectSummary();
-    }
-
-
-    /* LOAD PROJECTS */
-
-    async function loadProjects() {
-        try {
-            const response = await fetch(
-                "/api/admin/projects",
-                {
-                    method: "GET",
-                    credentials: "include",
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    },
-                    cache: "no-store"
-                }
-            );
-
-            if (
-                response.status === 401
-            ) {
-                handleExpiredLogin();
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error(
-                    "Unable to load projects."
-                );
-            }
-
-            const data =
-                await response.json();
-
-            projects =
-                Array.isArray(
-                    data.projects
-                )
-                    ? data.projects
-                    : [];
-
-            renderProjects();
-        } catch (error) {
-            console.error(
-                "Projects failed to load:",
-                error
-            );
-
-            showToast(
-                "We couldn't load your projects. Try refreshing the page."
-            );
-        }
-    }
-
-
-    /* RENDER PROJECT MEDIA */
-
-    function renderProjectMedia() {
-        if (
-            !projectMediaList ||
-            !editingProject
-        ) {
-            return;
-        }
-
-        projectMediaList.replaceChildren();
-
-        const media =
-            sortedMedia(
-                editingProject
-            );
-
-        if (projectMediaCount) {
-            projectMediaCount.textContent =
-                `${media.length} ${
-                    media.length === 1
-                        ? "Image"
-                        : "Images"
-                }`;
-        }
-
-        if (
-            media.length === 0
-        ) {
-            const empty =
-                document.createElement(
-                    "div"
-                );
-
-            empty.className =
-                "project-media-empty";
-
-            const title =
-                document.createElement(
-                    "strong"
-                );
-
-            title.textContent =
-                "No Website Manager uploads yet";
-
-            const text =
-                document.createElement(
-                    "p"
-                );
-
-            text.textContent =
-                "Upload an image above and it will appear here.";
-
-            empty.append(
-                title,
-                text
-            );
-
-            projectMediaList.appendChild(
-                empty
-            );
-
-            return;
-        }
-
-        media.forEach(
-            (item, index) => {
-                const card =
-                    document.createElement(
-                        "article"
-                    );
-
-                card.className =
-                    "project-media-item";
-
-                const preview =
-                    document.createElement(
-                        "div"
-                    );
-
-                preview.className =
-                    "project-media-item-preview";
-
-                const image =
-                    document.createElement(
-                        "img"
-                    );
-
-                image.src =
-                    getMediaUrl(item);
-
-                image.alt =
-                    item.alt_text ||
-                    "Project image";
-
-                image.loading =
-                    "lazy";
-
-                preview.appendChild(
-                    image
-                );
-
-                const info =
-                    document.createElement(
-                        "div"
-                    );
-
-                info.className =
-                    "project-media-item-info";
-
-                const position =
-                    document.createElement(
-                        "strong"
-                    );
-
-                position.textContent =
-                    `Image ${index + 1}`;
-
-                const alt =
-                    document.createElement(
-                        "span"
-                    );
-
-                alt.textContent =
-                    item.alt_text ||
-                    "No image description";
-
-                info.append(
-                    position,
-                    alt
-                );
-
-                const controls =
-                    document.createElement(
-                        "div"
-                    );
-
-                controls.className =
-                    "project-media-controls";
-
-                const up =
-                    document.createElement(
-                        "button"
-                    );
-
-                up.type = "button";
-                up.textContent = "Move Up";
-                up.disabled =
-                    index === 0;
-
-                up.addEventListener(
-                    "click",
-                    () => {
-                        moveProjectMedia(
-                            item.id,
-                            -1
-                        );
-                    }
-                );
-
-                const down =
-                    document.createElement(
-                        "button"
-                    );
-
-                down.type = "button";
-                down.textContent =
-                    "Move Down";
-
-                down.disabled =
-                    index ===
-                    media.length - 1;
-
-                down.addEventListener(
-                    "click",
-                    () => {
-                        moveProjectMedia(
-                            item.id,
-                            1
-                        );
-                    }
-                );
-
-                const remove =
-                    document.createElement(
-                        "button"
-                    );
-
-                remove.type = "button";
-                remove.className =
-                    "remove-media-button";
-
-                remove.textContent =
-                    "Remove";
-
-                remove.addEventListener(
-                    "click",
-                    () => {
-                        deleteProjectMedia(
-                            item
-                        );
-                    }
-                );
-
-                controls.append(
-                    up,
-                    down,
-                    remove
-                );
-
-                card.append(
-                    preview,
-                    info,
-                    controls
-                );
-
-                projectMediaList.appendChild(
-                    card
-                );
-            }
-        );
-    }
-
-
-    /* UPDATE PROJECT MEDIA */
-
-    function updateEditingProjectMedia(
-        media
-    ) {
-        if (!editingProject) {
-            return;
-        }
-
-        editingProject = {
-            ...editingProject,
-            media
-        };
-
-        projects =
-            projects.map(
-                project =>
-                    project.id ===
-                    editingProject.id
-                        ? editingProject
-                        : project
-            );
-
-        renderProjectMedia();
-        renderProjects();
-    }
-
-
-    /* UPLOAD IMAGE */
-
-    async function uploadProjectMedia() {
-        if (
-            !editingProject ||
-            !uploadProjectMediaButton
-        ) {
-            return;
-        }
-
-        const file =
-            projectMediaFile
-                ?.files?.[0];
-
-        if (!file) {
-            showToast(
-                "Choose an image first."
-            );
-
-            projectMediaFile?.focus();
-
-            return;
-        }
-
-        if (
-            file.size >
-            20 * 1024 * 1024
-        ) {
-            showToast(
-                "Images must be 20 MB or smaller."
-            );
-
-            return;
-        }
-
-        const originalText =
-            uploadProjectMediaButton
-                .textContent;
-
-        uploadProjectMediaButton.disabled =
-            true;
-
-        uploadProjectMediaButton.textContent =
-            "Uploading...";
-
-        const formData =
-            new FormData();
-
-        formData.append(
-            "file",
-            file
-        );
-
-        formData.append(
-            "alt_text",
-            projectMediaAlt
-                ?.value
-                .trim() ||
-                ""
-        );
-
-        try {
-            const response = await fetch(
-                `/api/admin/projects/${editingProject.id}/media`,
-                {
-                    method: "POST",
-                    credentials: "include",
-                    body: formData
-                }
-            );
-
-            if (
-                response.status === 401
-            ) {
-                handleExpiredLogin();
-                return;
-            }
-
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error ||
-                    "Unable to upload image."
-                );
-            }
-
-            const currentMedia =
-                sortedMedia(
-                    editingProject
-                );
-
-            updateEditingProjectMedia([
-                ...currentMedia,
-                data.media
-            ]);
-
-            projectMediaFile.value =
-                "";
-
-            projectMediaAlt.value =
-                "";
-
-            showToast(
-                "Image uploaded!"
-            );
-        } catch (error) {
-            console.error(
-                "Unable to upload image:",
-                error
-            );
-
-            showToast(
-                error.message ||
-                "We couldn't upload that image."
-            );
-        } finally {
-            uploadProjectMediaButton.disabled =
-                false;
-
-            uploadProjectMediaButton.textContent =
-                originalText;
-        }
-    }
-
-    uploadProjectMediaButton
-        ?.addEventListener(
-            "click",
-            uploadProjectMedia
-        );
-
-
-    /* MOVE IMAGE */
-
-    async function moveProjectMedia(
-        mediaId,
-        direction
-    ) {
-        if (!editingProject) {
-            return;
-        }
-
-        const current =
-            sortedMedia(
-                editingProject
-            );
-
-        const index =
-            current.findIndex(
-                media =>
-                    Number(media.id) ===
-                    Number(mediaId)
-            );
-
-        if (index === -1) {
-            return;
-        }
-
-        const newIndex =
-            index + direction;
-
-        if (
-            newIndex < 0 ||
-            newIndex >= current.length
-        ) {
-            return;
-        }
-
-        const reordered = [
-            ...current
-        ];
-
-        [
-            reordered[index],
-            reordered[newIndex]
-        ] = [
-            reordered[newIndex],
-            reordered[index]
-        ];
-
-        updateEditingProjectMedia(
-            reordered.map(
-                (media, order) => ({
-                    ...media,
-                    sort_order: order
-                })
-            )
-        );
-
-        try {
-            const response = await fetch(
-                `/api/admin/projects/${editingProject.id}/media/order`,
-                {
-                    method: "PUT",
-                    credentials: "include",
-                    headers: {
-                        "Accept":
-                            "application/json",
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body: JSON.stringify({
-                        media_ids:
-                            reordered.map(
-                                media =>
-                                    media.id
-                            )
-                    })
-                }
-            );
-
-            if (
-                response.status === 401
-            ) {
-                handleExpiredLogin();
-                return;
-            }
-
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error ||
-                    "Unable to reorder images."
-                );
-            }
-
-            if (
-                Array.isArray(
-                    data.media
-                )
-            ) {
-                updateEditingProjectMedia(
-                    data.media
-                );
-            }
-
-            showToast(
-                "Image order saved!"
-            );
-        } catch (error) {
-            console.error(
-                "Unable to reorder images:",
-                error
-            );
-
-            updateEditingProjectMedia(
-                current
-            );
-
-            showToast(
-                "We couldn't save that image order."
-            );
-        }
-    }
-
-
-    /* DELETE IMAGE */
-
-    async function deleteProjectMedia(
-        media
-    ) {
-        if (
-            !editingProject ||
-            !media
-        ) {
-            return;
-        }
-
-        const confirmed =
-            window.confirm(
-                "Remove this uploaded image from the project?"
-            );
-
-        if (!confirmed) {
-            return;
-        }
-
-        try {
-            const response = await fetch(
-                `/api/admin/media/${media.id}`,
-                {
-                    method: "DELETE",
-                    credentials: "include",
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    }
-                }
-            );
-
-            if (
-                response.status === 401
-            ) {
-                handleExpiredLogin();
-                return;
-            }
-
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error ||
-                    "Unable to remove image."
-                );
-            }
-
-            updateEditingProjectMedia(
-                sortedMedia(
-                    editingProject
-                ).filter(
-                    item =>
-                        Number(item.id) !==
-                        Number(media.id)
-                )
-            );
-
-            showToast(
-                "Image removed."
-            );
-        } catch (error) {
-            console.error(
-                "Unable to remove image:",
-                error
-            );
-
-            showToast(
-                error.message ||
-                "We couldn't remove that image."
-            );
-        }
-    }
-
-
-    /* OPEN PROJECT EDITOR */
-
-    function openProjectEditor(slug) {
-        const project =
-            projects.find(
-                item =>
-                    item.slug === slug
-            );
-
-        if (
-            !project ||
-            !projectEditor
-        ) {
-            return;
-        }
-
-        editingProject = project;
-
-        projectId.value =
-            String(project.id);
-
-        projectTitle.value =
-            project.title || "";
-
-        projectKicker.value =
-            project.kicker || "";
-
-        projectDescription.value =
-            project.description || "";
-
-        projectYear.value =
-            project.year ?? "";
-
-        projectRole.value =
-            project.role || "";
-
-        projectVisible.checked =
-            Number(
-                project.is_published
-            ) === 1;
-
-        if (projectMediaFile) {
-            projectMediaFile.value =
-                "";
-        }
-
-        if (projectMediaAlt) {
-            projectMediaAlt.value =
-                "";
-        }
-
-        renderProjectMedia();
-
-        if (!projectEditor.open) {
-            projectEditor.showModal();
-        }
-
-        document.body.classList.add(
-            "editor-open"
-        );
-
-        window.setTimeout(() => {
-            projectTitle.focus();
-        }, 0);
-    }
-
-
-    /* CLOSE PROJECT EDITOR */
-
-    function closeProjectEditor() {
-        if (
-            projectEditor?.open
-        ) {
-            projectEditor.close();
-        }
-
-        editingProject = null;
-
-        document.body.classList.remove(
-            "editor-open"
-        );
-    }
-
-    closeProjectButtons.forEach(
-        (button) => {
-            button.addEventListener(
-                "click",
-                closeProjectEditor
-            );
-        }
-    );
-
-    projectEditor?.addEventListener(
-        "cancel",
-        (event) => {
-            event.preventDefault();
-
-            closeProjectEditor();
-        }
-    );
-
-    projectEditor?.addEventListener(
-        "click",
-        (event) => {
-            if (
-                event.target ===
-                projectEditor
-            ) {
-                closeProjectEditor();
-            }
-        }
-    );
-
-
-    /* SAVE PROJECT */
-
-    async function saveProject(event) {
-        event.preventDefault();
-
-        if (
-            !editingProject ||
-            !saveProjectButton
-        ) {
-            return;
-        }
-
-        if (
-            !projectTitle.value.trim()
-        ) {
-            showToast(
-                "Your project needs a name."
-            );
-
-            projectTitle.focus();
-
-            return;
-        }
-
-        const originalText =
-            saveProjectButton
-                .textContent;
-
-        saveProjectButton.disabled =
-            true;
-
-        saveProjectButton.textContent =
-            "Saving...";
-
-        const yearValue =
-            projectYear
-                .value
-                .trim();
-
-        try {
-            const response = await fetch(
-                `/api/admin/projects/${editingProject.id}`,
-                {
-                    method: "PUT",
-                    credentials: "include",
-                    headers: {
-                        "Accept":
-                            "application/json",
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body: JSON.stringify({
-                        title:
-                            projectTitle
-                                .value
-                                .trim(),
-
-                        kicker:
-                            projectKicker
-                                .value
-                                .trim() ||
-                            null,
-
-                        description:
-                            projectDescription
-                                .value
-                                .trim() ||
-                            null,
-
-                        year:
-                            yearValue
-                                ? Number(
-                                    yearValue
-                                )
-                                : null,
-
-                        role:
-                            projectRole
-                                .value
-                                .trim() ||
-                            null,
-
-                        is_published:
-                            projectVisible.checked
-                    })
-                }
-            );
-
-            if (
-                response.status === 401
-            ) {
-                handleExpiredLogin();
-                return;
-            }
-
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error ||
-                    "Unable to save project."
-                );
-            }
-
-            if (data.project) {
-                const updatedProject = {
-                    ...data.project
-                };
-
-                projects =
-                    projects.map(
-                        project =>
-                            project.id ===
-                            updatedProject.id
-                                ? updatedProject
-                                : project
-                    );
-            }
-
-            renderProjects();
-            closeProjectEditor();
-
-            showToast(
-                "Project changes saved!"
-            );
-        } catch (error) {
-            console.error(
-                "Unable to save project:",
-                error
-            );
-
-            showToast(
-                "Something went wrong while saving the project. Your changes are still here."
-            );
-        } finally {
-            saveProjectButton.disabled =
-                false;
-
-            saveProjectButton.textContent =
-                originalText;
-        }
-    }
-
-    projectEditorForm?.addEventListener(
-        "submit",
-        saveProject
-    );
-
-
-    /* NAVIGATION */
-
-    navigationLinks.forEach(
-        (link) => {
-            link.addEventListener(
-                "click",
-                () => {
-                    navigationLinks.forEach(
-                        item =>
-                            item.classList.remove(
-                                "active"
-                            )
-                    );
-
-                    link.classList.add(
-                        "active"
-                    );
-                }
-            );
-        }
-    );
-
-
-    /* START */
-
-    async function startDashboard() {
-        const authenticated =
-            await checkSession();
-
-        if (!authenticated) {
-            return;
-        }
-
-        await Promise.all([
-            loadHomepageSettings(),
-            loadProjects()
-        ]);
-    }
-
-    startDashboard();
-});
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="Manage the Maybelin Works portfolio website">
+    <title>Website Manager | Maybelin Works</title>
+
+    <link rel="icon" type="image/png" href="../assets/maygarcia_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./admin-stylesheet.css">
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar">
+
+            <div class="sidebar-top">
+                <a class="admin-brand" href="../index.html">
+                    <img class="admin-brand-logo" src="../assets/maygarcia_logo.png" alt="">
+                    <div>
+                        <p class="admin-brand-name">Maybelin Works</p>
+                        <p class="admin-brand-label">Website Manager</p>
+                    </div>
+                </a>
+
+                <nav class="admin-nav" aria-label="Website Manager Navigation">
+                    <a href="#overview" class="admin-nav-link active">Overview</a>
+                    <a href="#homepage" class="admin-nav-link">Homepage</a>
+                    <a href="#projects" class="admin-nav-link">Projects</a>
+                    <a href="#media" class="admin-nav-link">Images &amp; Media</a>
+                    <a href="#about" class="admin-nav-link">About Me</a>
+                    <a href="#account" class="admin-nav-link">Account</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-bottom">
+                <a class="sidebar-site-link" href="../index.html" target="_blank" rel="noreferrer">View My Website</a>
+                <button class="sidebar-logout" type="button" data-logout>Log Out</button>
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN -->
+        <main class="admin-main">
+
+            <header class="admin-topbar">
+                <div>
+                    <p class="admin-eyebrow">Maybelin Works</p>
+                    <h1>Website Manager</h1>
+                </div>
+
+                <div class="admin-user">
+                    <div class="admin-user-avatar" data-user-avatar>M</div>
+                    <div class="admin-user-info">
+                        <span class="admin-user-label">Signed in as</span>
+                        <strong data-admin-username>Loading...</strong>
+                    </div>
+                </div>
+            </header>
+
+
+            <div class="admin-content">
+
+                <!-- OVERVIEW -->
+                <section class="dashboard-section" id="overview">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-kicker">Your Website</p>
+                            <h2>Welcome back!</h2>
+                            <p class="section-description">Manage the portfolio without opening VS Code, GitHub, or Cloudflare.</p>
+                        </div>
+
+                        <a class="primary-link-button" href="../index.html" target="_blank" rel="noreferrer">View My Website</a>
+                    </div>
+
+                    <div class="overview-grid">
+                        <article class="overview-card highlight-card">
+                            <p class="overview-label">Website</p>
+                            <h3>Maybelin Works</h3>
+                            <p>Your portfolio is online and ready for updates.</p>
+                            <span class="status-badge">Online</span>
+                        </article>
+
+                        <article class="overview-card">
+                            <p class="overview-label">Portfolio Projects</p>
+                            <p class="overview-number" data-project-count>0</p>
+                            <p class="overview-note" data-project-summary>Loading projects...</p>
+                        </article>
+
+                        <article class="overview-card">
+                            <p class="overview-label">Project Images</p>
+                            <p class="overview-number" data-media-count>0</p>
+                            <p class="overview-note">Managed in project editors</p>
+                        </article>
+
+                        <article class="overview-card">
+                            <p class="overview-label">Website Editing</p>
+                            <p class="overview-value">Full CMS</p>
+                            <p class="overview-note">Projects, galleries, About Me, fonts and contact info</p>
+                        </article>
+                    </div>
+                </section>
+
+
+                <!-- HOMEPAGE -->
+                <section class="dashboard-section" id="homepage">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-kicker">Homepage</p>
+                            <h2>What visitors see first</h2>
+                            <p class="section-description">Edit the homepage message and website typography.</p>
+                        </div>
+
+                        <span class="coming-soon-badge" data-settings-status>Loading...</span>
+                    </div>
+
+                    <div class="settings-grid">
+                        <article class="dashboard-panel large-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Main Text</p>
+                                    <h3>Homepage Message</h3>
+                                </div>
+                                <span class="panel-status">Currently Live</span>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="admin-field full-field">
+                                    <label for="hero-kicker">Small Text Above Your Heading</label>
+                                    <input type="text" id="hero-kicker" maxlength="100" disabled>
+                                </div>
+
+                                <div class="admin-field full-field">
+                                    <label for="hero-title">Main Heading</label>
+                                    <textarea id="hero-title" rows="4" maxlength="300" disabled></textarea>
+                                </div>
+
+                                <div class="admin-field full-field">
+                                    <label for="hero-description">Extra Description</label>
+                                    <textarea id="hero-description" rows="4" disabled></textarea>
+                                    <small>This is stored for the site, but the current homepage layout does not display it.</small>
+                                </div>
+                            </div>
+
+                            <div class="panel-footer">
+                                <p>Save and the public homepage updates automatically.</p>
+                                <button class="disabled-button" type="button" data-save-homepage disabled>Save Homepage Changes</button>
+                            </div>
+                        </article>
+
+                        <article class="dashboard-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Website Style</p>
+                                    <h3>Fonts</h3>
+                                </div>
+                                <span class="panel-status">Editable</span>
+                            </div>
+
+                            <div class="font-controls">
+                                <div class="admin-field">
+                                    <label for="display-font">Heading Font</label>
+                                    <select id="display-font" disabled>
+                                        <option value="Playfair Display">Playfair Display</option>
+                                        <option value="Cormorant Garamond">Cormorant Garamond</option>
+                                        <option value="DM Serif Display">DM Serif Display</option>
+                                        <option value="Libre Baskerville">Libre Baskerville</option>
+                                        <option value="Cardo">Cardo</option>
+                                        <option value="Lato">Lato</option>
+                                        <option value="Montserrat">Montserrat</option>
+                                    </select>
+                                </div>
+
+                                <div class="font-live-preview">
+                                    <span>Preview</span>
+                                    <p class="font-display-preview" data-display-font-preview>Maybelin Works</p>
+                                </div>
+
+                                <div class="admin-field">
+                                    <label for="body-font">Regular Text Font</label>
+                                    <select id="body-font" disabled>
+                                        <option value="Lato">Lato</option>
+                                        <option value="Inter">Inter</option>
+                                        <option value="Montserrat">Montserrat</option>
+                                        <option value="Nunito">Nunito</option>
+                                        <option value="Source Sans 3">Source Sans 3</option>
+                                        <option value="Hind">Hind</option>
+                                        <option value="Libre Baskerville">Libre Baskerville</option>
+                                    </select>
+                                </div>
+
+                                <div class="font-live-preview">
+                                    <span>Preview</span>
+                                    <p class="font-body-preview" data-body-font-preview>Art, identity, curiosity and thoughtful design.</p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="dashboard-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Website Style</p>
+                                    <h3>Current Colors</h3>
+                                </div>
+                            </div>
+
+                            <div class="color-list">
+                                <div class="color-row"><span class="color-preview" style="background:#2A3F38"></span><div><p>Dark Green</p><span>Main dark color</span></div></div>
+                                <div class="color-row"><span class="color-preview" style="background:#8DF688"></span><div><p>Lime Green</p><span>Highlight</span></div></div>
+                                <div class="color-row"><span class="color-preview" style="background:#562F54"></span><div><p>Purple</p><span>Feature color</span></div></div>
+                                <div class="color-row"><span class="color-preview" style="background:#57585D"></span><div><p>Charcoal</p><span>Neutral</span></div></div>
+                                <div class="color-row"><span class="color-preview" style="background:#F650BD"></span><div><p>Pink</p><span>Accent</span></div></div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+
+                <!-- PROJECTS -->
+                <section class="dashboard-section" id="projects">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-kicker">Portfolio</p>
+                            <h2>Your Projects</h2>
+                            <p class="section-description">Create projects, choose their gallery style, edit text and manage every image.</p>
+                        </div>
+
+                        <button class="primary-link-button" type="button" data-add-project>+ Add a Project</button>
+                    </div>
+
+                    <div class="project-admin-list" data-project-list>
+                        <article class="project-admin-card project-loading-card">
+                            <div class="project-admin-number">...</div>
+                            <div class="project-admin-content">
+                                <p class="project-admin-type">Portfolio</p>
+                                <h3>Loading Projects</h3>
+                                <p>Getting your latest project information...</p>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+
+                <!-- MEDIA -->
+                <section class="dashboard-section" id="media">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-kicker">Images &amp; Media</p>
+                            <h2>Your Website Files</h2>
+                            <p class="section-description">Project images are managed inside each project. Your About Me photo is managed below.</p>
+                        </div>
+
+                        <a href="#projects" class="primary-link-button">Manage Project Images</a>
+                    </div>
+
+                    <div class="media-grid">
+                        <article class="media-card">
+                            <div class="media-preview logo-preview">
+                                <img src="../assets/maygarcia_logo.png" alt="Maybelin Works logo">
+                            </div>
+                            <div class="media-info"><strong>Website Logo</strong><span>Existing website branding file</span></div>
+                        </article>
+
+                        <article class="media-card">
+                            <div class="media-preview">
+                                <img src="../assets/may_photo.jpg" alt="About Me photo" loading="lazy" data-about-media-preview>
+                            </div>
+                            <div class="media-info"><strong>About Me Photo</strong><span>Replace it from the About Me editor</span></div>
+                        </article>
+
+                        <article class="media-card managed-media-card">
+                            <div class="media-preview">
+                                <div class="managed-media-count">
+                                    <strong data-media-count-large>0</strong>
+                                    <span>Project Images</span>
+                                </div>
+                            </div>
+                            <div class="media-info"><strong>Cloudflare R2</strong><span>Images managed through Website Manager</span></div>
+                        </article>
+                    </div>
+                </section>
+
+
+                <!-- ABOUT -->
+                <section class="dashboard-section" id="about">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-kicker">About Me</p>
+                            <h2>Your story and contact info</h2>
+                            <p class="section-description">Edit the Information popup, replace your portrait and update the links visitors use to contact you.</p>
+                        </div>
+
+                        <span class="coming-soon-badge" data-about-status>Loading...</span>
+                    </div>
+
+                    <div class="about-editor-grid">
+                        <article class="dashboard-panel about-text-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Information</p>
+                                    <h3>About Me Text</h3>
+                                </div>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="admin-field full-field">
+                                    <label for="about-kicker">Small Label</label>
+                                    <input type="text" id="about-kicker" maxlength="150" disabled>
+                                </div>
+
+                                <div class="admin-field full-field">
+                                    <label for="about-title">Heading</label>
+                                    <input type="text" id="about-title" maxlength="200" disabled>
+                                </div>
+
+                                <div class="admin-field full-field">
+                                    <label for="about-bio">Biography</label>
+                                    <textarea id="about-bio" rows="16" maxlength="20000" disabled></textarea>
+                                    <small>Leave a blank line between paragraphs.</small>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="dashboard-panel about-photo-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Portrait</p>
+                                    <h3>About Me Photo</h3>
+                                </div>
+                            </div>
+
+                            <div class="about-photo-editor">
+                                <div class="about-photo-preview">
+                                    <img src="../assets/may_photo.jpg" alt="Current About Me photo" data-about-photo-preview>
+                                </div>
+
+                                <div class="admin-field">
+                                    <label for="about-photo-file">Choose a New Photo</label>
+                                    <input type="file" id="about-photo-file" accept="image/jpeg,image/png,image/webp,image/avif,.jpg,.jpeg,.png,.webp,.avif" disabled>
+                                    <small>JPG, PNG, WebP or AVIF. Maximum 20 MB.</small>
+                                </div>
+
+                                <button class="media-upload-button" type="button" data-replace-about-photo disabled>Replace Photo</button>
+                            </div>
+                        </article>
+
+                        <article class="dashboard-panel contact-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Contact</p>
+                                    <h3>Visitor Links</h3>
+                                </div>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="admin-field full-field">
+                                    <label for="contact-email">Email</label>
+                                    <input type="email" id="contact-email" maxlength="320" disabled>
+                                </div>
+
+                                <div class="admin-field full-field">
+                                    <label for="contact-phone">Phone</label>
+                                    <input type="text" id="contact-phone" maxlength="100" disabled>
+                                </div>
+
+                                <div class="admin-field full-field">
+                                    <label for="instagram-url">Instagram URL</label>
+                                    <input type="url" id="instagram-url" maxlength="2000" disabled>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="about-save-bar">
+                        <p>These changes update both the Information popup and the contact links in the site header.</p>
+                        <button class="disabled-button" type="button" data-save-about disabled>Save About Me Changes</button>
+                    </div>
+                </section>
+
+
+                <!-- ACCOUNT -->
+                <section class="dashboard-section" id="account">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-kicker">Account</p>
+                            <h2>Your Login</h2>
+                            <p class="section-description">Information about your current Website Manager session.</p>
+                        </div>
+                    </div>
+
+                    <article class="dashboard-panel account-panel">
+                        <div class="account-detail"><span>Signed in as</span><strong data-account-username>Loading...</strong></div>
+                        <div class="account-detail"><span>Login lasts for</span><strong>8 Hours</strong></div>
+                        <div class="account-detail"><span>Login Status</span><strong>Secure</strong></div>
+                        <div class="account-actions"><button class="logout-button" type="button" data-logout>Log Out</button></div>
+                    </article>
+                </section>
+
+            </div>
+
+            <footer class="admin-footer">
+                <p>Maybelin Works Website Manager</p>
+                <p>Website created by Centari Studios</p>
+            </footer>
+        </main>
+    </div>
+
+
+    <!-- PROJECT EDITOR -->
+    <dialog class="project-editor-dialog" data-project-editor aria-labelledby="project-editor-title">
+        <form class="project-editor-form" data-project-editor-form>
+
+            <div class="project-editor-header">
+                <div>
+                    <p class="panel-kicker" data-project-editor-kicker>Portfolio Project</p>
+                    <h2 id="project-editor-title" data-project-editor-title>Edit Project</h2>
+                    <p data-project-editor-intro>Change project details and manage images from one place.</p>
+                </div>
+
+                <button class="project-editor-close" type="button" data-close-project-editor>Close</button>
+            </div>
+
+            <div class="project-editor-body">
+                <input type="hidden" id="project-id">
+
+                <section class="editor-section">
+                    <div class="editor-section-heading">
+                        <div>
+                            <p class="panel-kicker">Project Details</p>
+                            <h3>Information</h3>
+                        </div>
+                    </div>
+
+                    <div class="project-editor-grid">
+                        <div class="admin-field full-field">
+                            <label for="project-title">Project Name</label>
+                            <input type="text" id="project-title" maxlength="200" required>
+                        </div>
+
+                        <div class="admin-field full-field">
+                            <label for="project-kicker">Short Label</label>
+                            <input type="text" id="project-kicker" maxlength="200" placeholder="Example: Educational Publication">
+                            <small>This appears above the project name.</small>
+                        </div>
+
+                        <div class="admin-field full-field">
+                            <label for="project-description">Project Story</label>
+                            <textarea id="project-description" rows="10" maxlength="10000" placeholder="Tell visitors about this project..."></textarea>
+                            <small>Leave a blank line between paragraphs.</small>
+                        </div>
+
+                        <div class="admin-field">
+                            <label for="project-year">Year</label>
+                            <input type="number" id="project-year" min="1900" max="2100" placeholder="Optional">
+                        </div>
+
+                        <div class="admin-field">
+                            <label for="project-role">My Role</label>
+                            <input type="text" id="project-role" maxlength="500" placeholder="Example: Editorial Design">
+                        </div>
+
+                        <div class="admin-field full-field gallery-layout-field">
+                            <label for="project-layout">Gallery Layout</label>
+                            <select id="project-layout">
+                                <option value="smart">Smart Gallery</option>
+                                <option value="publication">Publication / Book</option>
+                                <option value="full">Full Width</option>
+                                <option value="grid">Classic Grid</option>
+                                <option value="featured">Featured + Grid</option>
+                            </select>
+                            <div class="layout-help" data-layout-description></div>
+                        </div>
+                    </div>
+
+                    <label class="project-visibility-option">
+                        <input type="checkbox" id="project-visible">
+                        <span>
+                            <strong>Show this project on the website</strong>
+                            <small>New projects start hidden so you can add images before making them public.</small>
+                        </span>
+                    </label>
+                </section>
+
+
+                <section class="editor-section project-media-editor" data-project-media-section>
+                    <div class="editor-section-heading">
+                        <div>
+                            <p class="panel-kicker">Project Images</p>
+                            <h3>Gallery Images</h3>
+                            <p>Upload, remove and reorder images. The selected Gallery Layout decides how these appear publicly.</p>
+                        </div>
+
+                        <span class="project-media-count" data-project-media-count>0 Images</span>
+                    </div>
+
+                    <div class="project-media-upload">
+                        <div class="admin-field">
+                            <label for="project-media-file">Choose an Image</label>
+                            <input type="file" id="project-media-file" accept="image/jpeg,image/png,image/webp,image/avif,.jpg,.jpeg,.png,.webp,.avif">
+                            <small>JPG, PNG, WebP or AVIF. Maximum 20 MB.</small>
+                        </div>
+
+                        <div class="admin-field">
+                            <label for="project-media-alt">Image Description</label>
+                            <input type="text" id="project-media-alt" maxlength="500" placeholder="Example: Fenix publication cover">
+                            <small>Describe what is visible for screen-reader users.</small>
+                        </div>
+
+                        <button class="media-upload-button" type="button" data-upload-project-media>Upload Image</button>
+                    </div>
+
+                    <div class="project-media-list" data-project-media-list></div>
+                </section>
+
+
+                <div class="create-project-media-note" data-create-project-media-note hidden>
+                    <strong>Create the project first.</strong>
+                    <span>After it is created, this window will stay open and the image uploader will appear.</span>
+                </div>
+            </div>
+
+            <div class="project-editor-actions">
+                <button class="secondary-button" type="button" data-close-project-editor>Cancel</button>
+                <button class="project-save-button" type="submit" data-save-project>Save Project</button>
+            </div>
+
+        </form>
+    </dialog>
+
+
+    <div class="admin-toast" data-admin-toast role="status" aria-live="polite"></div>
+
+    <script src="./admin-dashboard.js"></script>
+</body>
+</html>

@@ -84,6 +84,44 @@ function decodeMediaKey(rawKey) {
     }
 }
 
+function validateImageFile(file) {
+    if (
+        !file ||
+        typeof file !== "object" ||
+        typeof file.stream !== "function"
+    ) {
+        return {
+            error: "Choose an image to upload."
+        };
+    }
+
+    if (!file.size || file.size <= 0) {
+        return {
+            error: "That image appears to be empty."
+        };
+    }
+
+    if (file.size > MAX_MEDIA_SIZE) {
+        return {
+            error: "Images must be 20 MB or smaller."
+        };
+    }
+
+    const extension = ALLOWED_IMAGE_TYPES.get(
+        file.type
+    );
+
+    if (!extension) {
+        return {
+            error: "Please upload a JPG, PNG, WebP, or AVIF image."
+        };
+    }
+
+    return {
+        extension
+    };
+}
+
 
 /* PROJECT LOOKUP */
 
@@ -168,7 +206,10 @@ export async function handleGetMedia(
 
     if (
         !key ||
-        !key.startsWith("projects/")
+        (
+            !key.startsWith("projects/") &&
+            !key.startsWith("site/")
+        )
     ) {
         return new Response(
             "Not Found",
@@ -193,12 +234,9 @@ export async function handleGetMedia(
             );
         }
 
-        const headers =
-            new Headers();
+        const headers = new Headers();
 
-        object.writeHttpMetadata(
-            headers
-        );
+        object.writeHttpMetadata(headers);
 
         headers.set(
             "ETag",
@@ -245,7 +283,7 @@ export async function handleGetMedia(
 }
 
 
-/* UPLOAD MEDIA */
+/* UPLOAD PROJECT MEDIA */
 
 export async function handleUploadProjectMedia(
     request,
@@ -265,8 +303,9 @@ export async function handleUploadProjectMedia(
         }, 500);
     }
 
-    const numericProjectId =
-        validId(projectId);
+    const numericProjectId = validId(
+        projectId
+    );
 
     if (!numericProjectId) {
         return json({
@@ -277,60 +316,25 @@ export async function handleUploadProjectMedia(
     let formData;
 
     try {
-        formData =
-            await request.formData();
+        formData = await request.formData();
     } catch {
         return json({
             error: "Invalid upload."
         }, 400);
     }
 
-    const file =
-        formData.get("file");
+    const file = formData.get("file");
+    const validation = validateImageFile(file);
 
-    const altText =
-        cleanAltText(
-            formData.get("alt_text")
-        );
-
-    if (
-        !file ||
-        typeof file !== "object" ||
-        typeof file.stream !== "function"
-    ) {
+    if (validation.error) {
         return json({
-            error: "Choose an image to upload."
+            error: validation.error
         }, 400);
     }
 
-    if (
-        !file.size ||
-        file.size <= 0
-    ) {
-        return json({
-            error: "That image appears to be empty."
-        }, 400);
-    }
-
-    if (
-        file.size >
-        MAX_MEDIA_SIZE
-    ) {
-        return json({
-            error: "Images must be 20 MB or smaller."
-        }, 400);
-    }
-
-    const extension =
-        ALLOWED_IMAGE_TYPES.get(
-            file.type
-        );
-
-    if (!extension) {
-        return json({
-            error: "Please upload a JPG, PNG, WebP, or AVIF image."
-        }, 400);
-    }
+    const altText = cleanAltText(
+        formData.get("alt_text")
+    );
 
     let project;
 
@@ -356,37 +360,29 @@ export async function handleUploadProjectMedia(
         }, 404);
     }
 
-    const slug =
-        safeProjectSlug(
-            project.slug
-        );
+    const slug = safeProjectSlug(
+        project.slug
+    );
 
     const key =
-        `projects/${slug}/${crypto.randomUUID()}.${extension}`;
+        `projects/${slug}/${crypto.randomUUID()}.${validation.extension}`;
 
     let nextOrder = 0;
 
     try {
-        const orderResult =
-            await env.DB
-                .prepare(`
-                    SELECT
-                        COALESCE(
-                            MAX(sort_order),
-                            -1
-                        ) + 1 AS next_order
-                    FROM project_media
-                    WHERE project_id = ?
-                `)
-                .bind(
-                    numericProjectId
-                )
-                .first();
+        const orderResult = await env.DB
+            .prepare(`
+                SELECT
+                    COALESCE(MAX(sort_order), -1) + 1 AS next_order
+                FROM project_media
+                WHERE project_id = ?
+            `)
+            .bind(numericProjectId)
+            .first();
 
-        nextOrder =
-            Number(
-                orderResult?.next_order
-            ) || 0;
+        nextOrder = Number(
+            orderResult?.next_order
+        ) || 0;
     } catch (error) {
         console.error(
             "Unable to determine media order:",
@@ -404,36 +400,20 @@ export async function handleUploadProjectMedia(
             file.stream(),
             {
                 httpMetadata: {
-                    contentType:
-                        file.type,
-
+                    contentType: file.type,
                     cacheControl:
                         "public, max-age=31536000, immutable"
                 },
-
                 customMetadata: {
-                    projectId:
-                        String(
-                            numericProjectId
-                        ),
-
-                    originalName:
-                        String(
-                            file.name ||
-                            "image"
-                        ).slice(
-                            0,
-                            200
-                        ),
-
-                    uploadedBy:
-                        String(
-                            username ||
-                            "admin"
-                        ).slice(
-                            0,
-                            100
-                        )
+                    projectId: String(
+                        numericProjectId
+                    ),
+                    originalName: String(
+                        file.name || "image"
+                    ).slice(0, 200),
+                    uploadedBy: String(
+                        username || "admin"
+                    ).slice(0, 100)
                 }
             }
         );
@@ -475,8 +455,7 @@ export async function handleUploadProjectMedia(
 
         return json({
             success: true,
-            media:
-                mediaResponse(media)
+            media: mediaResponse(media)
         }, 201);
     } catch (error) {
         console.error(
@@ -484,14 +463,8 @@ export async function handleUploadProjectMedia(
             error
         );
 
-        /*
-         * If the database insert fails after
-         * the R2 upload, remove the orphaned file.
-         */
         try {
-            await env.MEDIA.delete(
-                key
-            );
+            await env.MEDIA.delete(key);
         } catch (cleanupError) {
             console.error(
                 "Unable to clean up failed upload:",
@@ -506,7 +479,142 @@ export async function handleUploadProjectMedia(
 }
 
 
-/* DELETE MEDIA */
+/* ABOUT PHOTO */
+
+export async function handleUploadAboutPhoto(
+    request,
+    env,
+    username
+) {
+    if (request.method !== "POST") {
+        return json({
+            error: "Method not allowed."
+        }, 405);
+    }
+
+    if (!env.DB || !env.MEDIA) {
+        return json({
+            error: "Media storage is not configured."
+        }, 500);
+    }
+
+    let formData;
+
+    try {
+        formData = await request.formData();
+    } catch {
+        return json({
+            error: "Invalid upload."
+        }, 400);
+    }
+
+    const file = formData.get("file");
+    const validation = validateImageFile(file);
+
+    if (validation.error) {
+        return json({
+            error: validation.error
+        }, 400);
+    }
+
+    let current;
+
+    try {
+        current = await env.DB
+            .prepare(`
+                SELECT about_photo_key
+                FROM site_settings
+                WHERE id = 1
+                LIMIT 1
+            `)
+            .first();
+    } catch (error) {
+        console.error(
+            "Unable to load current About photo:",
+            error
+        );
+
+        return json({
+            error: "Unable to prepare the photo upload."
+        }, 500);
+    }
+
+    const oldKey = current?.about_photo_key || null;
+    const newKey =
+        `site/about/${crypto.randomUUID()}.${validation.extension}`;
+
+    try {
+        await env.MEDIA.put(
+            newKey,
+            file.stream(),
+            {
+                httpMetadata: {
+                    contentType: file.type,
+                    cacheControl:
+                        "public, max-age=31536000, immutable"
+                },
+                customMetadata: {
+                    originalName: String(
+                        file.name || "about-photo"
+                    ).slice(0, 200),
+                    uploadedBy: String(
+                        username || "admin"
+                    ).slice(0, 100),
+                    usage: "about-photo"
+                }
+            }
+        );
+
+        try {
+            await env.DB
+                .prepare(`
+                    UPDATE site_settings
+                    SET
+                        about_photo_key = ?,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE id = 1
+                `)
+                .bind(newKey)
+                .run();
+        } catch (databaseError) {
+            await env.MEDIA.delete(newKey);
+            throw databaseError;
+        }
+
+        if (
+            oldKey &&
+            oldKey !== newKey &&
+            oldKey.startsWith("site/about/")
+        ) {
+            try {
+                await env.MEDIA.delete(oldKey);
+            } catch (deleteError) {
+                console.warn(
+                    "New About photo saved, but the previous R2 object could not be removed:",
+                    deleteError
+                );
+            }
+        }
+
+        return json({
+            success: true,
+            about_photo_key: newKey,
+            url: mediaUrl(newKey)
+        }, 201);
+    } catch (error) {
+        console.error(
+            "Unable to upload About photo:",
+            error
+        );
+
+        return json({
+            error: "Unable to replace the About photo."
+        }, 500);
+    }
+}
+
+
+/* DELETE PROJECT MEDIA */
 
 export async function handleDeleteProjectMedia(
     request,
@@ -525,8 +633,9 @@ export async function handleDeleteProjectMedia(
         }, 500);
     }
 
-    const numericMediaId =
-        validId(mediaId);
+    const numericMediaId = validId(
+        mediaId
+    );
 
     if (!numericMediaId) {
         return json({
@@ -547,9 +656,7 @@ export async function handleDeleteProjectMedia(
                 WHERE id = ?
                 LIMIT 1
             `)
-            .bind(
-                numericMediaId
-            )
+            .bind(numericMediaId)
             .first();
     } catch (error) {
         console.error(
@@ -578,15 +685,12 @@ export async function handleDeleteProjectMedia(
                 DELETE FROM project_media
                 WHERE id = ?
             `)
-            .bind(
-                numericMediaId
-            )
+            .bind(numericMediaId)
             .run();
 
         return json({
             success: true,
-            media_id:
-                numericMediaId
+            media_id: numericMediaId
         });
     } catch (error) {
         console.error(
@@ -601,7 +705,7 @@ export async function handleDeleteProjectMedia(
 }
 
 
-/* REORDER MEDIA */
+/* REORDER PROJECT MEDIA */
 
 export async function handleReorderProjectMedia(
     request,
@@ -620,8 +724,9 @@ export async function handleReorderProjectMedia(
         }, 500);
     }
 
-    const numericProjectId =
-        validId(projectId);
+    const numericProjectId = validId(
+        projectId
+    );
 
     if (!numericProjectId) {
         return json({
@@ -632,28 +737,22 @@ export async function handleReorderProjectMedia(
     let body;
 
     try {
-        body =
-            await request.json();
+        body = await request.json();
     } catch {
         return json({
             error: "Invalid request."
         }, 400);
     }
 
-    if (
-        !Array.isArray(
-            body.media_ids
-        )
-    ) {
+    if (!Array.isArray(body.media_ids)) {
         return json({
             error: "Image order is required."
         }, 400);
     }
 
-    const mediaIds =
-        body.media_ids.map(
-            value => Number(value)
-        );
+    const mediaIds = body.media_ids.map(
+        value => Number(value)
+    );
 
     if (
         mediaIds.some(
@@ -667,11 +766,8 @@ export async function handleReorderProjectMedia(
         }, 400);
     }
 
-    const uniqueIds =
-        new Set(mediaIds);
-
     if (
-        uniqueIds.size !==
+        new Set(mediaIds).size !==
         mediaIds.length
     ) {
         return json({
@@ -680,26 +776,21 @@ export async function handleReorderProjectMedia(
     }
 
     try {
-        const currentMedia =
-            await env.DB
-                .prepare(`
-                    SELECT id
-                    FROM project_media
-                    WHERE project_id = ?
-                    ORDER BY
-                        sort_order ASC,
-                        id ASC
-                `)
-                .bind(
-                    numericProjectId
-                )
-                .all();
+        const currentMedia = await env.DB
+            .prepare(`
+                SELECT id
+                FROM project_media
+                WHERE project_id = ?
+                ORDER BY
+                    sort_order ASC,
+                    id ASC
+            `)
+            .bind(numericProjectId)
+            .all();
 
-        const existingIds =
-            currentMedia.results.map(
-                media =>
-                    Number(media.id)
-            );
+        const existingIds = currentMedia.results.map(
+            media => Number(media.id)
+        );
 
         if (
             existingIds.length !==
@@ -710,50 +801,45 @@ export async function handleReorderProjectMedia(
             }, 409);
         }
 
-        const existingSet =
-            new Set(existingIds);
+        const existingSet = new Set(
+            existingIds
+        );
 
-        const allBelongToProject =
-            mediaIds.every(
-                id =>
-                    existingSet.has(id)
-            );
-
-        if (!allBelongToProject) {
+        if (
+            !mediaIds.every(
+                id => existingSet.has(id)
+            )
+        ) {
             return json({
                 error: "One or more images do not belong to this project."
             }, 400);
         }
 
         if (mediaIds.length > 0) {
-            const statements =
-                mediaIds.map(
-                    (id, index) =>
-                        env.DB
-                            .prepare(`
-                                UPDATE project_media
-                                SET sort_order = ?
-                                WHERE
-                                    id = ?
-                                    AND project_id = ?
-                            `)
-                            .bind(
-                                index,
-                                id,
-                                numericProjectId
-                            )
-                );
-
-            await env.DB.batch(
-                statements
+            const statements = mediaIds.map(
+                (id, index) =>
+                    env.DB
+                        .prepare(`
+                            UPDATE project_media
+                            SET sort_order = ?
+                            WHERE
+                                id = ?
+                                AND project_id = ?
+                        `)
+                        .bind(
+                            index,
+                            id,
+                            numericProjectId
+                        )
             );
+
+            await env.DB.batch(statements);
         }
 
-        const media =
-            await getProjectMedia(
-                env,
-                numericProjectId
-            );
+        const media = await getProjectMedia(
+            env,
+            numericProjectId
+        );
 
         return json({
             success: true,
