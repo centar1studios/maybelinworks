@@ -2,50 +2,17 @@ document.addEventListener("DOMContentLoaded", () => {
     /* FONTS */
 
     const GOOGLE_FONTS = new Map([
-        [
-            "Playfair Display",
-            "Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400"
-        ],
-        [
-            "Cormorant Garamond",
-            "Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400"
-        ],
-        [
-            "DM Serif Display",
-            "DM+Serif+Display:ital@0;1"
-        ],
-        [
-            "Libre Baskerville",
-            "Libre+Baskerville:ital,wght@0,400;0,700;1,400"
-        ],
-        [
-            "Cardo",
-            "Cardo:ital,wght@0,400;0,700;1,400"
-        ],
-        [
-            "Lato",
-            "Lato:wght@300;400;700;900"
-        ],
-        [
-            "Inter",
-            "Inter:wght@300;400;500;600;700;800"
-        ],
-        [
-            "Montserrat",
-            "Montserrat:wght@300;400;500;600;700;800"
-        ],
-        [
-            "Nunito",
-            "Nunito:wght@300;400;500;600;700;800"
-        ],
-        [
-            "Source Sans 3",
-            "Source+Sans+3:wght@300;400;500;600;700;800"
-        ],
-        [
-            "Hind",
-            "Hind:wght@300;400;500;600;700"
-        ]
+        ["Playfair Display", "Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400"],
+        ["Cormorant Garamond", "Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400"],
+        ["DM Serif Display", "DM+Serif+Display:ital@0;1"],
+        ["Libre Baskerville", "Libre+Baskerville:ital,wght@0,400;0,700;1,400"],
+        ["Cardo", "Cardo:ital,wght@0,400;0,700;1,400"],
+        ["Lato", "Lato:wght@300;400;700;900"],
+        ["Inter", "Inter:wght@300;400;500;600;700;800"],
+        ["Montserrat", "Montserrat:wght@300;400;500;600;700;800"],
+        ["Nunito", "Nunito:wght@300;400;500;600;700;800"],
+        ["Source Sans 3", "Source+Sans+3:wght@300;400;500;600;700;800"],
+        ["Hind", "Hind:wght@300;400;500;600;700"]
     ]);
 
     const loadedFonts = new Set([
@@ -54,33 +21,23 @@ document.addEventListener("DOMContentLoaded", () => {
     ]);
 
     function loadGoogleFont(fontName) {
-        if (
-            !fontName ||
-            loadedFonts.has(fontName)
-        ) {
+        if (!fontName || loadedFonts.has(fontName)) {
             return;
         }
 
-        const googleName =
-            GOOGLE_FONTS.get(fontName);
+        const googleName = GOOGLE_FONTS.get(fontName);
 
         if (!googleName) {
             return;
         }
 
-        const link =
-            document.createElement(
-                "link"
-            );
+        const link = document.createElement("link");
 
         link.rel = "stylesheet";
-
         link.href =
             `https://fonts.googleapis.com/css2?family=${googleName}&display=swap`;
 
-        document.head.appendChild(
-            link
-        );
+        document.head.appendChild(link);
 
         loadedFonts.add(fontName);
     }
@@ -94,13 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
             settings.body_font ||
             "Lato";
 
-        loadGoogleFont(
-            displayFont
-        );
-
-        loadGoogleFont(
-            bodyFont
-        );
+        loadGoogleFont(displayFont);
+        loadGoogleFont(bodyFont);
 
         document.documentElement.style.setProperty(
             "--font-display",
@@ -212,9 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     .trim()
                     .toLowerCase();
 
-            if (
-                title === "fenix"
-            ) {
+            if (title === "fenix") {
                 article.dataset.projectSlug =
                     "fenix";
 
@@ -225,8 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (
-                title &&
-                title.includes(
+                title?.includes(
                     "casa guadalupe"
                 )
             ) {
@@ -280,6 +229,19 @@ document.addEventListener("DOMContentLoaded", () => {
         previousProjectButton.innerHTML =
             "&#8592; Previous Project";
 
+        projectCounter =
+            document.createElement(
+                "span"
+            );
+
+        projectCounter.className =
+            "project-switcher-count";
+
+        projectCounter.setAttribute(
+            "aria-live",
+            "polite"
+        );
+
         nextProjectButton =
             document.createElement(
                 "button"
@@ -294,19 +256,6 @@ document.addEventListener("DOMContentLoaded", () => {
         nextProjectButton.innerHTML =
             "Next Project &#8594;";
 
-        projectCounter =
-            document.createElement(
-                "span"
-            );
-
-        projectCounter.className =
-            "project-switcher-count";
-
-        projectCounter.setAttribute(
-            "aria-live",
-            "polite"
-        );
-
         projectSwitcher.append(
             previousProjectButton,
             projectCounter,
@@ -319,16 +268,11 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-
-    /* PROJECT INDEX */
-
-    function normalizeProjectIndex(
-        index
-    ) {
+    function normalizeProjectIndex(index) {
         const total =
             availableProjectArticles.length;
 
-        if (total === 0) {
+        if (!total) {
             return 0;
         }
 
@@ -338,9 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ) % total;
     }
 
-    function getProjectTitle(
-        article
-    ) {
+    function getProjectTitle(article) {
         return (
             article
                 ?.querySelector(
@@ -352,18 +294,15 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-
-    /* UPDATE SWITCHER */
-
     function updateProjectSwitcher() {
-        const total =
-            availableProjectArticles.length;
-
         if (!projectSwitcher) {
             return;
         }
 
-        if (total === 0) {
+        const total =
+            availableProjectArticles.length;
+
+        if (!total) {
             projectSwitcher.hidden =
                 true;
 
@@ -418,16 +357,14 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-
-    /* SHOW PROJECT */
-
     function showProject(
         index,
         scrollToProject = true
     ) {
         staticProjectArticles.forEach(
             (article) => {
-                article.hidden = true;
+                article.hidden =
+                    true;
 
                 article.classList.remove(
                     "project-current"
@@ -436,8 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         if (
-            availableProjectArticles.length ===
-            0
+            !availableProjectArticles.length
         ) {
             updateProjectSwitcher();
             return;
@@ -475,39 +411,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function showPreviousProject() {
         if (
-            availableProjectArticles.length <=
+            availableProjectArticles.length >
             1
         ) {
-            return;
+            showProject(
+                currentProjectIndex - 1
+            );
         }
-
-        showProject(
-            currentProjectIndex - 1
-        );
     }
 
     function showNextProject() {
         if (
-            availableProjectArticles.length <=
+            availableProjectArticles.length >
             1
         ) {
-            return;
+            showProject(
+                currentProjectIndex + 1
+            );
         }
-
-        showProject(
-            currentProjectIndex + 1
-        );
     }
 
-    previousProjectButton?.addEventListener(
-        "click",
-        showPreviousProject
-    );
+    previousProjectButton
+        ?.addEventListener(
+            "click",
+            showPreviousProject
+        );
 
-    nextProjectButton?.addEventListener(
-        "click",
-        showNextProject
-    );
+    nextProjectButton
+        ?.addEventListener(
+            "click",
+            showNextProject
+        );
 
     showProject(
         0,
@@ -531,7 +465,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 .split("/")
                 .map(
                     part =>
-                        encodeURIComponent(part)
+                        encodeURIComponent(
+                            part
+                        )
                 )
                 .join("/");
 
@@ -539,7 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* FIND PROJECT META */
+    /* PROJECT META */
 
     function findMetaRow(
         meta,
@@ -557,7 +493,9 @@ document.addEventListener("DOMContentLoaded", () => {
             ).find(
                 row =>
                     row
-                        .querySelector("dt")
+                        .querySelector(
+                            "dt"
+                        )
                         ?.textContent
                         .trim()
                         .toLowerCase() ===
@@ -566,9 +504,6 @@ document.addEventListener("DOMContentLoaded", () => {
             null
         );
     }
-
-
-    /* SET PROJECT META */
 
     function setProjectMeta(
         meta,
@@ -587,10 +522,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!value) {
             if (
-                row &&
-                row.dataset
+                row?.dataset
                     .dynamicMeta ===
-                    "true"
+                "true"
             ) {
                 row.remove();
             }
@@ -631,16 +565,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const dd =
-            row.querySelector("dd");
+            row.querySelector(
+                "dd"
+            );
 
         if (dd) {
             dd.textContent =
                 String(value);
         }
     }
-
-
-    /* DESCRIPTION */
 
     function updateProjectDescription(
         container,
@@ -701,6 +634,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     lightbox.innerHTML = `
         <div class="portfolio-lightbox-toolbar">
+
             <p
                 class="portfolio-lightbox-count"
                 data-lightbox-count
@@ -714,6 +648,7 @@ document.addEventListener("DOMContentLoaded", () => {
             >
                 Close
             </button>
+
         </div>
 
         <div class="portfolio-lightbox-stage">
@@ -787,9 +722,6 @@ document.addEventListener("DOMContentLoaded", () => {
             "[data-lightbox-next]"
         );
 
-
-    /* VISIBLE IMAGES */
-
     function getVisibleGalleryImages() {
         const currentProject =
             availableProjectArticles[
@@ -807,9 +739,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-
-    /* LIGHTBOX CONTENT */
-
     function updateLightboxImage() {
         const images =
             getVisibleGalleryImages();
@@ -823,17 +752,19 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        const alt =
+            image.alt ||
+            "Portfolio artwork";
+
         lightboxImage.src =
             image.currentSrc ||
             image.src;
 
         lightboxImage.alt =
-            image.alt ||
-            "Portfolio artwork";
+            alt;
 
         lightboxCaption.textContent =
-            image.alt ||
-            "Portfolio artwork";
+            alt;
 
         lightboxCount.textContent =
             `${currentImageIndex + 1} / ${images.length}`;
@@ -853,7 +784,9 @@ document.addEventListener("DOMContentLoaded", () => {
             getVisibleGalleryImages();
 
         const index =
-            images.indexOf(image);
+            images.indexOf(
+                image
+            );
 
         if (index === -1) {
             return;
@@ -872,6 +805,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         updateDialogState();
+
         lightboxClose.focus();
     }
 
@@ -930,16 +864,13 @@ document.addEventListener("DOMContentLoaded", () => {
         updateLightboxImage();
     }
 
-
-    /* PREPARE IMAGE */
-
     function prepareGalleryImage(
         image
     ) {
         if (
             !image ||
             image.dataset.zoomReady ===
-            "true"
+                "true"
         ) {
             return;
         }
@@ -1007,9 +938,9 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-    /* MANAGED MEDIA */
+    /* DYNAMIC PROJECT GALLERY */
 
-    function syncManagedMedia(
+    function syncProjectGallery(
         article,
         project
     ) {
@@ -1022,47 +953,81 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const oldSection =
-            gallery.querySelector(
-                ".managed-project-media"
-            );
-
-        if (oldSection) {
-            oldSection.remove();
-        }
-
         const media =
             Array.isArray(
                 project.media
             )
-                ? [...project.media]
+                ? [
+                    ...project.media
+                ].sort(
+                    (a, b) => {
+                        const difference =
+                            (
+                                Number(
+                                    a.sort_order
+                                ) || 0
+                            ) -
+                            (
+                                Number(
+                                    b.sort_order
+                                ) || 0
+                            );
+
+                        return (
+                            difference ||
+                            Number(a.id) -
+                            Number(b.id)
+                        );
+                    }
+                )
                 : [];
 
-        media.sort(
-            (a, b) =>
-                (
-                    Number(
-                        a.sort_order
-                    ) || 0
-                ) -
-                (
-                    Number(
-                        b.sort_order
-                    ) || 0
-                )
+        /*
+         * The API loaded successfully, so D1 is now
+         * the source of truth for this project's gallery.
+         */
+        gallery.replaceChildren();
+
+        gallery.classList.add(
+            "managed-project-gallery"
         );
 
         if (!media.length) {
-            return;
-        }
+            const empty =
+                document.createElement(
+                    "div"
+                );
 
-        const section =
-            document.createElement(
-                "div"
+            empty.className =
+                "project-gallery-empty";
+
+            const heading =
+                document.createElement(
+                    "strong"
+                );
+
+            heading.textContent =
+                "No project images right now.";
+
+            const text =
+                document.createElement(
+                    "span"
+                );
+
+            text.textContent =
+                "This project is still available, but its gallery is currently empty.";
+
+            empty.append(
+                heading,
+                text
             );
 
-        section.className =
-            "project-gallery-section managed-project-media";
+            gallery.appendChild(
+                empty
+            );
+
+            return;
+        }
 
         const heading =
             document.createElement(
@@ -1070,27 +1035,44 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
         heading.className =
-            "gallery-heading";
+            "gallery-heading managed-gallery-heading";
 
         heading.textContent =
-            "Additional Images";
+            "Project Gallery";
 
-        section.appendChild(
-            heading
-        );
+        const grid =
+            document.createElement(
+                "div"
+            );
+
+        grid.className =
+            "managed-gallery-grid";
 
         media.forEach(
             item => {
+                const figure =
+                    document.createElement(
+                        "figure"
+                    );
+
+                figure.className =
+                    "managed-gallery-item";
+
+                figure.dataset.mediaId =
+                    String(item.id);
+
                 const image =
                     document.createElement(
                         "img"
                     );
 
                 image.className =
-                    "presentation-image";
+                    "managed-gallery-image";
 
                 image.src =
-                    getMediaUrl(item);
+                    getMediaUrl(
+                        item
+                    );
 
                 image.alt =
                     item.alt_text ||
@@ -1102,26 +1084,63 @@ document.addEventListener("DOMContentLoaded", () => {
                 image.decoding =
                     "async";
 
-                image.dataset.managedMediaId =
-                    String(item.id);
+                /*
+                 * Wide artwork spans both gallery columns.
+                 * Portrait and square artwork sits two-across.
+                 */
+                const updateWidth =
+                    () => {
+                        if (
+                            !image.naturalWidth ||
+                            !image.naturalHeight
+                        ) {
+                            return;
+                        }
+
+                        const ratio =
+                            image.naturalWidth /
+                            image.naturalHeight;
+
+                        figure.classList.toggle(
+                            "managed-gallery-wide",
+                            ratio >= 1.2
+                        );
+                    };
+
+                image.addEventListener(
+                    "load",
+                    updateWidth,
+                    {
+                        once: true
+                    }
+                );
+
+                if (image.complete) {
+                    updateWidth();
+                }
 
                 prepareGalleryImage(
                     image
                 );
 
-                section.appendChild(
+                figure.appendChild(
                     image
+                );
+
+                grid.appendChild(
+                    figure
                 );
             }
         );
 
-        gallery.appendChild(
-            section
+        gallery.append(
+            heading,
+            grid
         );
     }
 
 
-    /* APPLY PROJECT */
+    /* APPLY PROJECT DATA */
 
     function applyProjectData(
         article,
@@ -1161,7 +1180,10 @@ document.addEventListener("DOMContentLoaded", () => {
             number.textContent =
                 `Project ${String(
                     displayNumber
-                ).padStart(2, "0")}`;
+                ).padStart(
+                    2,
+                    "0"
+                )}`;
         }
 
         if (kicker) {
@@ -1199,7 +1221,7 @@ document.addEventListener("DOMContentLoaded", () => {
             project.year
         );
 
-        syncManagedMedia(
+        syncProjectGallery(
             article,
             project
         );
@@ -1210,17 +1232,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadSiteSettings() {
         try {
-            const response = await fetch(
-                "/api/settings",
-                {
-                    method: "GET",
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    },
-                    cache: "no-store"
-                }
-            );
+            const response =
+                await fetch(
+                    "/api/settings",
+                    {
+                        method: "GET",
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        },
+                        cache: "no-store"
+                    }
+                );
 
             if (!response.ok) {
                 throw new Error(
@@ -1235,29 +1258,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const settings =
-                data.settings;
-
             if (
                 heroKicker &&
-                settings.hero_kicker
+                data.settings
+                    .hero_kicker
                     ?.trim()
             ) {
                 heroKicker.textContent =
-                    settings.hero_kicker;
+                    data.settings
+                        .hero_kicker;
             }
 
             if (
                 heroTitle &&
-                settings.hero_title
+                data.settings
+                    .hero_title
                     ?.trim()
             ) {
                 heroTitle.textContent =
-                    settings.hero_title;
+                    data.settings
+                        .hero_title;
             }
 
             applySiteFonts(
-                settings
+                data.settings
             );
         } catch (error) {
             console.warn(
@@ -1273,23 +1297,24 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadProjects() {
         if (
             !publicProjectList ||
-            projectArticlesBySlug.size === 0
+            !projectArticlesBySlug.size
         ) {
             return;
         }
 
         try {
-            const response = await fetch(
-                "/api/projects",
-                {
-                    method: "GET",
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    },
-                    cache: "no-store"
-                }
-            );
+            const response =
+                await fetch(
+                    "/api/projects",
+                    {
+                        method: "GET",
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        },
+                        cache: "no-store"
+                    }
+                );
 
             if (!response.ok) {
                 throw new Error(
@@ -1312,7 +1337,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 [];
 
             data.projects.forEach(
-                (project, index) => {
+                (
+                    project,
+                    index
+                ) => {
                     const article =
                         projectArticlesBySlug.get(
                             project.slug
@@ -1349,6 +1377,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 false
             );
         } catch (error) {
+            /*
+             * API failure means we leave the original
+             * hardcoded HTML galleries untouched.
+             */
             availableProjectArticles = [
                 ...staticProjectArticles
             ];
@@ -1386,65 +1418,71 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* PROJECT DIALOG */
 
-    openProjectsButton?.addEventListener(
-        "click",
-        () => {
-            showProject(
-                0,
-                false
-            );
+    openProjectsButton
+        ?.addEventListener(
+            "click",
+            () => {
+                showProject(
+                    0,
+                    false
+                );
 
-            projectsDialog.showModal();
+                projectsDialog.showModal();
 
-            projectsDialog.scrollTop =
-                0;
+                projectsDialog.scrollTop =
+                    0;
 
-            updateDialogState();
-        }
-    );
+                updateDialogState();
+            }
+        );
 
-    closeProjectsButton?.addEventListener(
-        "click",
-        () => {
-            projectsDialog.close();
+    closeProjectsButton
+        ?.addEventListener(
+            "click",
+            () => {
+                projectsDialog.close();
 
-            updateDialogState();
-        }
-    );
+                updateDialogState();
+            }
+        );
 
 
     /* ABOUT DIALOG */
 
-    openAboutButton?.addEventListener(
-        "click",
-        () => {
-            aboutDialog.showModal();
+    openAboutButton
+        ?.addEventListener(
+            "click",
+            () => {
+                aboutDialog.showModal();
 
-            updateDialogState();
-        }
-    );
+                updateDialogState();
+            }
+        );
 
-    closeAboutButton?.addEventListener(
-        "click",
-        () => {
-            aboutDialog.close();
+    closeAboutButton
+        ?.addEventListener(
+            "click",
+            () => {
+                aboutDialog.close();
 
-            updateDialogState();
-        }
-    );
+                updateDialogState();
+            }
+        );
 
-    projectsDialog?.addEventListener(
-        "close",
-        updateDialogState
-    );
+    projectsDialog
+        ?.addEventListener(
+            "close",
+            updateDialogState
+        );
 
-    aboutDialog?.addEventListener(
-        "close",
-        updateDialogState
-    );
+    aboutDialog
+        ?.addEventListener(
+            "close",
+            updateDialogState
+        );
 
 
-    /* LIGHTBOX BUTTONS */
+    /* LIGHTBOX */
 
     lightboxClose.addEventListener(
         "click",
@@ -1538,7 +1576,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     event.preventDefault();
 
                     currentImageIndex =
-                        images.length - 1;
+                        images.length -
+                        1;
 
                     updateLightboxImage();
                 }
