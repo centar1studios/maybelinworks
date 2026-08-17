@@ -222,7 +222,9 @@ button:hover {
     height: calc(
         100dvh - var(--site-header-height) - var(--site-footer-height)
     );
-    object-fit: cover;
+    object-fit: contain;
+    object-position: center;
+    background: var(--header-footer);
     z-index: 0;
     pointer-events: none;
 }
@@ -520,7 +522,7 @@ dialog[open] {
 .portfolio-intro h2 {
     max-width: 850px;
     margin: 0;
-    color: var(--pink);
+    color: var(--content-text);
     font-family: var(--font-display);
     font-size: clamp(3.2rem, 7vw, 7.5rem);
     font-weight: 600;
@@ -690,12 +692,12 @@ dialog[open] {
 }
 
 .project-kicker {
-    color: var(--pink);
+    color: var(--content-text);
 }
 
 .project-info h3 {
     margin:0 0 1.25rem;
-    color: var(--pink);
+    color: var(--content-text);
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 4.5vw, 4.8rem);
     font-weight: 600;
@@ -761,7 +763,7 @@ dialog[open] {
 
 .about-content h2 {
     margin: 0;
-    color: var(--pink);
+    color: var(--content-text);
     font-family: var(--font-display);
     font-size: clamp(3.2rem, 7vw, 7.5rem);
     font-weight: 600;
@@ -791,7 +793,7 @@ dialog[open] {
 .about-copy p:first-child::first-letter {
     float: left;
     margin: 0.08em 0.12em 0 0;
-    color: var(--pink);
+    color: var(--content-text);
     font-family: var(--font-display);
     font-size: 4.5rem;
     line-height: 0.7;
@@ -1078,6 +1080,10 @@ body.dialog-open {
 
 /* MOBILE */
 @media (max-width: 760px) {
+    .background-video {
+        object-fit: cover;
+    }
+
     .site-header {
         padding: 0.8rem 1rem;
         flex-direction: column;
@@ -1605,6 +1611,12 @@ body.dialog-open {
     -webkit-backdrop-filter: blur(12px);
 }
 
+@media (orientation: portrait) {
+    .background-video {
+        object-fit: cover;
+    }
+}
+
 .project-switcher-button {
     width: fit-content;
     padding: 0;
@@ -1780,7 +1792,7 @@ body.dialog-open {
 
 .about-kicker {
     margin: 0 0 0.75rem;
-    color: var(--pink);
+    color: var(--content-text);
     font-family: var(--font-body);
     font-size: 0.7rem;
     font-weight: 700;
@@ -1899,7 +1911,7 @@ body.dialog-open {
 
 .cms-layout-heading h4 {
     margin: 0;
-    color: var(--pink);
+    color: var(--content-text);
     font-family: var(--font-display);
     font-size: clamp(1.7rem, 3vw, 3rem);
     font-weight: 600;
@@ -2043,7 +2055,7 @@ body.dialog-open {
     margin: 0;
     padding-bottom: 0.75rem;
     border-bottom: 2px solid var(--pink);
-    color: var(--pink);
+    color: var(--content-text);
     font-family: var(--font-display);
     font-size: clamp(1.7rem, 3vw, 3rem);
     font-weight: 600;
@@ -2127,7 +2139,7 @@ body.dialog-open {
     margin: 0;
     padding-bottom: 0.75rem;
     border-bottom: 2px solid var(--pink);
-    color: var(--pink);
+    color: var(--content-text);
     font-family: var(--font-display);
     font-size: clamp(1.7rem, 3vw, 3rem);
     font-weight: 600;

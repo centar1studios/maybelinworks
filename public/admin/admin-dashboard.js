@@ -702,13 +702,13 @@ document.addEventListener("DOMContentLoaded", () => {
             logoPreview,
             logoPreviewEmpty,
             settings.logo_key,
-            "../assets/maygarcia_logo.png"
+            "../assets/maygarcia_logo_plum.png"
         );
         setBrandingPreview(
             faviconPreview,
             faviconPreviewEmpty,
             settings.favicon_key,
-            "../assets/favicon.svg"
+            "../assets/favicon-32.png"
         );
 
         updateFontPreviews();

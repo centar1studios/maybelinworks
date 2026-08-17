@@ -928,7 +928,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (siteLogo && siteWordmark) {
             siteLogo.src = settings.logo_key
                 ? getMediaUrl(settings.logo_key)
-                : "./assets/maygarcia_logo.png";
+                : "./assets/maygarcia_logo_plum.png";
             siteLogo.hidden = false;
             siteWordmark.textContent = "Maybelin Garcia Romero";
             siteWordmark.hidden = false;
@@ -937,7 +937,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (siteFavicon) {
             siteFavicon.href = settings.favicon_key
                 ? getMediaUrl(settings.favicon_key)
-                : "./assets/favicon.svg";
+                : "./assets/favicon.svg?v=20260816-18";
         }
 
         if (footerText && settings.footer_text?.trim()) {
