@@ -1932,6 +1932,7 @@ body.dialog-open {
 }
 
 .cms-paged-stage {
+    position: relative;
     min-width: 0;
     overflow: hidden;
     border-radius: 16px;
@@ -1941,6 +1942,52 @@ body.dialog-open {
 .cms-book-stage {
     padding: clamp(0.7rem, 2vw, 1.5rem);
     background: linear-gradient(145deg, var(--dark-green), var(--purple));
+}
+
+.cms-book-page-turn {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    width: clamp(2.7rem, 4.5vw, 3.5rem);
+    height: clamp(2.7rem, 4.5vw, 3.5rem);
+    display: grid;
+    place-items: center;
+    padding: 0;
+    transform: translateY(-50%);
+    border: 1px solid rgba(255, 255, 255, 0.68);
+    border-radius: 50%;
+    background: rgba(86, 47, 84, 0.94);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    color: #FFFFFF;
+    font-family: var(--font-body);
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
+    line-height: 1;
+    cursor: pointer;
+    transition: opacity 160ms ease, transform 160ms ease,
+        background-color 160ms ease;
+}
+
+.cms-book-page-turn-previous {
+    left: clamp(0.35rem, 1.2vw, 1rem);
+}
+
+.cms-book-page-turn-next {
+    right: clamp(0.35rem, 1.2vw, 1rem);
+}
+
+.cms-book-page-turn:hover:not(:disabled) {
+    transform: translateY(-50%) scale(1.06);
+    background: var(--pink);
+}
+
+.cms-book-page-turn:focus-visible {
+    outline: 3px solid #FFFFFF;
+    outline-offset: 3px;
+}
+
+.cms-book-page-turn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
 
 .cms-slide-stage {
@@ -2183,6 +2230,12 @@ body.dialog-open {
 
     .cms-book-stage {
         padding: 0.55rem;
+    }
+
+    .cms-book-page-turn {
+        width: 2.45rem;
+        height: 2.45rem;
+        font-size: 1.1rem;
     }
 
     .cms-book-page {

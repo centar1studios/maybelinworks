@@ -734,6 +734,9 @@ document.addEventListener("DOMContentLoaded", () => {
             ? "cms-paged-stage cms-book-stage"
             : "cms-paged-stage cms-slide-stage";
 
+        let stagePrevious = null;
+        let stageNext = null;
+
         const groups = [];
 
         if (isBook) {
@@ -803,6 +806,32 @@ document.addEventListener("DOMContentLoaded", () => {
             return panel;
         });
 
+        if (isBook && panels.length > 1) {
+            stagePrevious = document.createElement("button");
+            stagePrevious.type = "button";
+            stagePrevious.className =
+                "cms-book-page-turn cms-book-page-turn-previous";
+            stagePrevious.setAttribute(
+                "aria-label",
+                "Turn to previous pages"
+            );
+            stagePrevious.title = "Previous pages";
+            stagePrevious.textContent = "←";
+
+            stageNext = document.createElement("button");
+            stageNext.type = "button";
+            stageNext.className =
+                "cms-book-page-turn cms-book-page-turn-next";
+            stageNext.setAttribute(
+                "aria-label",
+                "Turn to next pages"
+            );
+            stageNext.title = "Next pages";
+            stageNext.textContent = "→";
+
+            stage.append(stagePrevious, stageNext);
+        }
+
         const navigation = document.createElement("div");
         navigation.className = "cms-paged-navigation";
 
@@ -834,6 +863,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             previous.disabled = activeIndex === 0;
             next.disabled = activeIndex === panels.length - 1;
+            if (stagePrevious) {
+                stagePrevious.disabled = activeIndex === 0;
+            }
+            if (stageNext) {
+                stageNext.disabled = activeIndex === panels.length - 1;
+            }
             counter.textContent =
                 `${groups[activeIndex].label} • ${activeIndex + 1} / ${panels.length}`;
         };
@@ -843,6 +878,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         next.addEventListener("click", () => {
+            updateViewer(activeIndex + 1);
+        });
+
+        stagePrevious?.addEventListener("click", () => {
+            updateViewer(activeIndex - 1);
+        });
+
+        stageNext?.addEventListener("click", () => {
             updateViewer(activeIndex + 1);
         });
 
