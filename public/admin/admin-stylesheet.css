@@ -1873,6 +1873,10 @@ body.editor-open {
     object-fit: contain;
 }
 
+.branding-logo-preview {
+    background: var(--dark-green);
+}
+
 .branding-preview img[hidden],
 .branding-preview [hidden] {
     display: none;

@@ -129,10 +129,8 @@ button:hover {
     align-items: center;
     gap: 0.7rem;
     min-height: 50px;
-    padding: 0.25rem 0.6rem;
-    border-radius: 12px;
-    background: #FFFFFF;
-    color: var(--content-text);
+    padding: 0;
+    color: var(--light-text);
     font-family: var(--font-display);
     font-size: 1.35rem;
     font-weight: 600;
@@ -155,6 +153,7 @@ button:hover {
 .wordmark span {
     display: block;
     white-space: nowrap;
+    transition: color 180ms ease;
 }
 
 .site-nav {
@@ -222,8 +221,8 @@ button:hover {
     height: calc(
         100dvh - var(--site-header-height) - var(--site-footer-height)
     );
-    object-fit: contain;
-    object-position: center;
+    object-fit: cover;
+    object-position: 50% 32%;
     background: var(--header-footer);
     z-index: 0;
     pointer-events: none;
@@ -1082,6 +1081,7 @@ body.dialog-open {
 @media (max-width: 760px) {
     .background-video {
         object-fit: cover;
+        object-position: 42% 50%;
     }
 
     .site-header {
@@ -1093,7 +1093,7 @@ body.dialog-open {
 
     .wordmark {
         min-height: 46px;
-        padding: 0.25rem 0.5rem;
+        padding: 0;
         font-size: 1rem;
     }
 
@@ -1614,6 +1614,7 @@ body.dialog-open {
 @media (orientation: portrait) {
     .background-video {
         object-fit: cover;
+        object-position: 42% 50%;
     }
 }
 

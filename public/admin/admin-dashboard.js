@@ -702,13 +702,13 @@ document.addEventListener("DOMContentLoaded", () => {
             logoPreview,
             logoPreviewEmpty,
             settings.logo_key,
-            "../assets/maygarcia_logo_plum.png"
+            "../assets/maygarcia_logo_lime.png"
         );
         setBrandingPreview(
             faviconPreview,
             faviconPreviewEmpty,
             settings.favicon_key,
-            "../assets/favicon-32.png"
+            "../assets/favicon-32.png?v=20260816-19"
         );
 
         updateFontPreviews();
@@ -913,7 +913,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const file = fileInput?.files?.[0];
 
         if (!file) {
-            showToast(`Choose a ${isLogo ? "logo" : "browser icon"} first.`);
+            showToast(`Choose a ${isLogo ? "logo" : "tab logo"} first.`);
             fileInput?.focus();
             return;
         }
@@ -961,7 +961,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.key
             );
             fileInput.value = "";
-            showToast(`${isLogo ? "Logo" : "Browser icon"} updated!`);
+            showToast(`${isLogo ? "Logo" : "Tab logo"} updated!`);
         } catch (error) {
             console.error("Unable to upload branding image:", error);
             showToast(error.message || "Unable to upload that image.");
