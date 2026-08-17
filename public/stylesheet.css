@@ -1810,8 +1810,7 @@ body.dialog-open {
     font-size: 0.68rem;
 }
 
-.cms-media-caption a,
-.project-share-link {
+.cms-media-caption a {
     width: fit-content;
     color: var(--purple);
     font-weight: 700;
@@ -2474,15 +2473,6 @@ body.dialog-open {
     .cms-paged-counter {
         grid-row: 1;
     }
-}
-
-.project-share-link {
-    display: inline-block;
-    margin-top: 1.25rem;
-    font-family: var(--font-body);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
 }
 
 .portfolio-preview-mode [data-projects-dialog] .dialog-toolbar::before {

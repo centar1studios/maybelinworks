@@ -1752,22 +1752,12 @@ document.addEventListener("DOMContentLoaded", () => {
         addMetaRow(meta, "Role", project.role);
         addMetaRow(meta, "Year", project.year);
 
-        const shareLink = document.createElement("a");
-        shareLink.className = "project-share-link";
-        shareLink.href = projectShareUrl(project);
-        shareLink.textContent = "Share This Project";
-        shareLink.setAttribute(
-            "aria-label",
-            `Share ${project.title || "this project"}`
-        );
-
         info.append(
             number,
             kicker,
             title,
             description,
-            meta,
-            shareLink
+            meta
         );
 
         article.append(gallery, info);
