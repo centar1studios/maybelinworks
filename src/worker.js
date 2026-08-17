@@ -2438,6 +2438,10 @@ async function handleProjectSocialPage(
         return env.ASSETS.fetch(request);
     }
 
+    const assetUrl = new URL(url);
+    assetUrl.search = "";
+    const assetRequest = new Request(assetUrl, request);
+
     try {
         const project = await env.DB
             .prepare(`
@@ -2470,7 +2474,7 @@ async function handleProjectSocialPage(
             .bind(slug)
             .first();
 
-        const assetResponse = await env.ASSETS.fetch(request);
+        const assetResponse = await env.ASSETS.fetch(assetRequest);
 
         if (!project || !assetResponse.ok) {
             return assetResponse;
@@ -2516,7 +2520,7 @@ async function handleProjectSocialPage(
             .transform(assetResponse);
     } catch (error) {
         console.error("Unable to build project sharing metadata:", error);
-        return env.ASSETS.fetch(request);
+        return env.ASSETS.fetch(assetRequest);
     }
 }
 
