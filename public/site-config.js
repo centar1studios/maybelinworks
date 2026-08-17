@@ -476,7 +476,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ? new URL(getMediaUrl(socialMedia), window.location.origin).toString()
             : "";
 
-        document.title = `${title} — Maybelin Works`;
+        document.title = "Maybelin Works";
         setMetaContent('[data-social-title]', title);
         setMetaContent('[data-twitter-title]', title);
         setMetaContent('[data-social-description]', description);
@@ -677,7 +677,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         lightboxImage.src = image.currentSrc || image.src;
         lightboxImage.alt = alt;
-        lightboxCaption.textContent = captionParts.join(" — ");
+        lightboxCaption.textContent = captionParts.join(" · ");
         lightboxCount.textContent =
             `${currentImageIndex + 1} / ${images.length}`;
 
@@ -857,7 +857,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 ? getMediaUrl(settings.logo_key)
                 : "./assets/maygarcia_logo.png";
             siteLogo.hidden = false;
-            siteWordmark.hidden = true;
+            siteWordmark.textContent = "Maybelin Garcia Romero";
+            siteWordmark.hidden = false;
         }
 
         if (siteFavicon) {
@@ -1041,7 +1042,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const line = document.createElement("span");
                     line.textContent = [item.caption, item.credit]
                         .filter(Boolean)
-                        .join(" — ");
+                        .join(" · ");
                     caption.appendChild(line);
 
                     if (item.external_url) {

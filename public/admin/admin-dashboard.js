@@ -1448,15 +1448,15 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (projectCount) {
-                projectCount.textContent = "—";
+                projectCount.textContent = "-";
             }
 
             if (mediaCount) {
-                mediaCount.textContent = "—";
+                mediaCount.textContent = "-";
             }
 
             if (mediaCountLarge) {
-                mediaCountLarge.textContent = "—";
+                mediaCountLarge.textContent = "-";
             }
 
             showToast("We couldn't load your projects. Try refreshing the page.");

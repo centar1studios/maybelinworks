@@ -2503,7 +2503,7 @@ async function handleProjectSocialPage(
         return new HTMLRewriter()
             .on("title", {
                 element(element) {
-                    element.setInnerContent(`${title} — Maybelin Works`);
+                    element.setInnerContent("Maybelin Works");
                 }
             })
             .on("[data-social-title]", setContent(title))
