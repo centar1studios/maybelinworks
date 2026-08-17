@@ -8,12 +8,12 @@
     <meta name="description" content="Edit the Maybelin Works portfolio website">
     <title>Portfolio Manager | Maybelin Works</title>
 
-    <link rel="icon" type="image/png" href="../assets/maygarcia_logo.png">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="./admin-stylesheet.css?v=20260816-11">
+    <link rel="stylesheet" href="./admin-stylesheet.css?v=20260816-12">
 </head>
 
 <body>
@@ -213,8 +213,8 @@
                             <div class="color-editor-list">
                                 <div class="color-editor-row">
                                     <div class="color-editor-label">
-                                        <label for="dark-green-hex">Dark Green</label>
-                                        <span>Header and main dark color</span>
+                                        <label for="dark-green-hex">Header &amp; Footer</label>
+                                        <span>Shared background color for both bars</span>
                                     </div>
                                     <div class="color-editor-controls">
                                         <input type="color" id="dark-green-color" value="#2A3F38" aria-label="Choose dark green" disabled>
@@ -224,8 +224,8 @@
 
                                 <div class="color-editor-row">
                                     <div class="color-editor-label">
-                                        <label for="lime-green-hex">Lime Green</label>
-                                        <span>Highlights and emphasis</span>
+                                        <label for="lime-green-hex">Hover &amp; Highlight</label>
+                                        <span>Interactive green accents</span>
                                     </div>
                                     <div class="color-editor-controls">
                                         <input type="color" id="lime-green-color" value="#8DF688" aria-label="Choose lime green" disabled>
@@ -235,8 +235,8 @@
 
                                 <div class="color-editor-row">
                                     <div class="color-editor-label">
-                                        <label for="purple-hex">Purple</label>
-                                        <span>Feature color</span>
+                                        <label for="purple-hex">Content Text</label>
+                                        <span>Headings, captions and body text</span>
                                     </div>
                                     <div class="color-editor-controls">
                                         <input type="color" id="purple-color" value="#562F54" aria-label="Choose purple" disabled>
@@ -246,8 +246,8 @@
 
                                 <div class="color-editor-row">
                                     <div class="color-editor-label">
-                                        <label for="charcoal-hex">Charcoal</label>
-                                        <span>Background and neutral color</span>
+                                        <label for="charcoal-hex">Neutral Background</label>
+                                        <span>Supporting page and neutral color</span>
                                     </div>
                                     <div class="color-editor-controls">
                                         <input type="color" id="charcoal-color" value="#57585D" aria-label="Choose charcoal" disabled>
@@ -257,8 +257,8 @@
 
                                 <div class="color-editor-row">
                                     <div class="color-editor-label">
-                                        <label for="pink-hex">Pink</label>
-                                        <span>Accent color</span>
+                                        <label for="pink-hex">Magenta Accent</label>
+                                        <span>Hero and editorial accents</span>
                                     </div>
                                     <div class="color-editor-controls">
                                         <input type="color" id="pink-color" value="#F650BD" aria-label="Choose pink" disabled>
@@ -285,26 +285,28 @@
                             <div class="branding-grid">
                                 <div class="branding-uploader">
                                     <div class="branding-preview branding-logo-preview" data-logo-preview-wrap>
-                                        <img data-logo-preview alt="Current website logo">
-                                        <span data-logo-preview-empty>Maybelin Works</span>
+                                        <img src="../assets/maygarcia_logo.png" data-logo-preview alt="Current website logo">
+                                        <span data-logo-preview-empty hidden>No logo selected</span>
                                     </div>
                                     <div class="admin-field">
-                                        <label for="website-logo-file">Website Logo</label>
+                                        <label for="website-logo-file">Replace Website Logo (Optional)</label>
                                         <input type="file" id="website-logo-file" accept="image/jpeg,image/png,image/webp,image/avif,.jpg,.jpeg,.png,.webp,.avif" disabled>
+                                        <small>The current homepage logo is shown above.</small>
                                     </div>
-                                    <button class="media-upload-button" type="button" data-upload-logo disabled>Upload Logo</button>
+                                    <button class="media-upload-button" type="button" data-upload-logo disabled>Replace Logo</button>
                                 </div>
 
                                 <div class="branding-uploader">
                                     <div class="branding-preview branding-favicon-preview" data-favicon-preview-wrap>
-                                        <img data-favicon-preview alt="Current browser icon">
-                                        <span data-favicon-preview-empty>MW</span>
+                                        <img src="../assets/favicon.svg" data-favicon-preview alt="Current browser icon">
+                                        <span data-favicon-preview-empty hidden>No browser icon selected</span>
                                     </div>
                                     <div class="admin-field">
-                                        <label for="website-favicon-file">Browser Icon</label>
+                                        <label for="website-favicon-file">Replace Browser Icon (Optional)</label>
                                         <input type="file" id="website-favicon-file" accept="image/jpeg,image/png,image/webp,image/avif,.jpg,.jpeg,.png,.webp,.avif" disabled>
+                                        <small>The current high-contrast tab icon is shown above.</small>
                                     </div>
-                                    <button class="media-upload-button" type="button" data-upload-favicon disabled>Upload Browser Icon</button>
+                                    <button class="media-upload-button" type="button" data-upload-favicon disabled>Replace Browser Icon</button>
                                 </div>
                             </div>
 
@@ -314,13 +316,14 @@
                                     <input type="text" id="footer-text" maxlength="200" placeholder="Maybelin Works" disabled>
                                 </div>
                                 <div class="admin-field">
-                                    <label for="home-button-label">Homepage Button Label</label>
-                                    <input type="text" id="home-button-label" maxlength="100" placeholder="View My Work" disabled>
+                                    <label for="home-button-label">Optional Extra Button Label</label>
+                                    <input type="text" id="home-button-label" maxlength="100" disabled>
                                 </div>
                                 <div class="admin-field">
-                                    <label for="home-button-url">Homepage Button Link</label>
-                                    <input type="text" id="home-button-url" maxlength="2000" placeholder="#work" disabled>
+                                    <label for="home-button-url">Optional Extra Button Link</label>
+                                    <input type="text" id="home-button-url" maxlength="2000" disabled>
                                 </div>
+                                <p class="admin-field-note full-field">Leave both optional button fields blank to show only “Explore Works.”</p>
                             </div>
                         </article>
                     </div>
@@ -398,7 +401,7 @@
                         <div>
                             <p class="section-kicker">About Me</p>
                             <h2>Your story and contact info</h2>
-                            <p class="section-description">Edit the Information popup, replace your portrait and update the links visitors use to contact you.</p>
+                            <p class="section-description">Edit the About popup, replace your portrait and update the links visitors use to contact you.</p>
                         </div>
 
                         <span class="editor-status-badge" data-about-status>Loading...</span>
@@ -408,7 +411,7 @@
                         <article class="dashboard-panel about-text-panel">
                             <div class="panel-heading">
                                 <div>
-                                    <p class="panel-kicker">Information</p>
+                                    <p class="panel-kicker">About</p>
                                     <h3>About Me Text</h3>
                                 </div>
                             </div>
@@ -483,7 +486,7 @@
                     </div>
 
                     <div class="about-save-bar">
-                        <p>These changes update both the Information popup and the contact links in the site header.</p>
+                        <p>These changes update both the About popup and the contact links in the site header.</p>
                         <button class="disabled-button" type="button" data-save-about disabled>Save About Me Changes</button>
                     </div>
                 </section>
@@ -838,6 +841,6 @@
 
     <div class="admin-toast" data-admin-toast role="status" aria-live="polite"></div>
 
-    <script src="./admin-dashboard.js?v=20260816-11"></script>
+    <script src="./admin-dashboard.js?v=20260816-12"></script>
 </body>
 </html>

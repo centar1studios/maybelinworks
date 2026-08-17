@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     /* FONT OPTIONS */
 
     const GOOGLE_FONTS = new Map([
-        ["Playfair Display", "Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400"],
+        ["Playfair Display", "Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700"],
         ["Cormorant Garamond", "Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400"],
         ["DM Serif Display", "DM+Serif+Display:ital@0;1"],
         ["Libre Baskerville", "Libre+Baskerville:ital,wght@0,400;0,700;1,400"],
@@ -623,13 +623,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function setBrandingPreview(image, empty, key) {
+    function setBrandingPreview(
+        image,
+        empty,
+        key,
+        fallbackSource = ""
+    ) {
         if (!image || !empty) {
             return;
         }
 
-        if (key) {
-            image.src = getMediaUrl(key);
+        const source = key
+            ? getMediaUrl(key)
+            : fallbackSource;
+
+        if (source) {
+            image.src = source;
             image.hidden = false;
             empty.hidden = true;
         } else {
@@ -692,12 +701,14 @@ document.addEventListener("DOMContentLoaded", () => {
         setBrandingPreview(
             logoPreview,
             logoPreviewEmpty,
-            settings.logo_key
+            settings.logo_key,
+            "../assets/maygarcia_logo.png"
         );
         setBrandingPreview(
             faviconPreview,
             faviconPreviewEmpty,
-            settings.favicon_key
+            settings.favicon_key,
+            "../assets/favicon.svg"
         );
 
         updateFontPreviews();

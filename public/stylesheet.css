@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap');
 
 :root {
     --dark-green: #2A3F38;
@@ -8,7 +8,8 @@
     --pink: #F650BD;
 
     --background: #57585D;
-    --text: #2A3F38;
+    --text: #562F54;
+    --content-text: #562F54;
     --muted: #57585D;
     --line: #F650BD;
     --panel: #FFFFFF;
@@ -98,16 +99,17 @@ button:hover {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1.15rem 1.5rem;
-    background: rgba(42, 63, 56, 0.97);
+    min-height: 72px;
+    padding: 0.6rem 1.5rem;
+    background: var(--header-footer);
     color: var(--light-text);
-    border-bottom: 2px solid var(--pink);
-    box-shadow: 0 8px 30px rgba(42, 63, 56, 0.18);
+    border: 0;
+    box-shadow: 0 8px 26px rgba(42, 63, 56, 0.16);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.82rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     pointer-events: none;
@@ -120,10 +122,16 @@ button:hover {
 }
 
 .wordmark {
-    color: var(--light-text);
+    display: inline-flex;
+    align-items: center;
+    min-height: 50px;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    background: #FFFFFF;
+    color: var(--content-text);
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 400;
+    font-weight: 600;
     text-transform: none;
     letter-spacing: 0.04em;
 }
@@ -134,8 +142,8 @@ button:hover {
 
 .wordmark img {
     width: auto;
-    max-width: min(220px, 42vw);
-    height: 42px;
+    max-width: min(230px, 42vw);
+    height: 44px;
     display: block;
     object-fit: contain;
 }
@@ -206,7 +214,7 @@ button:hover {
 .background-overlay {
     position: fixed;
     inset: 0;
-    background: linear-gradient(135deg,rgba(86, 47, 84, 0.22),rgba(42, 63, 56, 0.18),rgba(246, 80, 189, 0.10)),rgba(42, 63, 56, 0.16);
+    background: rgba(42, 63, 56, 0.18);
     z-index: 1;
     pointer-events: none;
 }
@@ -237,43 +245,25 @@ button:hover {
 
 .hero-text-box {
     position: relative;
-    width: min(70vw, 980px);
+    width: min(58vw, 760px);
     margin: 0 auto;
-    padding: 38px 52px;
-    background: linear-gradient(145deg,rgba(86, 47, 84, 0.90), rgba(73, 47, 72, 0.88));
-    border: 1px solid rgba(246, 80, 189, 0.60);
-    border-radius: 18px;
+    padding: 28px 38px;
+    background: rgba(86, 47, 84, 0.92);
+    border: 0;
+    border-radius: 16px;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 26px 70px rgba(42, 63, 56, 0.35), 0 0 40px rgba(246, 80, 189, 0.12);
+    box-shadow: 0 22px 56px rgba(42, 63, 56, 0.28);
     text-align: center;
     pointer-events: auto;
 }
 
 .hero-text-box::before {
-    content: "";
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    width: 38px;
-    height: 38px;
-    border-top: 2px solid var(--lime);
-    border-left: 2px solid var(--lime);
-    border-radius: 5px 0 0 0;
-    pointer-events: none;
+    content: none;
 }
 
 .hero-text-box::after {
-    content: "";
-    position: absolute;
-    right: 12px;
-    bottom: 12px;
-    width: 38px;
-    height: 38px;
-    border-right: 2px solid var(--pink);
-    border-bottom: 2px solid var(--pink);
-    border-radius: 0 0 5px 0;
-    pointer-events: none;
+    content: none;
 }
 
 .hero-kicker {
@@ -287,15 +277,21 @@ button:hover {
 }
 
 .hero-title {
-    max-width: 900px;
+    max-width: 700px;
     margin: 0 auto;
-    color: var(--light-text);
+    color: var(--pink);
     font-family: var(--font-display);
-    font-size: clamp(3.2rem, 6vw, 6.7rem);
-    font-weight: 400;
-    line-height: 0.98;
+    font-size: clamp(2.8rem, 5vw, 5.4rem);
+    font-weight: 600;
+    line-height: 1.02;
     letter-spacing: 0.01em;
     text-align: center;
+    white-space: pre;
+    transition: color 180ms ease;
+}
+
+.hero-title:hover {
+    color: var(--lime);
 }
 
 .hero-bottom {
@@ -306,7 +302,7 @@ button:hover {
     gap: 1rem;
     margin-top: 1.6rem;
     padding-top: 1.2rem;
-    border-top: 1px solid rgba(141, 246, 136, 0.72);
+    border-top: 0;
     text-align: center;
     pointer-events: auto;
 }
@@ -317,11 +313,11 @@ button:hover {
     padding: 0.6rem 1rem;
     border: 0;
     background: none;
-    color: var(--pink);
+    color: var(--lime);
     white-space: nowrap;
     font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.8rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     cursor: pointer;
@@ -329,7 +325,7 @@ button:hover {
 }
 
 .text-button:hover {
-    color: var(--lime);
+    color: var(--light-text);
 }
 
 .hero-home-button {
@@ -346,6 +342,10 @@ button:hover {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
+}
+
+.hero-home-button[hidden] {
+    display: none;
 }
 
 .hero-home-button:hover {
@@ -365,14 +365,15 @@ button:hover {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.95rem 1.5rem;
-    background: rgba(42, 63, 56, 0.97);
-    color: rgba(255, 255, 255, 0.82);
-    border-top: 2px solid var(--lime);
-    box-shadow: 0 -8px 30px rgba(42, 63, 56, 0.15);
+    min-height: 72px;
+    padding: 0.9rem 1.5rem;
+    background: var(--header-footer);
+    color: var(--light-text);
+    border: 0;
+    box-shadow: 0 -8px 26px rgba(42, 63, 56, 0.14);
     font-family: var(--font-body);
-    font-size: 0.68rem;
-    font-weight: 500;
+    font-size: 0.76rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.09em;
     pointer-events: none;
@@ -437,14 +438,14 @@ dialog[open] {
     justify-content: space-between;
     align-items: center;
     padding: 1.15rem 1.5rem;
-    border-bottom: 2px solid var(--pink);
-    background: rgba(42, 63, 56, 0.98);
+    border: 0;
+    background: var(--header-footer);
     color: var(--light-text);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     font-family: var(--font-body);
-    font-size: 0.72rem;
-    font-weight: 500;
+    font-size: 0.78rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
 }
@@ -497,18 +498,19 @@ dialog[open] {
 .portfolio-intro h2 {
     max-width: 850px;
     margin: 0;
-    color: var(--purple);
+    color: var(--pink);
     font-family: var(--font-display);
     font-size: clamp(3.2rem, 7vw, 7.5rem);
-    font-weight: 400;
+    font-weight: 600;
     line-height: 0.95;
     letter-spacing: 0.01em;
+    transition: color 180ms ease;
 }
 
 .portfolio-intro p {
     max-width: 500px;
     margin: 0;
-    color: var(--charcoal);
+    color: var(--text);
     font-family: var(--font-body);
     font-size: 0.95rem;
     line-height: 1.75;
@@ -633,7 +635,7 @@ dialog[open] {
     align-items: center;
     gap: 1rem;
     margin: 0.5rem 0 0;
-    color: var(--dark-green);
+    color: var(--text);
     font-family: var(--font-body);
     font-size: 0.68rem;
     font-weight: 700;
@@ -657,7 +659,7 @@ dialog[open] {
 .project-number,
 .project-kicker {
     margin: 0 0 0.8rem;
-    color: var(--dark-green);
+    color: var(--text);
     font-family: var(--font-body);
     font-size: 0.7rem;
     font-weight: 700;
@@ -671,17 +673,18 @@ dialog[open] {
 
 .project-info h3 {
     margin:0 0 1.25rem;
-    color: var(--purple);
+    color: var(--pink);
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 4.5vw, 4.8rem);
-    font-weight: 400;
+    font-weight: 600;
     line-height: 1;
     letter-spacing: 0.01em;
+    transition: color 180ms ease;
 }
 
 .project-description {
     margin: 0;
-    color: var(--charcoal);
+    color: var(--text);
     font-family: var(--font-body);
     font-size: 0.92rem;
     line-height: 1.75;
@@ -696,7 +699,7 @@ dialog[open] {
 }
 
 .project-description strong {
-    color: var(--purple);
+    color: var(--text);
     font-weight: 600;
 }
 
@@ -717,13 +720,13 @@ dialog[open] {
 }
 
 .project-meta dt {
-    color: var(--dark-green);
+    color: var(--text);
     font-weight: 700;
 }
 
 .project-meta dd {
     margin: 0;
-    color: var(--charcoal);
+    color: var(--text);
 }
 
 /* ABOUT */
@@ -736,16 +739,23 @@ dialog[open] {
 
 .about-content h2 {
     margin: 0;
-    color: var(--purple);
+    color: var(--pink);
     font-family: var(--font-display);
     font-size: clamp(3.2rem, 7vw, 7.5rem);
-    font-weight: 400;
+    font-weight: 600;
     line-height: 0.95;
     letter-spacing: 0.01em;
+    transition: color 180ms ease;
+}
+
+.portfolio-intro h2:hover,
+.project-info h3:hover,
+.about-content h2:hover {
+    color: var(--dark-green);
 }
 
 .about-copy {
-    color: var(--charcoal);
+    color: var(--text);
     font-family: var(--font-body);
     font-size: 0.95rem;
     line-height: 1.8;
@@ -811,7 +821,7 @@ dialog[open] {
 }
 
 .contact-list dt {
-    color: var(--dark-green);
+    color: var(--text);
     font-weight: 700;
 }
 
@@ -1031,11 +1041,11 @@ body.dialog-open {
 /* TABLET */
 @media (max-width: 1000px) {
     .hero-text-box {
-        width: min(86vw, 900px);
+        width: min(72vw, 700px);
     }
 
     .hero-title {
-        font-size: clamp(3rem, 8vw, 6rem);
+        font-size: clamp(2.6rem, 6.5vw, 4.8rem);
     }
 
     .portfolio-intro {
@@ -1047,14 +1057,20 @@ body.dialog-open {
 /* MOBILE */
 @media (max-width: 760px) {
     .site-header {
-        padding: 0.85rem 1rem;
+        padding: 0.8rem 1rem;
         flex-direction: column;
         align-items: flex-start;
         gap: 0.55rem;
     }
 
     .wordmark {
+        min-height: 46px;
+        padding: 0.25rem 0.5rem;
         font-size: 1.2rem;
+    }
+
+    .wordmark img {
+        height: 38px;
     }
 
     .site-nav {
@@ -1066,7 +1082,7 @@ body.dialog-open {
 
     .site-nav a,
     .site-nav button {
-        font-size: 0.65rem;
+        font-size: 0.72rem;
     }
 
     .hero {
@@ -1093,11 +1109,11 @@ body.dialog-open {
     }
 
     .hero-text-box {
-        width: 100%;
-        max-width: 620px;
+        width: min(88vw, 560px);
+        max-width: 560px;
         max-height: calc(100vh - 14rem);
         margin: 0 auto;
-        padding: 26px 20px;
+        padding: 22px 20px;
         border-radius: 14px;
         overflow-y: auto;
         pointer-events: auto;
@@ -1117,7 +1133,7 @@ body.dialog-open {
     .hero-title {
         max-width: 100%;
         margin: 0 auto;
-        font-size: clamp(2.6rem, 12vw, 4.8rem);
+        font-size: clamp(1.9rem, 8vw, 3.2rem);
         line-height: 1;
         text-align: center;
     }
@@ -1135,11 +1151,11 @@ body.dialog-open {
     }
 
     .site-footer {
-        padding: 0.7rem 1rem;
+        padding: 0.8rem 1rem;
         flex-wrap: wrap;
         justify-content: center;
         gap: 0.25rem 0.8rem;
-        font-size: 0.6rem;
+        font-size: 0.68rem;
         text-align: center;
     }
 
@@ -1251,7 +1267,7 @@ body.dialog-open {
 
     .site-nav a,
     .site-nav button {
-        font-size: 0.6rem;
+        font-size: 0.65rem;
     }
 
     .hero {
@@ -1260,17 +1276,18 @@ body.dialog-open {
     }
 
     .hero-text-box {
+        width: 90vw;
         max-height: calc(100vh - 13rem);
-        padding: 22px 16px;
+        padding: 20px 16px;
     }
 
     .hero-title {
-        font-size: clamp(2.35rem, 11vw, 3.8rem);
+        font-size: clamp(1.75rem, 7.8vw, 2.7rem);
     }
 
     .site-footer {
-        padding: 0.6rem 0.75rem;
-        font-size: 0.54rem;
+        padding: 0.7rem 0.8rem;
+        font-size: 0.62rem;
     }
 
 
@@ -1771,7 +1788,7 @@ body.dialog-open {
     display: grid;
     gap: 0.25rem;
     padding: 0.65rem 0.2rem 0;
-    color: var(--charcoal);
+    color: var(--text);
     font-family: var(--font-body);
     font-size: 0.76rem;
     line-height: 1.45;
@@ -1854,11 +1871,31 @@ body.dialog-open {
 
 .cms-layout-heading h4 {
     margin: 0;
-    color: var(--purple);
+    color: var(--pink);
     font-family: var(--font-display);
     font-size: clamp(1.7rem, 3vw, 3rem);
-    font-weight: 400;
+    font-weight: 600;
     line-height: 1;
+    transition: color 180ms ease;
+}
+
+.cms-layout-heading h4:hover,
+.cms-section-heading:hover,
+.cms-paged-heading:hover {
+    color: var(--dark-green);
+}
+
+.cms-section-background-dark :is(
+    .cms-layout-heading h4,
+    .cms-section-heading,
+    .cms-paged-heading
+):hover,
+.cms-section-background-purple :is(
+    .cms-layout-heading h4,
+    .cms-section-heading,
+    .cms-paged-heading
+):hover {
+    color: var(--lime);
 }
 
 .cms-layout-text {
@@ -1867,7 +1904,7 @@ body.dialog-open {
 
 .cms-layout-text p {
     margin: 0;
-    color: var(--charcoal);
+    color: var(--text);
     font-family: var(--font-body);
     font-size: 0.9rem;
     line-height: 1.7;
@@ -1978,11 +2015,12 @@ body.dialog-open {
     margin: 0;
     padding-bottom: 0.75rem;
     border-bottom: 2px solid var(--pink);
-    color: var(--purple);
+    color: var(--pink);
     font-family: var(--font-display);
     font-size: clamp(1.7rem, 3vw, 3rem);
-    font-weight: 400;
+    font-weight: 600;
     line-height: 1;
+    transition: color 180ms ease;
 }
 
 .cms-section-copy {
@@ -1993,7 +2031,7 @@ body.dialog-open {
 
 .cms-section-copy p {
     margin: 0;
-    color: var(--charcoal);
+    color: var(--text);
     font-family: var(--font-body);
     font-size: 0.9rem;
     line-height: 1.7;
@@ -2061,11 +2099,12 @@ body.dialog-open {
     margin: 0;
     padding-bottom: 0.75rem;
     border-bottom: 2px solid var(--pink);
-    color: var(--purple);
+    color: var(--pink);
     font-family: var(--font-display);
     font-size: clamp(1.7rem, 3vw, 3rem);
-    font-weight: 400;
+    font-weight: 600;
     line-height: 1;
+    transition: color 180ms ease;
 }
 
 .cms-paged-intro {
@@ -2076,7 +2115,7 @@ body.dialog-open {
 
 .cms-paged-intro p {
     margin: 0;
-    color: var(--charcoal);
+    color: var(--text);
     font-family: var(--font-body);
     font-size: 0.9rem;
     line-height: 1.7;

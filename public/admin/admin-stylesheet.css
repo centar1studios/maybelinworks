@@ -1842,8 +1842,8 @@ body.editor-open {
 
 .branding-uploader {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
+    grid-template-columns: 1fr;
+    align-items: stretch;
     gap: 12px;
     padding: 15px;
     border: 1px solid var(--line);
@@ -1852,7 +1852,7 @@ body.editor-open {
 }
 
 .branding-preview {
-    grid-column: 1 / -1;
+    grid-column: auto;
     min-height: 100px;
     display: grid;
     place-items: center;
@@ -1873,6 +1873,11 @@ body.editor-open {
     object-fit: contain;
 }
 
+.branding-preview img[hidden],
+.branding-preview [hidden] {
+    display: none;
+}
+
 .branding-favicon-preview img {
     width: 64px;
     height: 64px;
@@ -1881,6 +1886,17 @@ body.editor-open {
 
 .branding-text-fields {
     margin-top: 16px;
+}
+
+.branding-uploader .media-upload-button {
+    width: 100%;
+}
+
+.admin-field-note {
+    margin: -2px 0 0;
+    color: var(--muted);
+    font-size: 0.74rem;
+    line-height: 1.5;
 }
 
 .project-admin-actions {

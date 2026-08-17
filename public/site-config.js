@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     /* FONTS */
 
     const GOOGLE_FONTS = new Map([
-        ["Playfair Display", "Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400"],
+        ["Playfair Display", "Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700"],
         ["Cormorant Garamond", "Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400"],
         ["DM Serif Display", "DM+Serif+Display:ital@0;1"],
         ["Libre Baskerville", "Libre+Baskerville:ital,wght@0,400;0,700;1,400"],
@@ -77,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const homeButton = document.querySelector("[data-home-button]");
     const currentYear = document.querySelector("[data-current-year]");
     const publicProjectList = document.querySelector(".project-list");
+    const pageParams = new URLSearchParams(window.location.search);
 
     const aboutIntro = aboutDialog?.querySelector(".about-intro");
     const aboutTitle = aboutIntro?.querySelector("h2");
@@ -485,6 +486,28 @@ document.addEventListener("DOMContentLoaded", () => {
         setMetaContent('[data-twitter-image]', imageUrl);
     }
 
+    function resetHomepageMetadata() {
+        const description =
+            "Portfolio of multidisciplinary artist and designer Maybelin Garcia Romero.";
+
+        document.title = "Maybelin Works";
+        setMetaContent('[data-social-title]', "Maybelin Works");
+        setMetaContent('[data-twitter-title]', "Maybelin Works");
+        setMetaContent('[data-social-description]', description);
+        setMetaContent('[data-twitter-description]', description);
+        setMetaContent('[data-social-url]', `${window.location.origin}/`);
+        setMetaContent('[data-social-image]', "");
+        setMetaContent('[data-twitter-image]', "");
+    }
+
+    function shouldShowProjectMetadata() {
+        return Boolean(
+            projectsDialog?.open ||
+            pageParams.has("project") ||
+            document.body.classList.contains("portfolio-preview-mode")
+        );
+    }
+
     function updateProjectSwitcher() {
         if (!projectSwitcher) {
             return;
@@ -550,7 +573,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         currentArticle.hidden = false;
         currentArticle.classList.add("project-current");
-        updateProjectSocialMetadata(currentArticle._projectData);
+        if (shouldShowProjectMetadata()) {
+            updateProjectSocialMetadata(currentArticle._projectData);
+        }
         updateProjectSwitcher();
 
         if (scrollToProject && projectsDialog?.open) {
@@ -807,13 +832,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         [
             ["--dark-green", palette.dark],
-            ["--text", palette.dark],
             ["--header-footer", palette.dark],
             ["--lime", palette.highlight],
             ["--accent-green", palette.highlight],
             ["--accent-lime", palette.highlight],
             ["--purple", palette.feature],
             ["--dark-plum", palette.feature],
+            ["--text", palette.feature],
+            ["--content-text", palette.feature],
             ["--charcoal", palette.neutral],
             ["--background", palette.neutral],
             ["--muted", palette.neutral],
@@ -827,16 +853,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         if (siteLogo && siteWordmark) {
-            siteLogo.hidden = !settings.logo_key;
-            siteWordmark.hidden = Boolean(settings.logo_key);
-
-            if (settings.logo_key) {
-                siteLogo.src = getMediaUrl(settings.logo_key);
-            }
+            siteLogo.src = settings.logo_key
+                ? getMediaUrl(settings.logo_key)
+                : "./assets/maygarcia_logo.png";
+            siteLogo.hidden = false;
+            siteWordmark.hidden = true;
         }
 
-        if (siteFavicon && settings.favicon_key) {
-            siteFavicon.href = getMediaUrl(settings.favicon_key);
+        if (siteFavicon) {
+            siteFavicon.href = settings.favicon_key
+                ? getMediaUrl(settings.favicon_key)
+                : "./assets/favicon.svg";
         }
 
         if (footerText && settings.footer_text?.trim()) {
@@ -1801,9 +1828,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const requestedParams = new URLSearchParams(window.location.search);
-
-        if (requestedParams.get("preview") === "1") {
+        if (pageParams.get("preview") === "1") {
             try {
                 const previewState = JSON.parse(
                     sessionStorage.getItem("maybelin-project-preview") || "null"
@@ -1870,7 +1895,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             availableProjectArticles = dynamicArticles;
             currentProjectIndex = 0;
-            const requestedSlug = requestedParams.get("project");
+            const requestedSlug = pageParams.get("project");
             const requestedIndex = requestedSlug
                 ? dynamicArticles.findIndex(article =>
                     article.dataset.projectSlug === requestedSlug
@@ -1921,8 +1946,8 @@ document.addEventListener("DOMContentLoaded", () => {
     /* PROJECT DIALOG */
 
     openProjectsButton?.addEventListener("click", () => {
-        showProject(0, false);
         projectsDialog.showModal();
+        showProject(0, false);
         projectsDialog.scrollTop = 0;
         updateDialogState();
     });
@@ -1945,7 +1970,13 @@ document.addEventListener("DOMContentLoaded", () => {
         updateDialogState();
     });
 
-    projectsDialog?.addEventListener("close", updateDialogState);
+    projectsDialog?.addEventListener("close", () => {
+        if (!pageParams.has("project")) {
+            resetHomepageMetadata();
+        }
+
+        updateDialogState();
+    });
     aboutDialog?.addEventListener("close", updateDialogState);
 
 
@@ -2023,6 +2054,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* START */
 
+    resetHomepageMetadata();
     showProject(0, false);
 
     Promise.all([
