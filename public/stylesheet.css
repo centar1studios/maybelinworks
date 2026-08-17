@@ -303,7 +303,7 @@ button:hover {
     margin: 0 auto;
     color: var(--pink);
     font-family: var(--font-display);
-    font-size: clamp(2.3rem, 4.5vw, 4.8rem);
+    font-size: clamp(2rem, 3.8vw, 4rem);
     font-weight: 600;
     line-height: 1.02;
     letter-spacing: 0.01em;
@@ -1067,7 +1067,7 @@ body.dialog-open {
     }
 
     .hero-title {
-        font-size: clamp(2.15rem, 4.5vw, 3rem);
+        font-size: clamp(1.9rem, 3.7vw, 2.55rem);
     }
 
     .portfolio-intro {
@@ -1158,7 +1158,7 @@ body.dialog-open {
     .hero-title {
         max-width: 100%;
         margin: 0 auto;
-        font-size: clamp(1.9rem, 8vw, 3.2rem);
+        font-size: clamp(1.65rem, 7vw, 2.6rem);
         line-height: 1;
         text-align: center;
     }
@@ -1311,7 +1311,7 @@ body.dialog-open {
     }
 
     .hero-title {
-        font-size: clamp(1.75rem, 7.8vw, 2.7rem);
+        font-size: clamp(1.55rem, 6.8vw, 2.35rem);
     }
 
     .site-footer {

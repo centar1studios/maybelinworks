@@ -125,6 +125,43 @@ document.addEventListener("DOMContentLoaded", () => {
         window.addEventListener("resize", updateSiteChromeOffsets);
     }
 
+    let heroFitFrame = 0;
+
+    function fitHeroTitleToPanel() {
+        if (!heroTitle) {
+            return;
+        }
+
+        window.cancelAnimationFrame(heroFitFrame);
+
+        heroFitFrame = window.requestAnimationFrame(() => {
+            heroTitle.style.removeProperty("font-size");
+
+            const minimumSize = 24;
+            let fontSize = Number.parseFloat(
+                window.getComputedStyle(heroTitle).fontSize
+            );
+            let attempts = 0;
+
+            while (
+                heroTitle.scrollWidth > heroTitle.clientWidth + 1 &&
+                fontSize > minimumSize &&
+                attempts < 60
+            ) {
+                fontSize -= 1;
+                heroTitle.style.fontSize = `${fontSize}px`;
+                attempts += 1;
+            }
+        });
+    }
+
+    fitHeroTitleToPanel();
+    window.addEventListener("resize", fitHeroTitleToPanel);
+
+    if (document.fonts?.ready) {
+        document.fonts.ready.then(fitHeroTitleToPanel);
+    }
+
 
     /* FALLBACK PROJECTS */
 
@@ -1834,9 +1871,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (heroTitle && settings.hero_title?.trim()) {
                 heroTitle.textContent = settings.hero_title;
+                fitHeroTitleToPanel();
             }
 
             applySiteFonts(settings);
+            fitHeroTitleToPanel();
             applySiteBranding(settings);
             applyAboutSettings(settings);
         } catch (error) {
