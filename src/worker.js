@@ -38,6 +38,14 @@ const ALLOWED_PAGE_LAYOUT_PRESETS = [
     "slides"
 ];
 
+const ALLOWED_SECTION_LAYOUTS = [
+    "custom",
+    "grid",
+    "book",
+    "slides",
+    "full"
+];
+
 const MAX_PAGE_LAYOUT_BLOCKS = 200;
 const MAX_PAGE_LAYOUT_BYTES = 100 * 1024;
 
@@ -553,6 +561,12 @@ function cleanPageLayout(value, allowedMediaIds) {
         };
     }
 
+    const preset = ALLOWED_PAGE_LAYOUT_PRESETS.includes(
+        value.preset
+    )
+        ? value.preset
+        : "canvas";
+
     const blockIds = new Set();
     const blocks = [];
 
@@ -642,16 +656,71 @@ function cleanPageLayout(value, allowedMediaIds) {
             );
         }
 
+        if (block.type === "heading") {
+            cleaned.section_layout = ALLOWED_SECTION_LAYOUTS.includes(
+                block.section_layout
+            )
+                ? block.section_layout
+                : null;
+        } else if (typeof block.section_id === "string") {
+            cleaned.section_id = cleanText(
+                block.section_id,
+                "",
+                80
+            );
+        }
+
         blocks.push(cleaned);
     }
 
+    const presetSectionLayouts = {
+        canvas: "custom",
+        grid: "grid",
+        book: "book",
+        slides: "slides"
+    };
+
+    const sections = blocks
+        .filter(block => block.type === "heading")
+        .sort((a, b) =>
+            a.y - b.y ||
+            a.x - b.x
+        );
+
+    const sectionIds = new Set(
+        sections.map(section => section.id)
+    );
+
+    sections.forEach((section, index) => {
+        if (!ALLOWED_SECTION_LAYOUTS.includes(section.section_layout)) {
+            section.section_layout = index === 0
+                ? presetSectionLayouts[preset]
+                : "custom";
+        }
+    });
+
+    blocks.forEach(block => {
+        if (block.type === "heading") {
+            delete block.section_id;
+            return;
+        }
+
+        if (sectionIds.has(block.section_id)) {
+            return;
+        }
+
+        const precedingSection = [...sections]
+            .reverse()
+            .find(section => section.y <= block.y);
+
+        block.section_id = precedingSection?.id ||
+            sections[0]?.id ||
+            null;
+    });
+
     const layout = {
         version: 1,
-        preset: ALLOWED_PAGE_LAYOUT_PRESETS.includes(
-            value.preset
-        )
-            ? value.preset
-            : "canvas",
+        preset,
         blocks
     };
 

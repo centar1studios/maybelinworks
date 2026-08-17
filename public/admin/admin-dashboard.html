@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="./admin-stylesheet.css?v=20260816-6">
+    <link rel="stylesheet" href="./admin-stylesheet.css?v=20260816-7">
 </head>
 
 <body>
@@ -520,7 +520,7 @@
                         <div>
                             <p class="panel-kicker">Project Page</p>
                             <h3>Customize Project Layout</h3>
-                            <p>Choose how this project's images, publication pages, presentation slides and content sections appear.</p>
+                            <p>Add sections, choose a different layout for each one and assign images or text to the section where they belong.</p>
                         </div>
 
                         <span class="project-media-count" data-page-layout-status>Gallery Layout</span>
@@ -537,7 +537,7 @@
                     <div class="page-layout-builder" data-page-layout-builder hidden>
                         <div class="page-layout-preset-bar">
                             <div class="admin-field">
-                                <label for="project-page-preset">Page Type</label>
+                                <label for="project-page-preset">Starting Layout</label>
                                 <select id="project-page-preset">
                                     <option value="canvas">Custom Layout</option>
                                     <option value="grid">Portfolio Grid</option>
@@ -546,7 +546,7 @@
                                 </select>
                             </div>
 
-                            <p data-page-preset-description>Place images, headings and text anywhere on the page.</p>
+                            <p data-page-preset-description>Create the first section, then add more sections with their own layout types.</p>
                             <button type="button" data-apply-page-preset>Apply Layout</button>
                         </div>
 
@@ -559,7 +559,7 @@
                         </div>
 
                         <p class="page-layout-help">
-                            Drag blocks to place them. Use the corner handle to resize. Select a block for precise controls. Changes save only when you choose <strong>Save Project</strong>.
+                            Select a section heading to choose its type. Select an image, text block or spacer to assign it to a section. You can still drag and resize every block. Changes save only when you choose <strong>Save Project</strong>.
                         </p>
 
                         <div class="page-layout-workspace">
@@ -586,6 +586,24 @@
                                         <option value="contain">Show the whole image</option>
                                         <option value="cover">Crop to fill the block</option>
                                     </select>
+                                </div>
+
+                                <div class="admin-field" data-layout-section-type-field hidden>
+                                    <label for="layout-section-type">Section Type</label>
+                                    <select id="layout-section-type">
+                                        <option value="custom">Custom Arrangement</option>
+                                        <option value="grid">Portfolio Grid</option>
+                                        <option value="book">Publication / Book</option>
+                                        <option value="slides">Presentation / Slides</option>
+                                        <option value="full">Full Width</option>
+                                    </select>
+                                    <small>Choose how the images assigned to this section appear.</small>
+                                </div>
+
+                                <div class="admin-field" data-layout-block-section-field hidden>
+                                    <label for="layout-block-section">Section</label>
+                                    <select id="layout-block-section"></select>
+                                    <small>Choose which section contains this item.</small>
                                 </div>
 
                                 <div class="layout-position-grid">
@@ -631,6 +649,6 @@
 
     <div class="admin-toast" data-admin-toast role="status" aria-live="polite"></div>
 
-    <script src="./admin-dashboard.js?v=20260816-6"></script>
+    <script src="./admin-dashboard.js?v=20260816-7"></script>
 </body>
 </html>

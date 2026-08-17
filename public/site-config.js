@@ -865,73 +865,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return viewer;
     }
 
-    function createCustomProjectLayout(project, media) {
-        const layout = project?.page_layout;
-
-        if (
-            !layout ||
-            layout.version !== 1 ||
-            !Array.isArray(layout.blocks) ||
-            !layout.blocks.length
-        ) {
-            return null;
-        }
-
-        const mediaById = new Map(
-            media.map(item => [
-                Number(item.id),
-                item
-            ])
-        );
-
-        const allowedTypes = new Set([
-            "media",
-            "heading",
-            "text",
-            "spacer"
-        ]);
-
-        const blocks = layout.blocks
-            .filter(block =>
-                block &&
-                allowedTypes.has(block.type)
-            )
-            .map((block, index) => {
-                const x = pageLayoutNumber(
-                    block.x,
-                    0,
-                    0,
-                    11
-                );
-
-                return {
-                    ...block,
-                    x,
-                    y: pageLayoutNumber(block.y, 0, 0, 500),
-                    w: pageLayoutNumber(block.w, 12, 1, 12 - x),
-                    h: pageLayoutNumber(block.h, 4, 1, 24),
-                    sourceOrder: index
-                };
-            })
-            .sort((a, b) =>
-                a.y - b.y ||
-                a.x - b.x ||
-                a.sourceOrder - b.sourceOrder
-            );
-
-        const preset = ["book", "slides"].includes(layout.preset)
-            ? layout.preset
-            : "canvas";
-
-        if (preset === "book" || preset === "slides") {
-            return createPagedProjectLayout(
-                project,
-                blocks,
-                mediaById,
-                preset
-            );
-        }
-
+    function createCanvasProjectLayout(
+        project,
+        blocks,
+        mediaById
+    ) {
         const canvas = document.createElement("div");
         canvas.className = "cms-layout-canvas";
 
@@ -991,14 +929,10 @@ document.addEventListener("DOMContentLoaded", () => {
             element.style.setProperty("--layout-w", String(block.w));
             element.style.setProperty("--layout-h", String(block.h));
             element.style.setProperty("--layout-order", String(index));
-            element.style.left =
-                `${(block.x / 12) * 100}%`;
-            element.style.top =
-                `${block.y * 3.5}rem`;
-            element.style.width =
-                `${(block.w / 12) * 100}%`;
-            element.style.height =
-                `${block.h * 3.5}rem`;
+            element.style.left = `${(block.x / 12) * 100}%`;
+            element.style.top = `${block.y * 3.5}rem`;
+            element.style.width = `${(block.w / 12) * 100}%`;
+            element.style.height = `${block.h * 3.5}rem`;
             element.style.order = String(index);
 
             canvas.appendChild(element);
@@ -1021,6 +955,287 @@ document.addEventListener("DOMContentLoaded", () => {
             `${Math.max(bottomRow, 1) * 3.5}rem`;
 
         return canvas;
+    }
+
+    function createStructuredProjectSection(
+        project,
+        blocks,
+        mediaById,
+        sectionLayout
+    ) {
+        const section = document.createElement("section");
+        section.className =
+            `cms-structured-section cms-section-${sectionLayout}`;
+
+        const headingBlock = blocks.find(
+            block => block.type === "heading"
+        );
+
+        if (headingBlock) {
+            const heading = document.createElement("h4");
+            heading.className = "cms-section-heading";
+            heading.textContent = headingBlock.text || "Project Section";
+            section.appendChild(heading);
+        }
+
+        const textBlocks = blocks.filter(
+            block => block.type === "text" && block.text
+        );
+
+        if (textBlocks.length) {
+            const copy = document.createElement("div");
+            copy.className = "cms-section-copy";
+
+            textBlocks.forEach(block => {
+                const paragraph = document.createElement("p");
+                paragraph.textContent = block.text;
+                copy.appendChild(paragraph);
+            });
+
+            section.appendChild(copy);
+        }
+
+        const mediaBlocks = blocks.filter(
+            block =>
+                block.type === "media" &&
+                mediaById.has(Number(block.media_id))
+        );
+
+        if (mediaBlocks.length) {
+            const mediaGrid = document.createElement("div");
+            mediaGrid.className = "cms-section-media";
+
+            mediaBlocks.forEach(block => {
+                const item = mediaById.get(Number(block.media_id));
+                const figure = document.createElement("figure");
+                figure.className = "cms-section-media-item";
+                figure.dataset.mediaId = String(item.id);
+
+                const image = document.createElement("img");
+                image.src = getMediaUrl(item);
+                image.alt = item.alt_text ||
+                    `${project.title} project image`;
+                image.loading = "lazy";
+                image.decoding = "async";
+                image.style.objectFit = block.fit === "cover"
+                    ? "cover"
+                    : "contain";
+
+                prepareGalleryImage(image);
+                figure.appendChild(image);
+                mediaGrid.appendChild(figure);
+            });
+
+            section.appendChild(mediaGrid);
+        }
+
+        const spacerRows = blocks
+            .filter(block => block.type === "spacer")
+            .reduce((total, block) => total + block.h, 0);
+
+        if (spacerRows) {
+            section.style.setProperty(
+                "--section-space",
+                `${Math.min(spacerRows, 18) * 0.6}rem`
+            );
+        }
+
+        return section;
+    }
+
+    function createMixedProjectLayout(
+        project,
+        blocks,
+        mediaById,
+        preset
+    ) {
+        const sectionLayouts = new Set([
+            "custom",
+            "grid",
+            "book",
+            "slides",
+            "full"
+        ]);
+
+        const presetSections = {
+            canvas: "custom",
+            grid: "grid",
+            book: "book",
+            slides: "slides"
+        };
+
+        const sections = blocks.filter(
+            block => block.type === "heading"
+        );
+
+        if (!sections.length) {
+            return null;
+        }
+
+        const sectionIds = new Set(
+            sections.map(section => section.id)
+        );
+
+        const blocksBySection = new Map(
+            sections.map(section => [
+                section.id,
+                [section]
+            ])
+        );
+
+        blocks
+            .filter(block => block.type !== "heading")
+            .forEach(block => {
+                let sectionId = sectionIds.has(block.section_id)
+                    ? block.section_id
+                    : null;
+
+                if (!sectionId) {
+                    sectionId = [...sections]
+                        .reverse()
+                        .find(section => section.y <= block.y)
+                        ?.id || sections[0].id;
+                }
+
+                blocksBySection.get(sectionId)?.push(block);
+            });
+
+        const mixedLayout = document.createElement("div");
+        mixedLayout.className = "cms-mixed-project-layout";
+
+        sections.forEach((section, index) => {
+            const sectionLayout = sectionLayouts.has(
+                section.section_layout
+            )
+                ? section.section_layout
+                : (
+                    index === 0
+                        ? presetSections[preset] || "custom"
+                        : "custom"
+                );
+
+            const sectionBlocks = blocksBySection.get(section.id) ||
+                [section];
+
+            let content;
+
+            if (sectionLayout === "book" || sectionLayout === "slides") {
+                content = createPagedProjectLayout(
+                    project,
+                    sectionBlocks,
+                    mediaById,
+                    sectionLayout
+                ) || createStructuredProjectSection(
+                    project,
+                    sectionBlocks,
+                    mediaById,
+                    "full"
+                );
+            } else if (
+                sectionLayout === "grid" ||
+                sectionLayout === "full"
+            ) {
+                content = createStructuredProjectSection(
+                    project,
+                    sectionBlocks,
+                    mediaById,
+                    sectionLayout
+                );
+            } else {
+                const firstRow = Math.min(
+                    ...sectionBlocks.map(block => block.y)
+                );
+
+                content = createCanvasProjectLayout(
+                    project,
+                    sectionBlocks.map(block => ({
+                        ...block,
+                        y: block.y - firstRow
+                    })),
+                    mediaById
+                );
+            }
+
+            if (!content) {
+                return;
+            }
+
+            const wrapper = document.createElement("div");
+            wrapper.className =
+                `cms-project-section cms-project-section-${sectionLayout}`;
+            wrapper.appendChild(content);
+            mixedLayout.appendChild(wrapper);
+        });
+
+        return mixedLayout.children.length
+            ? mixedLayout
+            : null;
+    }
+
+    function createCustomProjectLayout(project, media) {
+        const layout = project?.page_layout;
+
+        if (
+            !layout ||
+            layout.version !== 1 ||
+            !Array.isArray(layout.blocks) ||
+            !layout.blocks.length
+        ) {
+            return null;
+        }
+
+        const mediaById = new Map(
+            media.map(item => [
+                Number(item.id),
+                item
+            ])
+        );
+
+        const allowedTypes = new Set([
+            "media",
+            "heading",
+            "text",
+            "spacer"
+        ]);
+
+        const blocks = layout.blocks
+            .filter(block =>
+                block &&
+                allowedTypes.has(block.type)
+            )
+            .map((block, index) => {
+                const x = pageLayoutNumber(
+                    block.x,
+                    0,
+                    0,
+                    11
+                );
+
+                return {
+                    ...block,
+                    x,
+                    y: pageLayoutNumber(block.y, 0, 0, 500),
+                    w: pageLayoutNumber(block.w, 12, 1, 12 - x),
+                    h: pageLayoutNumber(block.h, 4, 1, 24),
+                    sourceOrder: index
+                };
+            })
+            .sort((a, b) =>
+                a.y - b.y ||
+                a.x - b.x ||
+                a.sourceOrder - b.sourceOrder
+            );
+
+        return createMixedProjectLayout(
+            project,
+            blocks,
+            mediaById,
+            layout.preset
+        ) || createCanvasProjectLayout(
+            project,
+            blocks,
+            mediaById
+        );
     }
 
     function createProjectGallery(project) {

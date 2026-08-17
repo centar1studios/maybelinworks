@@ -55,23 +55,38 @@ document.addEventListener("DOMContentLoaded", () => {
         canvas: {
             label: "Custom Layout",
             description:
-                "Arrange images, section headings, text and spacing on a flexible project page."
+                "Create a custom first section, then add more sections with their own layout types."
         },
         grid: {
             label: "Portfolio Grid",
             description:
-                "Arrange images in a clean two-column grid, then drag or resize individual pieces if needed."
+                "Start with a two-column grid section, then add Book, Slides, Full Width or Custom sections."
         },
         book: {
             label: "Book / Zine Reader",
             description:
-                "Show a front cover, page spreads in order, and a back cover with previous and next page controls."
+                "Start with a publication reader section with covers and page spreads."
         },
         slides: {
             label: "Presentation / Slides",
             description:
-                "Show one presentation slide at a time with previous, next and slide-count controls."
+                "Start with a presentation section that shows one slide at a time."
         }
+    };
+
+    const SECTION_LAYOUT_TYPES = {
+        custom: "Custom Arrangement",
+        grid: "Portfolio Grid",
+        book: "Publication / Book",
+        slides: "Presentation / Slides",
+        full: "Full Width"
+    };
+
+    const PRESET_SECTION_LAYOUTS = {
+        canvas: "custom",
+        grid: "grid",
+        book: "book",
+        slides: "slides"
     };
 
     function loadGoogleFont(fontName) {
@@ -182,6 +197,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const layoutBlockText = document.querySelector("#layout-block-text");
     const layoutFitField = document.querySelector("[data-layout-fit-field]");
     const layoutBlockFit = document.querySelector("#layout-block-fit");
+    const layoutSectionTypeField = document.querySelector("[data-layout-section-type-field]");
+    const layoutSectionType = document.querySelector("#layout-section-type");
+    const layoutBlockSectionField = document.querySelector("[data-layout-block-section-field]");
+    const layoutBlockSection = document.querySelector("#layout-block-section");
     const layoutBlockX = document.querySelector("#layout-block-x");
     const layoutBlockY = document.querySelector("#layout-block-y");
     const layoutBlockWidth = document.querySelector("#layout-block-width");
@@ -1068,6 +1087,58 @@ document.addEventListener("DOMContentLoaded", () => {
         return `${type}-${suffix}`;
     }
 
+    function sectionLayoutForPreset(preset) {
+        return PRESET_SECTION_LAYOUTS[preset] || "custom";
+    }
+
+    function sortedLayoutSections(blocks = editingPageLayout.blocks) {
+        return blocks
+            .filter(block => block.type === "heading")
+            .sort((a, b) =>
+                a.y - b.y ||
+                a.x - b.x
+            );
+    }
+
+    function normalizeLayoutSectionAssignments(blocks, preset) {
+        const sections = sortedLayoutSections(blocks);
+        const sectionIds = new Set(
+            sections.map(section => section.id)
+        );
+
+        sections.forEach((section, index) => {
+            if (!Object.prototype.hasOwnProperty.call(
+                SECTION_LAYOUT_TYPES,
+                section.section_layout
+            )) {
+                section.section_layout = index === 0
+                    ? sectionLayoutForPreset(preset)
+                    : "custom";
+            }
+        });
+
+        blocks.forEach(block => {
+            if (block.type === "heading") {
+                delete block.section_id;
+                return;
+            }
+
+            if (sectionIds.has(block.section_id)) {
+                return;
+            }
+
+            const precedingSection = [...sections]
+                .reverse()
+                .find(section => section.y <= block.y);
+
+            block.section_id = precedingSection?.id ||
+                sections[0]?.id ||
+                null;
+        });
+
+        return blocks;
+    }
+
     function normalizeClientPageLayout(value, project) {
         if (
             !value ||
@@ -1155,12 +1226,28 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
                 }
 
+                if (block.type === "heading") {
+                    normalized.section_layout =
+                        Object.prototype.hasOwnProperty.call(
+                            SECTION_LAYOUT_TYPES,
+                            block.section_layout
+                        )
+                            ? block.section_layout
+                            : null;
+                } else {
+                    normalized.section_id = typeof block.section_id === "string"
+                        ? block.section_id.trim().slice(0, 80)
+                        : null;
+                }
+
                 return normalized;
             })
             .filter(block =>
                 block.type !== "media" ||
                 mediaIds.has(block.media_id)
             );
+
+        normalizeLayoutSectionAssignments(blocks, preset);
 
         return {
             version: 1,
@@ -1222,8 +1309,11 @@ document.addEventListener("DOMContentLoaded", () => {
             x: 0,
             y: 0,
             w: 12,
-            h: 2
+            h: 2,
+            section_layout: sectionLayoutForPreset(preset)
         }];
+
+        const sectionId = blocks[0].id;
 
         const addMediaBlock = (item, x, y, width, height) => {
             blocks.push({
@@ -1231,6 +1321,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 type: "media",
                 media_id: Number(item.id),
                 fit: "contain",
+                section_id: sectionId,
                 x,
                 y,
                 w: width,
@@ -1363,9 +1454,24 @@ document.addEventListener("DOMContentLoaded", () => {
             const preset = PAGE_LAYOUT_PRESETS[
                 editingPageLayout.preset
             ] || PAGE_LAYOUT_PRESETS.canvas;
+            const sections = sortedLayoutSections();
+            const sectionCount = sections.length;
+            const layoutLabel = sectionCount > 1
+                ? "Mixed Sections"
+                : (
+                    SECTION_LAYOUT_TYPES[
+                        sections[0]?.section_layout
+                    ] || preset.label
+                );
 
             pageLayoutStatus.textContent = enabled
-                ? (pageLayoutDirty ? "Unsaved Layout" : preset.label)
+                ? (
+                    pageLayoutDirty
+                        ? "Unsaved Layout"
+                        : (
+                            layoutLabel
+                        )
+                )
                 : "Gallery Layout";
         }
     }
@@ -1373,6 +1479,32 @@ document.addEventListener("DOMContentLoaded", () => {
     function selectedLayoutBlock() {
         return editingPageLayout.blocks.find(
             block => block.id === selectedLayoutBlockId
+        ) || null;
+    }
+
+    function activeLayoutSectionId() {
+        const selected = selectedLayoutBlock();
+
+        if (selected?.type === "heading") {
+            return selected.id;
+        }
+
+        if (selected?.section_id) {
+            return selected.section_id;
+        }
+
+        return sortedLayoutSections().at(-1)?.id || null;
+    }
+
+    function sectionForLayoutBlock(block) {
+        if (block.type === "heading") {
+            return block;
+        }
+
+        return editingPageLayout.blocks.find(
+            candidate =>
+                candidate.type === "heading" &&
+                candidate.id === block.section_id
         ) || null;
     }
 
@@ -1389,7 +1521,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (block.type === "heading") {
-            return block.text || "Section heading";
+            const sectionType = SECTION_LAYOUT_TYPES[
+                block.section_layout
+            ] || SECTION_LAYOUT_TYPES.custom;
+
+            return `${block.text || "Section heading"} • ${sectionType}`;
         }
 
         if (block.type === "text") {
@@ -1397,6 +1533,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         return "Space";
+    }
+
+    function layoutBlockCanvasLabel(block) {
+        const label = layoutBlockLabel(block);
+        const section = sectionForLayoutBlock(block);
+
+        if (block.type === "heading" || !section) {
+            return label;
+        }
+
+        return `${label} • ${section.text || "Section"}`;
     }
 
     function positionLayoutElement(element, block) {
@@ -1443,6 +1590,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         layoutTextField.hidden = !hasText;
         layoutFitField.hidden = block.type !== "media";
+        layoutSectionTypeField.hidden = block.type !== "heading";
+
+        const sections = sortedLayoutSections();
+        layoutBlockSectionField.hidden =
+            block.type === "heading" ||
+            !sections.length;
 
         if (hasText) {
             layoutBlockText.maxLength = block.type === "heading"
@@ -1453,6 +1606,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (block.type === "media") {
             layoutBlockFit.value = block.fit || "contain";
+        }
+
+        if (block.type === "heading") {
+            layoutSectionType.value =
+                block.section_layout || "custom";
+        } else if (sections.length) {
+            layoutBlockSection.replaceChildren();
+
+            sections.forEach((section, index) => {
+                const option = document.createElement("option");
+                option.value = section.id;
+                option.textContent = section.text ||
+                    `Section ${index + 1}`;
+                layoutBlockSection.appendChild(option);
+            });
+
+            layoutBlockSection.value = sectionForLayoutBlock(block)?.id ||
+                sections[0].id;
         }
 
         layoutBlockX.value = String(block.x + 1);
@@ -1681,7 +1852,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const label = document.createElement("span");
             label.className = "layout-block-label";
-            label.textContent = layoutBlockLabel(block);
+            label.textContent = layoutBlockCanvasLabel(block);
 
             const resize = document.createElement("button");
             resize.type = "button";
@@ -1735,6 +1906,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function addContentLayoutBlock(type) {
+        const sectionId = activeLayoutSectionId();
+
+        if (type !== "heading" && !sectionId) {
+            showToast("Add a section before adding content.");
+            return;
+        }
+
         const block = {
             id: newLayoutBlockId(type),
             type,
@@ -1746,6 +1924,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (type === "heading") {
             block.text = "New Section";
+            block.section_layout = "custom";
+        } else {
+            block.section_id = sectionId;
         }
 
         if (type === "text") {
@@ -1770,11 +1951,24 @@ document.addEventListener("DOMContentLoaded", () => {
             return 0;
         }
 
+        const sectionId = activeLayoutSectionId();
+
+        if (!sectionId) {
+            showToast("Add or select a section before adding images.");
+            return 0;
+        }
+
         const startRow = currentLayoutBottom() + 1;
 
-        const preset = editingPageLayout.preset || "canvas";
-        const fullWidth = preset === "slides";
-        const tallPages = preset === "book";
+        const activeSection = editingPageLayout.blocks.find(
+            block => block.id === sectionId
+        );
+
+        const sectionLayout = activeSection?.section_layout || "custom";
+        const fullWidth =
+            sectionLayout === "slides" ||
+            sectionLayout === "full";
+        const tallPages = sectionLayout === "book";
         const width = fullWidth ? 12 : 6;
         const height = fullWidth ? 7 : (tallPages ? 8 : 5);
         const rowSpan = height + 1;
@@ -1788,6 +1982,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 type: "media",
                 media_id: Number(media.id),
                 fit: "contain",
+                section_id: sectionId,
                 x: column * 6,
                 y: startRow + rowIndex * rowSpan,
                 w: width,
@@ -1970,6 +2165,10 @@ document.addEventListener("DOMContentLoaded", () => {
         editingPageLayout.blocks = editingPageLayout.blocks.filter(
             block => block.id !== selectedLayoutBlockId
         );
+        normalizeLayoutSectionAssignments(
+            editingPageLayout.blocks,
+            editingPageLayout.preset
+        );
         selectedLayoutBlockId = null;
         markPageLayoutDirty();
         renderPageLayout();
@@ -2017,6 +2216,43 @@ document.addEventListener("DOMContentLoaded", () => {
         block.fit = layoutBlockFit.value === "cover"
             ? "cover"
             : "contain";
+        markPageLayoutDirty();
+        renderPageLayout();
+    });
+
+    layoutSectionType?.addEventListener("change", () => {
+        const block = selectedLayoutBlock();
+
+        if (!block || block.type !== "heading") {
+            return;
+        }
+
+        block.section_layout = Object.prototype.hasOwnProperty.call(
+            SECTION_LAYOUT_TYPES,
+            layoutSectionType.value
+        )
+            ? layoutSectionType.value
+            : "custom";
+
+        markPageLayoutDirty();
+        renderPageLayout();
+    });
+
+    layoutBlockSection?.addEventListener("change", () => {
+        const block = selectedLayoutBlock();
+        const validSectionIds = new Set(
+            sortedLayoutSections().map(section => section.id)
+        );
+
+        if (
+            !block ||
+            block.type === "heading" ||
+            !validSectionIds.has(layoutBlockSection.value)
+        ) {
+            return;
+        }
+
+        block.section_id = layoutBlockSection.value;
         markPageLayoutDirty();
         renderPageLayout();
     });

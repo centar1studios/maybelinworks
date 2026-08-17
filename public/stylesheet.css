@@ -1814,6 +1814,83 @@ body.dialog-open {
 }
 
 
+/* MIXED PROJECT SECTIONS */
+
+.cms-mixed-project-layout {
+    display: grid;
+    gap: clamp(3.5rem, 8vw, 7rem);
+    min-width: 0;
+}
+
+.cms-project-section,
+.cms-structured-section {
+    min-width: 0;
+}
+
+.cms-structured-section {
+    display: grid;
+    gap: 1.2rem;
+    padding-bottom: var(--section-space, 0);
+}
+
+.cms-section-heading {
+    margin: 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--pink);
+    color: var(--purple);
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 3vw, 3rem);
+    font-weight: 400;
+    line-height: 1;
+}
+
+.cms-section-copy {
+    display: grid;
+    gap: 0.65rem;
+    max-width: 760px;
+}
+
+.cms-section-copy p {
+    margin: 0;
+    color: var(--charcoal);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+.cms-section-media {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.cms-section-grid .cms-section-media {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cms-section-full .cms-section-media {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.cms-section-media-item {
+    min-width: 0;
+    margin: 0;
+}
+
+.cms-section-media-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #FFFFFF;
+    border: 1px solid rgba(86, 47, 84, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(42, 63, 56, 0.09);
+    cursor: zoom-in;
+}
+
+
 /* BOOK / ZINE AND PRESENTATION READERS */
 
 .cms-paged-layout {
@@ -2098,6 +2175,10 @@ body.dialog-open {
 
     .cms-layout-spacer {
         min-height: 2rem;
+    }
+
+    .cms-section-grid .cms-section-media {
+        grid-template-columns: 1fr;
     }
 
     .cms-book-stage {
