@@ -1773,6 +1773,176 @@ body.editor-open {
 }
 
 
+/* EXPANDED PORTFOLIO EDITOR */
+
+.branding-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.branding-uploader {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 12px;
+    padding: 15px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface-soft);
+}
+
+.branding-preview {
+    grid-column: 1 / -1;
+    min-height: 100px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    padding: 13px;
+    border: 1px dashed rgba(86, 47, 84, 0.35);
+    border-radius: 10px;
+    background: #FFFFFF;
+    color: var(--purple);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+}
+
+.branding-preview img {
+    max-width: 100%;
+    max-height: 90px;
+    display: block;
+    object-fit: contain;
+}
+
+.branding-favicon-preview img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+}
+
+.branding-text-fields {
+    margin-top: 16px;
+}
+
+.project-admin-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    min-width: 190px;
+}
+
+.project-admin-actions button {
+    min-height: 34px;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: var(--dark-green);
+    font-size: 0.67rem;
+    font-weight: 700;
+}
+
+.project-admin-actions button:not(:disabled):hover {
+    border-color: var(--purple);
+    color: var(--purple);
+}
+
+.project-admin-actions .project-edit-button {
+    grid-column: 1 / -1;
+    color: #FFFFFF;
+}
+
+.project-media-details {
+    margin-top: 4px;
+    padding-top: 6px;
+    border-top: 1px solid var(--line);
+}
+
+.project-media-details summary {
+    color: var(--purple);
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.project-media-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 12px;
+}
+
+.project-media-detail-field {
+    display: grid;
+    gap: 5px;
+    color: var(--muted);
+    font-size: 0.67rem;
+    font-weight: 700;
+}
+
+.project-media-detail-field input,
+.project-media-detail-field textarea {
+    width: 100%;
+    min-width: 0;
+    padding: 8px 9px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: #FFFFFF;
+    color: var(--charcoal);
+    font: inherit;
+    font-weight: 400;
+}
+
+.project-media-detail-field input[type="range"] {
+    padding: 3px 0;
+    accent-color: var(--pink);
+}
+
+.media-detail-save-button {
+    min-height: 36px;
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: 1px solid var(--purple);
+    border-radius: 8px;
+    background: var(--purple);
+    color: #FFFFFF;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.layout-focal-fields,
+.layout-section-style-fields {
+    display: grid;
+    gap: 10px;
+}
+
+.layout-focal-fields input[type="range"] {
+    width: 100%;
+    accent-color: var(--pink);
+}
+
+.layout-use-image-crop {
+    min-height: 34px;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--surface-soft);
+    color: var(--purple);
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.compact-option {
+    padding: 10px;
+}
+
+.page-layout-toolbar button:disabled {
+    border-color: var(--line);
+    background: #F3F4F2;
+    color: #A0A5A2;
+}
+
+
 /* TABLET */
 
 @media (max-width: 1100px) {
@@ -1800,7 +1970,7 @@ body.editor-open {
         grid-column: 2;
     }
 
-    .project-edit-button {
+    .project-admin-actions {
         grid-column: 3;
         grid-row: 1 / span 2;
     }
@@ -1967,6 +2137,19 @@ body.editor-open {
         grid-template-columns: 1fr;
     }
 
+    .branding-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .branding-uploader {
+        grid-template-columns: 1fr;
+    }
+
+    .branding-preview,
+    .branding-uploader .media-upload-button {
+        grid-column: auto;
+    }
+
     .panel-footer {
         align-items: flex-start;
         flex-direction: column;
@@ -1992,7 +2175,7 @@ body.editor-open {
         gap: 10px;
     }
 
-    .project-edit-button {
+    .project-admin-actions {
         grid-column: 2;
         grid-row: auto;
         width: 100%;
@@ -2067,6 +2250,10 @@ body.editor-open {
     .project-media-controls {
         grid-column: auto;
         justify-content: flex-start;
+    }
+
+    .project-media-details-grid {
+        grid-template-columns: 1fr;
     }
 
     .project-editor-actions {

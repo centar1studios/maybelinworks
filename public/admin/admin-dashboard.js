@@ -136,6 +136,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const displayFontPreview = document.querySelector("[data-display-font-preview]");
     const bodyFontPreview = document.querySelector("[data-body-font-preview]");
     const saveHomepageButton = document.querySelector("[data-save-homepage]");
+    const colorPalette = document.querySelector("#color-palette");
+    const footerText = document.querySelector("#footer-text");
+    const homeButtonLabel = document.querySelector("#home-button-label");
+    const homeButtonUrl = document.querySelector("#home-button-url");
+    const websiteLogoFile = document.querySelector("#website-logo-file");
+    const websiteFaviconFile = document.querySelector("#website-favicon-file");
+    const uploadLogoButton = document.querySelector("[data-upload-logo]");
+    const uploadFaviconButton = document.querySelector("[data-upload-favicon]");
+    const logoPreview = document.querySelector("[data-logo-preview]");
+    const logoPreviewEmpty = document.querySelector("[data-logo-preview-empty]");
+    const faviconPreview = document.querySelector("[data-favicon-preview]");
+    const faviconPreviewEmpty = document.querySelector("[data-favicon-preview-empty]");
 
     const aboutStatus = document.querySelector("[data-about-status]");
     const aboutKicker = document.querySelector("#about-kicker");
@@ -173,6 +185,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const projectRole = document.querySelector("#project-role");
     const projectLayout = document.querySelector("#project-layout");
     const projectVisible = document.querySelector("#project-visible");
+    const projectCoverMedia = document.querySelector("#project-cover-media");
+    const projectSocialTitle = document.querySelector("#project-social-title");
+    const projectSocialDescription = document.querySelector("#project-social-description");
+    const projectSocialMedia = document.querySelector("#project-social-media");
     const layoutDescription = document.querySelector("[data-layout-description]");
 
     const projectMediaSection = document.querySelector("[data-project-media-section]");
@@ -197,8 +213,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const layoutBlockText = document.querySelector("#layout-block-text");
     const layoutFitField = document.querySelector("[data-layout-fit-field]");
     const layoutBlockFit = document.querySelector("#layout-block-fit");
+    const layoutFocalFields = document.querySelector("[data-layout-focal-fields]");
+    const layoutBlockFocalX = document.querySelector("#layout-block-focal-x");
+    const layoutBlockFocalY = document.querySelector("#layout-block-focal-y");
+    const layoutUseImageCropButton = document.querySelector("[data-layout-use-image-crop]");
     const layoutSectionTypeField = document.querySelector("[data-layout-section-type-field]");
     const layoutSectionType = document.querySelector("#layout-section-type");
+    const layoutSectionStyleFields = document.querySelector("[data-layout-section-style-fields]");
+    const layoutSectionBackground = document.querySelector("#layout-section-background");
+    const layoutSectionWidth = document.querySelector("#layout-section-width");
+    const layoutSectionAlign = document.querySelector("#layout-section-align");
+    const layoutSectionSpacing = document.querySelector("#layout-section-spacing");
+    const layoutSectionShowHeading = document.querySelector("#layout-section-show-heading");
     const layoutBlockSectionField = document.querySelector("[data-layout-block-section-field]");
     const layoutBlockSection = document.querySelector("#layout-block-section");
     const layoutBlockX = document.querySelector("#layout-block-x");
@@ -209,8 +235,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const addLayoutTextButton = document.querySelector("[data-add-layout-text]");
     const addLayoutSpacerButton = document.querySelector("[data-add-layout-spacer]");
     const addLayoutMediaButton = document.querySelector("[data-add-layout-media]");
+    const duplicateLayoutSectionButton = document.querySelector("[data-duplicate-layout-section]");
+    const layoutUndoButton = document.querySelector("[data-layout-undo]");
+    const layoutRedoButton = document.querySelector("[data-layout-redo]");
     const resetPageLayoutButton = document.querySelector("[data-reset-page-layout]");
     const removeLayoutBlockButton = document.querySelector("[data-remove-layout-block]");
+    const previewProjectButton = document.querySelector("[data-preview-project]");
 
     if (pageLayoutSection && projectMediaSection) {
         projectMediaSection.before(pageLayoutSection);
@@ -227,6 +257,9 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     let selectedLayoutBlockId = null;
     let pageLayoutDirty = false;
+    let layoutHistory = [];
+    let layoutHistoryIndex = -1;
+    let restoringLayoutHistory = false;
 
 
     /* MESSAGES */
@@ -413,7 +446,13 @@ document.addEventListener("DOMContentLoaded", () => {
             heroKicker,
             heroTitle,
             displayFont,
-            bodyFont
+            bodyFont,
+            colorPalette,
+            footerText,
+            homeButtonLabel,
+            homeButtonUrl,
+            websiteLogoFile,
+            websiteFaviconFile
         ].forEach((element) => {
             if (element) {
                 element.disabled = !ready;
@@ -441,6 +480,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 ? "Ready to Edit"
                 : "Loading...";
         }
+
+        [uploadLogoButton, uploadFaviconButton].forEach(button => {
+            if (button) {
+                button.disabled = !ready;
+            }
+        });
     }
 
     function setAboutReady(ready) {
@@ -495,6 +540,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function setBrandingPreview(image, empty, key) {
+        if (!image || !empty) {
+            return;
+        }
+
+        if (key) {
+            image.src = getMediaUrl(key);
+            image.hidden = false;
+            empty.hidden = true;
+        } else {
+            image.removeAttribute("src");
+            image.hidden = true;
+            empty.hidden = false;
+        }
+    }
+
     function populateSettings(settings) {
         currentSettings = settings;
 
@@ -525,6 +586,33 @@ document.addEventListener("DOMContentLoaded", () => {
         if (bodyFont) {
             bodyFont.value = savedBodyFont;
         }
+
+        if (colorPalette) {
+            colorPalette.value = settings.color_palette || "signature";
+        }
+
+        if (footerText) {
+            footerText.value = settings.footer_text || "Maybelin Works";
+        }
+
+        if (homeButtonLabel) {
+            homeButtonLabel.value = settings.home_button_label || "";
+        }
+
+        if (homeButtonUrl) {
+            homeButtonUrl.value = settings.home_button_url || "";
+        }
+
+        setBrandingPreview(
+            logoPreview,
+            logoPreviewEmpty,
+            settings.logo_key
+        );
+        setBrandingPreview(
+            faviconPreview,
+            faviconPreviewEmpty,
+            settings.favicon_key
+        );
 
         updateFontPreviews();
 
@@ -663,9 +751,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     hero_title: heroTitle.value.trim(),
                     hero_description: currentSettings.hero_description,
                     display_font: displayFont.value,
-                    body_font: bodyFont.value
+                    body_font: bodyFont.value,
+                    color_palette: colorPalette?.value || "signature",
+                    footer_text: footerText?.value.trim() || "Maybelin Works",
+                    home_button_label: homeButtonLabel?.value.trim() || null,
+                    home_button_url: homeButtonUrl?.value.trim() || null
                 },
-                "Homepage and fonts saved!"
+                "Homepage and branding saved!"
             );
 
             settingsStatus.textContent = "Saved";
@@ -683,6 +775,83 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     saveHomepageButton?.addEventListener("click", saveHomepage);
+
+    async function uploadBrandingAsset(type) {
+        const isLogo = type === "logo";
+        const fileInput = isLogo
+            ? websiteLogoFile
+            : websiteFaviconFile;
+        const button = isLogo
+            ? uploadLogoButton
+            : uploadFaviconButton;
+        const file = fileInput?.files?.[0];
+
+        if (!file) {
+            showToast(`Choose a ${isLogo ? "logo" : "browser icon"} first.`);
+            fileInput?.focus();
+            return;
+        }
+
+        if (file.size > 20 * 1024 * 1024) {
+            showToast("Images must be 20 MB or smaller.");
+            return;
+        }
+
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = "Uploading...";
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetch(
+                `/api/admin/branding/${type}`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    body: formData
+                }
+            );
+
+            if (response.status === 401) {
+                handleExpiredLogin();
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Unable to upload that image.");
+            }
+
+            const keyName = isLogo ? "logo_key" : "favicon_key";
+            currentSettings = {
+                ...currentSettings,
+                [keyName]: data.key
+            };
+            setBrandingPreview(
+                isLogo ? logoPreview : faviconPreview,
+                isLogo ? logoPreviewEmpty : faviconPreviewEmpty,
+                data.key
+            );
+            fileInput.value = "";
+            showToast(`${isLogo ? "Logo" : "Browser icon"} updated!`);
+        } catch (error) {
+            console.error("Unable to upload branding image:", error);
+            showToast(error.message || "Unable to upload that image.");
+        } finally {
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+
+    uploadLogoButton?.addEventListener("click", () => {
+        uploadBrandingAsset("logo");
+    });
+
+    uploadFaviconButton?.addEventListener("click", () => {
+        uploadBrandingAsset("favicon");
+    });
 
     async function saveAbout() {
         if (!currentSettings || !saveAboutButton) {
@@ -971,11 +1140,136 @@ document.addEventListener("DOMContentLoaded", () => {
                 openProjectEditor(project.slug);
             });
 
-            card.append(number, content, meta, editButton);
+            const actions = document.createElement("div");
+            actions.className = "project-admin-actions";
+
+            const moveUpButton = document.createElement("button");
+            moveUpButton.type = "button";
+            moveUpButton.textContent = "Move Up";
+            moveUpButton.disabled = index === 0;
+            moveUpButton.addEventListener("click", () => {
+                moveProject(project.id, -1);
+            });
+
+            const moveDownButton = document.createElement("button");
+            moveDownButton.type = "button";
+            moveDownButton.textContent = "Move Down";
+            moveDownButton.disabled = index === sortedProjects.length - 1;
+            moveDownButton.addEventListener("click", () => {
+                moveProject(project.id, 1);
+            });
+
+            const duplicateButton = document.createElement("button");
+            duplicateButton.type = "button";
+            duplicateButton.textContent = "Duplicate";
+            duplicateButton.addEventListener("click", () => {
+                duplicateProject(project.id, duplicateButton);
+            });
+
+            actions.append(
+                moveUpButton,
+                moveDownButton,
+                duplicateButton,
+                editButton
+            );
+
+            card.append(number, content, meta, actions);
             projectList.appendChild(card);
         });
 
         updateProjectSummary();
+    }
+
+    async function saveProjectOrder(orderedProjects) {
+        const response = await fetch(
+            "/api/admin/projects/order",
+            {
+                method: "PUT",
+                credentials: "include",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    project_ids: orderedProjects.map(project => Number(project.id))
+                })
+            }
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Unable to reorder projects.");
+        }
+    }
+
+    async function moveProject(projectIdValue, direction) {
+        const ordered = [...projects].sort((a, b) =>
+            (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0) ||
+            Number(a.id) - Number(b.id)
+        );
+        const index = ordered.findIndex(
+            project => Number(project.id) === Number(projectIdValue)
+        );
+        const targetIndex = index + direction;
+
+        if (index < 0 || targetIndex < 0 || targetIndex >= ordered.length) {
+            return;
+        }
+
+        [ordered[index], ordered[targetIndex]] = [
+            ordered[targetIndex],
+            ordered[index]
+        ];
+
+        const previous = projects;
+        projects = ordered.map((project, order) => ({
+            ...project,
+            sort_order: order
+        }));
+        renderProjects();
+
+        try {
+            await saveProjectOrder(projects);
+            showToast("Project order updated!");
+        } catch (error) {
+            projects = previous;
+            renderProjects();
+            showToast(error.message || "Unable to reorder projects.");
+        }
+    }
+
+    async function duplicateProject(projectIdValue, button) {
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = "Duplicating...";
+
+        try {
+            const response = await fetch(
+                `/api/admin/projects/${projectIdValue}/duplicate`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
+            );
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Unable to duplicate the project.");
+            }
+
+            projects.push(data.project);
+            renderProjects();
+            showToast("Project duplicated as a hidden copy.");
+            openProjectEditor(data.project.slug);
+        } catch (error) {
+            showToast(error.message || "Unable to duplicate the project.");
+        } finally {
+            button.disabled = false;
+            button.textContent = originalText;
+        }
     }
 
     async function loadProjects() {
@@ -1077,6 +1371,14 @@ document.addEventListener("DOMContentLoaded", () => {
             Math.max(Math.round(number), min),
             max
         );
+    }
+
+    function layoutPercent(value, fallback = 50) {
+        const number = Number(value);
+
+        return Number.isFinite(number)
+            ? Math.min(Math.max(number, 0), 100)
+            : fallback;
     }
 
     function newLayoutBlockId(type) {
@@ -1208,6 +1510,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     normalized.fit = block.fit === "cover"
                         ? "cover"
                         : "contain";
+
+                    if (
+                        Object.prototype.hasOwnProperty.call(block, "focal_x") &&
+                        Number.isFinite(Number(block.focal_x))
+                    ) {
+                        normalized.focal_x = layoutPercent(block.focal_x);
+                    }
+
+                    if (
+                        Object.prototype.hasOwnProperty.call(block, "focal_y") &&
+                        Number.isFinite(Number(block.focal_y))
+                    ) {
+                        normalized.focal_y = layoutPercent(block.focal_y);
+                    }
                 }
 
                 if (
@@ -1234,6 +1550,25 @@ document.addEventListener("DOMContentLoaded", () => {
                         )
                             ? block.section_layout
                             : null;
+                    normalized.section_background = [
+                        "none", "soft", "dark", "purple"
+                    ].includes(block.section_background)
+                        ? block.section_background
+                        : "none";
+                    normalized.section_width = [
+                        "narrow", "standard", "wide"
+                    ].includes(block.section_width)
+                        ? block.section_width
+                        : "standard";
+                    normalized.section_align = block.section_align === "center"
+                        ? "center"
+                        : "left";
+                    normalized.section_spacing = [
+                        "compact", "normal", "airy"
+                    ].includes(block.section_spacing)
+                        ? block.section_spacing
+                        : "normal";
+                    normalized.show_heading = block.show_heading !== false;
                 } else {
                     normalized.section_id = typeof block.section_id === "string"
                         ? block.section_id.trim().slice(0, 80)
@@ -1310,7 +1645,12 @@ document.addEventListener("DOMContentLoaded", () => {
             y: 0,
             w: 12,
             h: 2,
-            section_layout: sectionLayoutForPreset(preset)
+            section_layout: sectionLayoutForPreset(preset),
+            section_background: "none",
+            section_width: "standard",
+            section_align: "left",
+            section_spacing: "normal",
+            show_heading: true
         }];
 
         const sectionId = blocks[0].id;
@@ -1438,8 +1778,85 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-    function markPageLayoutDirty() {
+    function layoutHistorySnapshot() {
+        return JSON.stringify({
+            enabled: Boolean(customLayoutEnabled?.checked),
+            layout: editingPageLayout
+        });
+    }
+
+    function updateLayoutHistoryButtons() {
+        if (layoutUndoButton) {
+            layoutUndoButton.disabled = layoutHistoryIndex <= 0;
+        }
+
+        if (layoutRedoButton) {
+            layoutRedoButton.disabled =
+                layoutHistoryIndex < 0 ||
+                layoutHistoryIndex >= layoutHistory.length - 1;
+        }
+    }
+
+    function resetLayoutHistory() {
+        layoutHistory = [layoutHistorySnapshot()];
+        layoutHistoryIndex = 0;
+        updateLayoutHistoryButtons();
+    }
+
+    function recordLayoutHistory() {
+        if (restoringLayoutHistory) {
+            return;
+        }
+
+        const snapshot = layoutHistorySnapshot();
+
+        if (layoutHistory[layoutHistoryIndex] === snapshot) {
+            updateLayoutHistoryButtons();
+            return;
+        }
+
+        layoutHistory = layoutHistory.slice(0, layoutHistoryIndex + 1);
+        layoutHistory.push(snapshot);
+
+        if (layoutHistory.length > 60) {
+            layoutHistory.shift();
+        }
+
+        layoutHistoryIndex = layoutHistory.length - 1;
+        updateLayoutHistoryButtons();
+    }
+
+    function restoreLayoutHistory(index) {
+        if (index < 0 || index >= layoutHistory.length) {
+            return;
+        }
+
+        restoringLayoutHistory = true;
+
+        try {
+            const state = JSON.parse(layoutHistory[index]);
+            editingPageLayout = normalizeClientPageLayout(
+                state.layout,
+                editingProject || { media: [] }
+            );
+            customLayoutEnabled.checked = Boolean(state.enabled);
+            selectedLayoutBlockId = null;
+            layoutHistoryIndex = index;
+            pageLayoutDirty = true;
+            renderPageLayout();
+            updateLayoutHistoryButtons();
+        } finally {
+            restoringLayoutHistory = false;
+        }
+    }
+
+    function markPageLayoutDirty(recordHistory = true) {
         pageLayoutDirty = true;
+
+        if (recordHistory) {
+            recordLayoutHistory();
+        }
+
         updatePageLayoutStatus();
     }
 
@@ -1590,7 +2007,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         layoutTextField.hidden = !hasText;
         layoutFitField.hidden = block.type !== "media";
+        layoutFocalFields.hidden = block.type !== "media";
         layoutSectionTypeField.hidden = block.type !== "heading";
+        layoutSectionStyleFields.hidden = block.type !== "heading";
 
         const sections = sortedLayoutSections();
         layoutBlockSectionField.hidden =
@@ -1606,11 +2025,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (block.type === "media") {
             layoutBlockFit.value = block.fit || "contain";
+            const media = mediaForLayoutBlock(block);
+            layoutBlockFocalX.value = String(layoutPercent(
+                block.focal_x,
+                layoutPercent(media?.focal_x)
+            ));
+            layoutBlockFocalY.value = String(layoutPercent(
+                block.focal_y,
+                layoutPercent(media?.focal_y)
+            ));
         }
 
         if (block.type === "heading") {
             layoutSectionType.value =
                 block.section_layout || "custom";
+            layoutSectionBackground.value =
+                block.section_background || "none";
+            layoutSectionWidth.value = block.section_width || "standard";
+            layoutSectionAlign.value = block.section_align || "left";
+            layoutSectionSpacing.value = block.section_spacing || "normal";
+            layoutSectionShowHeading.checked = block.show_heading !== false;
         } else if (sections.length) {
             layoutBlockSection.replaceChildren();
 
@@ -1722,13 +2156,14 @@ document.addEventListener("DOMContentLoaded", () => {
             positionLayoutElement(blockElement, block);
             updatePageLayoutCanvasHeight();
             renderLayoutInspector();
-            markPageLayoutDirty();
+            markPageLayoutDirty(false);
         };
 
         const finish = () => {
             pointerTarget.removeEventListener("pointermove", move);
             pointerTarget.removeEventListener("pointerup", finish);
             pointerTarget.removeEventListener("pointercancel", finish);
+            recordLayoutHistory();
             renderPageLayout();
         };
 
@@ -1842,6 +2277,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     image.alt = media.alt_text || "Project image";
                     image.loading = "lazy";
                     image.style.objectFit = block.fit || "contain";
+                    image.style.objectPosition =
+                        `${layoutPercent(block.focal_x, layoutPercent(media.focal_x))}% ` +
+                        `${layoutPercent(block.focal_y, layoutPercent(media.focal_y))}%`;
                     content.appendChild(image);
                 }
             } else if (block.type === "spacer") {
@@ -1925,6 +2363,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (type === "heading") {
             block.text = "New Section";
             block.section_layout = "custom";
+            block.section_background = "none";
+            block.section_width = "standard";
+            block.section_align = "left";
+            block.section_spacing = "normal";
+            block.show_heading = true;
         } else {
             block.section_id = sectionId;
         }
@@ -2016,6 +2459,49 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast(
             `${missing.length} ${missing.length === 1 ? "image was" : "images were"} added to the page.`
         );
+    }
+
+    function duplicateSelectedLayoutSection() {
+        const selected = selectedLayoutBlock();
+        const section = selected
+            ? sectionForLayoutBlock(selected)
+            : sortedLayoutSections().at(-1);
+
+        if (!section) {
+            showToast("Select or add a section first.");
+            return;
+        }
+
+        const sectionBlocks = editingPageLayout.blocks.filter(block =>
+            block.id === section.id || block.section_id === section.id
+        );
+        const top = Math.min(...sectionBlocks.map(block => block.y));
+        const newTop = currentLayoutBottom() + 1;
+        const idMap = new Map(
+            sectionBlocks.map(block => [
+                block.id,
+                newLayoutBlockId(block.type)
+            ])
+        );
+        const newSectionId = idMap.get(section.id);
+        const copies = sectionBlocks.map(block => ({
+            ...block,
+            id: idMap.get(block.id),
+            y: newTop + (block.y - top),
+            ...(block.type === "heading"
+                ? {
+                    text: `${block.text || "Section"} Copy`
+                }
+                : {
+                    section_id: newSectionId
+                })
+        }));
+
+        editingPageLayout.blocks.push(...copies);
+        selectedLayoutBlockId = newSectionId;
+        markPageLayoutDirty();
+        renderPageLayout();
+        showToast("Section duplicated!");
     }
 
     function updateSelectedLayoutPosition(field, value) {
@@ -2111,6 +2597,19 @@ document.addEventListener("DOMContentLoaded", () => {
         "click",
         addMissingMediaToLayout
     );
+
+    duplicateLayoutSectionButton?.addEventListener(
+        "click",
+        duplicateSelectedLayoutSection
+    );
+
+    layoutUndoButton?.addEventListener("click", () => {
+        restoreLayoutHistory(layoutHistoryIndex - 1);
+    });
+
+    layoutRedoButton?.addEventListener("click", () => {
+        restoreLayoutHistory(layoutHistoryIndex + 1);
+    });
 
     pageLayoutPreset?.addEventListener(
         "change",
@@ -2220,6 +2719,39 @@ document.addEventListener("DOMContentLoaded", () => {
         renderPageLayout();
     });
 
+    [
+        [layoutBlockFocalX, "focal_x"],
+        [layoutBlockFocalY, "focal_y"]
+    ].forEach(([input, field]) => {
+        input?.addEventListener("input", () => {
+            const block = selectedLayoutBlock();
+
+            if (!block || block.type !== "media") {
+                return;
+            }
+
+            block[field] = layoutPercent(input.value);
+            markPageLayoutDirty(false);
+            renderPageLayout();
+        });
+
+        input?.addEventListener("change", recordLayoutHistory);
+    });
+
+    layoutUseImageCropButton?.addEventListener("click", () => {
+        const block = selectedLayoutBlock();
+
+        if (!block || block.type !== "media") {
+            return;
+        }
+
+        delete block.focal_x;
+        delete block.focal_y;
+        markPageLayoutDirty();
+        renderPageLayout();
+        showToast("This block now follows the image’s main crop.");
+    });
+
     layoutSectionType?.addEventListener("change", () => {
         const block = selectedLayoutBlock();
 
@@ -2234,6 +2766,37 @@ document.addEventListener("DOMContentLoaded", () => {
             ? layoutSectionType.value
             : "custom";
 
+        markPageLayoutDirty();
+        renderPageLayout();
+    });
+
+    [
+        [layoutSectionBackground, "section_background"],
+        [layoutSectionWidth, "section_width"],
+        [layoutSectionAlign, "section_align"],
+        [layoutSectionSpacing, "section_spacing"]
+    ].forEach(([input, field]) => {
+        input?.addEventListener("change", () => {
+            const block = selectedLayoutBlock();
+
+            if (!block || block.type !== "heading") {
+                return;
+            }
+
+            block[field] = input.value;
+            markPageLayoutDirty();
+            renderPageLayout();
+        });
+    });
+
+    layoutSectionShowHeading?.addEventListener("change", () => {
+        const block = selectedLayoutBlock();
+
+        if (!block || block.type !== "heading") {
+            return;
+        }
+
+        block.show_heading = layoutSectionShowHeading.checked;
         markPageLayoutDirty();
         renderPageLayout();
     });
@@ -2305,6 +2868,9 @@ document.addEventListener("DOMContentLoaded", () => {
         projectRole.value = project?.role || "";
         projectLayout.value = project?.gallery_layout || "smart";
         projectVisible.checked = Number(project?.is_published) === 1;
+        projectSocialTitle.value = project?.social_title || "";
+        projectSocialDescription.value = project?.social_description || "";
+        updateProjectMediaSelectors(project);
 
         const savedPageLayout = normalizeClientPageLayout(
             project?.page_layout,
@@ -2321,6 +2887,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 savedPageLayout.blocks.length
             );
         }
+
+        resetLayoutHistory();
 
         if (pageLayoutPreset) {
             pageLayoutPreset.value = project?.page_layout
@@ -2418,6 +2986,9 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         selectedLayoutBlockId = null;
         pageLayoutDirty = false;
+        layoutHistory = [];
+        layoutHistoryIndex = -1;
+        updateLayoutHistoryButtons();
         document.body.classList.remove("editor-open");
     }
 
@@ -2447,6 +3018,14 @@ document.addEventListener("DOMContentLoaded", () => {
             role: projectRole.value.trim() || null,
             gallery_layout: projectLayout.value,
             is_published: projectVisible.checked,
+            cover_media_id: projectCoverMedia?.value
+                ? Number(projectCoverMedia.value)
+                : null,
+            social_title: projectSocialTitle?.value.trim() || null,
+            social_description: projectSocialDescription?.value.trim() || null,
+            social_media_id: projectSocialMedia?.value
+                ? Number(projectSocialMedia.value)
+                : null,
             page_layout: customLayoutEnabled?.checked
                 ? {
                     version: 1,
@@ -2456,6 +3035,46 @@ document.addEventListener("DOMContentLoaded", () => {
                 : null
         };
     }
+
+    function previewProjectChanges() {
+        if (!projectTitle.value.trim()) {
+            showToast("Add a project name before previewing.");
+            projectTitle.focus();
+            return;
+        }
+
+        const payload = projectPayload();
+        const previewProject = {
+            ...(editingProject || {}),
+            ...payload,
+            id: editingProject?.id || "preview",
+            slug: editingProject?.slug || "preview-project",
+            media: sortedMedia(editingProject || { media: [] }),
+            page_layout: payload.page_layout
+        };
+
+        sessionStorage.setItem(
+            "maybelin-project-preview",
+            JSON.stringify({
+                created_at: Date.now(),
+                project: previewProject
+            })
+        );
+
+        const previewWindow = window.open(
+            "../index.html?preview=1",
+            "_blank"
+        );
+
+        if (!previewWindow) {
+            showToast("Allow pop-ups to open the project preview.");
+        }
+    }
+
+    previewProjectButton?.addEventListener(
+        "click",
+        previewProjectChanges
+    );
 
     async function saveProject(event) {
         event.preventDefault();
@@ -2562,6 +3181,167 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* PROJECT MEDIA */
 
+    function updateProjectMediaSelectors(
+        project = editingProject,
+        preserveSelection = false
+    ) {
+        const media = sortedMedia(project);
+
+        [projectCoverMedia, projectSocialMedia].forEach((select, index) => {
+            if (!select) {
+                return;
+            }
+
+            const selectedValue = preserveSelection
+                ? select.value
+                : (
+                    index === 0
+                        ? project?.cover_media_id
+                        : project?.social_media_id
+                );
+            select.replaceChildren();
+
+            const automatic = document.createElement("option");
+            automatic.value = "";
+            automatic.textContent = index === 0
+                ? "First Image"
+                : "Use Project Cover";
+            select.appendChild(automatic);
+
+            media.forEach((item, mediaIndex) => {
+                const option = document.createElement("option");
+                option.value = String(item.id);
+                option.textContent = item.alt_text || `Image ${mediaIndex + 1}`;
+                select.appendChild(option);
+            });
+
+            select.value = selectedValue ? String(selectedValue) : "";
+        });
+    }
+
+    function createMediaDetailsField(labelText, input) {
+        const field = document.createElement("label");
+        field.className = "project-media-detail-field";
+        const label = document.createElement("span");
+        label.textContent = labelText;
+        field.append(label, input);
+        return field;
+    }
+
+    function buildMediaDetails(item, previewImage) {
+        const details = document.createElement("details");
+        details.className = "project-media-details";
+        const summary = document.createElement("summary");
+        summary.textContent = "Edit image details";
+        const grid = document.createElement("div");
+        grid.className = "project-media-details-grid";
+
+        const altInput = document.createElement("input");
+        altInput.type = "text";
+        altInput.maxLength = 500;
+        altInput.value = item.alt_text || "";
+        const captionInput = document.createElement("textarea");
+        captionInput.rows = 2;
+        captionInput.maxLength = 1000;
+        captionInput.value = item.caption || "";
+        const creditInput = document.createElement("input");
+        creditInput.type = "text";
+        creditInput.maxLength = 500;
+        creditInput.value = item.credit || "";
+        const linkInput = document.createElement("input");
+        linkInput.type = "url";
+        linkInput.maxLength = 2000;
+        linkInput.placeholder = "https://...";
+        linkInput.value = item.external_url || "";
+        const focalXInput = document.createElement("input");
+        focalXInput.type = "range";
+        focalXInput.min = "0";
+        focalXInput.max = "100";
+        focalXInput.value = String(layoutPercent(item.focal_x));
+        const focalYInput = document.createElement("input");
+        focalYInput.type = "range";
+        focalYInput.min = "0";
+        focalYInput.max = "100";
+        focalYInput.value = String(layoutPercent(item.focal_y));
+
+        const updatePreviewCrop = () => {
+            previewImage.style.objectPosition =
+                `${focalXInput.value}% ${focalYInput.value}%`;
+        };
+        focalXInput.addEventListener("input", updatePreviewCrop);
+        focalYInput.addEventListener("input", updatePreviewCrop);
+
+        grid.append(
+            createMediaDetailsField("Accessibility Description", altInput),
+            createMediaDetailsField("Caption", captionInput),
+            createMediaDetailsField("Credit", creditInput),
+            createMediaDetailsField("Optional Link", linkInput),
+            createMediaDetailsField("Crop: Left / Right", focalXInput),
+            createMediaDetailsField("Crop: Top / Bottom", focalYInput)
+        );
+
+        const save = document.createElement("button");
+        save.type = "button";
+        save.className = "media-detail-save-button";
+        save.textContent = "Save Image Details";
+        save.addEventListener("click", () => {
+            updateProjectMediaDetails(
+                item,
+                {
+                    alt_text: altInput.value,
+                    caption: captionInput.value,
+                    credit: creditInput.value,
+                    external_url: linkInput.value,
+                    focal_x: Number(focalXInput.value),
+                    focal_y: Number(focalYInput.value)
+                },
+                save
+            );
+        });
+
+        details.append(summary, grid, save);
+        return details;
+    }
+
+    async function updateProjectMediaDetails(item, payload, button) {
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = "Saving...";
+
+        try {
+            const response = await fetch(
+                `/api/admin/media/${item.id}`,
+                {
+                    method: "PUT",
+                    credentials: "include",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                }
+            );
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Unable to save image details.");
+            }
+
+            updateEditingProjectMedia(
+                sortedMedia(editingProject).map(media =>
+                    Number(media.id) === Number(data.media.id)
+                        ? data.media
+                        : media
+                )
+            );
+            showToast("Image details saved!");
+        } catch (error) {
+            showToast(error.message || "Unable to save image details.");
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+
     function renderProjectMedia() {
         if (!projectMediaList || !editingProject) {
             return;
@@ -2597,6 +3377,8 @@ document.addEventListener("DOMContentLoaded", () => {
             image.src = getMediaUrl(item);
             image.alt = item.alt_text || "Project image";
             image.loading = "lazy";
+            image.style.objectPosition =
+                `${layoutPercent(item.focal_x)}% ${layoutPercent(item.focal_y)}%`;
             preview.appendChild(image);
 
             const info = document.createElement("div");
@@ -2608,7 +3390,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const alt = document.createElement("span");
             alt.textContent = item.alt_text || "No image description";
 
-            info.append(position, alt);
+            info.append(position, alt, buildMediaDetails(item, image));
 
             const controls = document.createElement("div");
             controls.className = "project-media-controls";
@@ -2670,6 +3452,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ...editingProject,
             media
         };
+
+        updateProjectMediaSelectors(editingProject, true);
 
         projects = projects.map(project =>
             project.id === editingProject.id
@@ -2843,7 +3627,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const confirmed = window.confirm(
-            "Remove this image from the project? This deletes the R2 file too."
+            "Remove this image from the project?"
         );
 
         if (!confirmed) {

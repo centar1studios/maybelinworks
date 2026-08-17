@@ -1,9 +1,11 @@
 import {
     handleGetMedia,
     handleUploadProjectMedia,
+    handleUpdateProjectMedia,
     handleDeleteProjectMedia,
     handleReorderProjectMedia,
-    handleUploadAboutPhoto
+    handleUploadAboutPhoto,
+    handleUploadSiteAsset
 } from "./media.js";
 
 const COOKIE_NAME = "maybelin_admin";
@@ -44,6 +46,37 @@ const ALLOWED_SECTION_LAYOUTS = [
     "book",
     "slides",
     "full"
+];
+
+const ALLOWED_SECTION_BACKGROUNDS = [
+    "none",
+    "soft",
+    "dark",
+    "purple"
+];
+
+const ALLOWED_SECTION_WIDTHS = [
+    "narrow",
+    "standard",
+    "wide"
+];
+
+const ALLOWED_SECTION_ALIGNMENTS = [
+    "left",
+    "center"
+];
+
+const ALLOWED_SECTION_SPACING = [
+    "compact",
+    "normal",
+    "airy"
+];
+
+const ALLOWED_COLOR_PALETTES = [
+    "signature",
+    "earth",
+    "midnight",
+    "gallery"
 ];
 
 const MAX_PAGE_LAYOUT_BLOCKS = 200;
@@ -490,6 +523,53 @@ function cleanGalleryLayout(value, fallback = "smart") {
         : fallback;
 }
 
+function cleanNavigationUrl(value, fallback) {
+    if (typeof value !== "string") {
+        return fallback;
+    }
+
+    const cleaned = value.trim();
+
+    if (!cleaned) {
+        return null;
+    }
+
+    if (cleaned.startsWith("#") || cleaned.startsWith("/")) {
+        return cleaned.slice(0, 2000);
+    }
+
+    return cleanHttpUrl(cleaned, fallback);
+}
+
+function cleanMediaReference(value, fallback, allowedMediaIds) {
+    if (value === null || value === "") {
+        return null;
+    }
+
+    const mediaId = Number(value);
+
+    if (
+        Number.isInteger(mediaId) &&
+        mediaId > 0 &&
+        allowedMediaIds.has(mediaId)
+    ) {
+        return mediaId;
+    }
+
+    return fallback && allowedMediaIds.has(Number(fallback))
+        ? Number(fallback)
+        : null;
+}
+
+function publicMediaUrl(r2Key) {
+    const encodedKey = String(r2Key)
+        .split("/")
+        .map(part => encodeURIComponent(part))
+        .join("/");
+
+    return `/media/${encodedKey}`;
+}
+
 function parsePageLayout(value) {
     if (!value) {
         return null;
@@ -637,6 +717,30 @@ function cleanPageLayout(value, allowedMediaIds) {
             cleaned.fit = block.fit === "cover"
                 ? "cover"
                 : "contain";
+
+            if (
+                Object.prototype.hasOwnProperty.call(block, "focal_x") &&
+                Number.isFinite(Number(block.focal_x))
+            ) {
+                cleaned.focal_x = clampNumber(
+                    block.focal_x,
+                    50,
+                    0,
+                    100
+                );
+            }
+
+            if (
+                Object.prototype.hasOwnProperty.call(block, "focal_y") &&
+                Number.isFinite(Number(block.focal_y))
+            ) {
+                cleaned.focal_y = clampNumber(
+                    block.focal_y,
+                    50,
+                    0,
+                    100
+                );
+            }
         }
 
         if (
@@ -662,6 +766,29 @@ function cleanPageLayout(value, allowedMediaIds) {
             )
                 ? block.section_layout
                 : null;
+            cleaned.section_background =
+                ALLOWED_SECTION_BACKGROUNDS.includes(
+                    block.section_background
+                )
+                    ? block.section_background
+                    : "none";
+            cleaned.section_width = ALLOWED_SECTION_WIDTHS.includes(
+                block.section_width
+            )
+                ? block.section_width
+                : "standard";
+            cleaned.section_align = ALLOWED_SECTION_ALIGNMENTS.includes(
+                block.section_align
+            )
+                ? block.section_align
+                : "left";
+            cleaned.section_spacing = ALLOWED_SECTION_SPACING.includes(
+                block.section_spacing
+            )
+                ? block.section_spacing
+                : "normal";
+            cleaned.show_heading = block.show_heading !== false &&
+                block.show_heading !== 0;
         } else if (typeof block.section_id === "string") {
             cleaned.section_id = cleanText(
                 block.section_id,
@@ -948,6 +1075,12 @@ async function getSiteSettings(env) {
                 contact_email,
                 contact_phone,
                 instagram_url,
+                logo_key,
+                favicon_key,
+                footer_text,
+                home_button_label,
+                home_button_url,
+                color_palette,
                 updated_at
             FROM site_settings
             WHERE id = 1
@@ -1169,6 +1302,29 @@ async function handleUpdateSettings(
             current.instagram_url
         );
 
+        const footerText = cleanText(
+            body.footer_text,
+            current.footer_text || "Maybelin Works",
+            200
+        );
+
+        const homeButtonLabel = cleanNullableText(
+            body.home_button_label,
+            current.home_button_label,
+            100
+        );
+
+        const homeButtonUrl = cleanNavigationUrl(
+            body.home_button_url,
+            current.home_button_url
+        );
+
+        const colorPalette = ALLOWED_COLOR_PALETTES.includes(
+            body.color_palette
+        )
+            ? body.color_palette
+            : current.color_palette || "signature";
+
         await env.DB
             .prepare(`
                 UPDATE site_settings
@@ -1192,6 +1348,10 @@ async function handleUpdateSettings(
                     contact_email = ?,
                     contact_phone = ?,
                     instagram_url = ?,
+                    footer_text = ?,
+                    home_button_label = ?,
+                    home_button_url = ?,
+                    color_palette = ?,
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = 1
             `)
@@ -1214,7 +1374,11 @@ async function handleUpdateSettings(
                 aboutBio,
                 contactEmail,
                 contactPhone,
-                instagramUrl
+                instagramUrl,
+                footerText,
+                homeButtonLabel,
+                homeButtonUrl,
+                colorPalette
             )
             .run();
 
@@ -1259,6 +1423,10 @@ async function getProjectsFromDatabase(
                 role,
                 gallery_layout,
                 page_layout_json,
+                cover_media_id,
+                social_title,
+                social_description,
+                social_media_id,
                 sort_order,
                 is_published,
                 created_at,
@@ -1280,6 +1448,11 @@ async function getProjectsFromDatabase(
                 pm.project_id,
                 pm.r2_key,
                 pm.alt_text,
+                pm.caption,
+                pm.credit,
+                pm.external_url,
+                pm.focal_x,
+                pm.focal_y,
                 pm.sort_order
             FROM project_media AS pm
             INNER JOIN projects AS p
@@ -1487,6 +1660,18 @@ async function handleCreateProject(
         "smart"
     );
 
+    const socialTitle = cleanNullableText(
+        body.social_title,
+        null,
+        200
+    );
+
+    const socialDescription = cleanNullableText(
+        body.social_description,
+        null,
+        500
+    );
+
     const isPublished = cleanBoolean(
         body.is_published,
         0
@@ -1521,10 +1706,14 @@ async function handleCreateProject(
                     role,
                     gallery_layout,
                     page_layout_json,
+                    cover_media_id,
+                    social_title,
+                    social_description,
+                    social_media_id,
                     sort_order,
                     is_published
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `)
             .bind(
                 slug,
@@ -1534,6 +1723,11 @@ async function handleCreateProject(
                 year,
                 role,
                 galleryLayout,
+                null,
+                null,
+                socialTitle,
+                socialDescription,
+                null,
                 sortOrder,
                 isPublished
             )
@@ -1554,6 +1748,11 @@ async function handleCreateProject(
                     year,
                     role,
                     gallery_layout,
+                    page_layout_json,
+                    cover_media_id,
+                    social_title,
+                    social_description,
+                    social_media_id,
                     sort_order,
                     is_published,
                     created_at,
@@ -1687,6 +1886,45 @@ async function handleUpdateProject(
             current.gallery_layout || "smart"
         );
 
+        const mediaIdResult = await env.DB
+            .prepare(`
+                SELECT id
+                FROM project_media
+                WHERE project_id = ?
+            `)
+            .bind(numericId)
+            .all();
+
+        const allowedMediaIds = new Set(
+            mediaIdResult.results.map(
+                media => Number(media.id)
+            )
+        );
+
+        const coverMediaId = cleanMediaReference(
+            body.cover_media_id,
+            current.cover_media_id,
+            allowedMediaIds
+        );
+
+        const socialTitle = cleanNullableText(
+            body.social_title,
+            current.social_title,
+            200
+        );
+
+        const socialDescription = cleanNullableText(
+            body.social_description,
+            current.social_description,
+            500
+        );
+
+        const socialMediaId = cleanMediaReference(
+            body.social_media_id,
+            current.social_media_id,
+            allowedMediaIds
+        );
+
         const sortOrder = Math.round(
             clampNumber(
                 body.sort_order,
@@ -1709,21 +1947,6 @@ async function handleUpdateProject(
                 "page_layout"
             )
         ) {
-            const mediaResult = await env.DB
-                .prepare(`
-                    SELECT id
-                    FROM project_media
-                    WHERE project_id = ?
-                `)
-                .bind(numericId)
-                .all();
-
-            const allowedMediaIds = new Set(
-                mediaResult.results.map(
-                    media => Number(media.id)
-                )
-            );
-
             const cleanedLayout = cleanPageLayout(
                 body.page_layout,
                 allowedMediaIds
@@ -1749,6 +1972,10 @@ async function handleUpdateProject(
                     role = ?,
                     gallery_layout = ?,
                     page_layout_json = ?,
+                    cover_media_id = ?,
+                    social_title = ?,
+                    social_description = ?,
+                    social_media_id = ?,
                     sort_order = ?,
                     is_published = ?,
                     updated_at = CURRENT_TIMESTAMP
@@ -1762,6 +1989,10 @@ async function handleUpdateProject(
                 role,
                 galleryLayout,
                 pageLayoutJson,
+                coverMediaId,
+                socialTitle,
+                socialDescription,
+                socialMediaId,
                 sortOrder,
                 isPublished,
                 numericId
@@ -1780,6 +2011,10 @@ async function handleUpdateProject(
                     role,
                     gallery_layout,
                     page_layout_json,
+                    cover_media_id,
+                    social_title,
+                    social_description,
+                    social_media_id,
                     sort_order,
                     is_published,
                     created_at,
@@ -1798,6 +2033,11 @@ async function handleUpdateProject(
                     project_id,
                     r2_key,
                     alt_text,
+                    caption,
+                    credit,
+                    external_url,
+                    focal_x,
+                    focal_y,
                     sort_order
                 FROM project_media
                 WHERE project_id = ?
@@ -1822,6 +2062,452 @@ async function handleUpdateProject(
         return json({
             error: "Unable to save project."
         }, 500);
+    }
+}
+
+
+/* REORDER PROJECTS */
+
+async function handleReorderProjects(
+    request,
+    env
+) {
+    if (request.method !== "PUT") {
+        return json({
+            error: "Method not allowed."
+        }, 405);
+    }
+
+    const session = await requireAdmin(
+        request,
+        env
+    );
+
+    if (!session) {
+        return json({
+            error: "Unauthorized."
+        }, 401);
+    }
+
+    if (!env.DB) {
+        return json({
+            error: "Database is not configured."
+        }, 500);
+    }
+
+    let body;
+
+    try {
+        body = await request.json();
+    } catch {
+        return json({
+            error: "Invalid request."
+        }, 400);
+    }
+
+    const projectIds = Array.isArray(body.project_ids)
+        ? body.project_ids.map(Number)
+        : [];
+
+    if (
+        projectIds.some(id =>
+            !Number.isInteger(id) || id <= 0
+        ) ||
+        new Set(projectIds).size !== projectIds.length
+    ) {
+        return json({
+            error: "Invalid project order."
+        }, 400);
+    }
+
+    try {
+        const currentResult = await env.DB
+            .prepare(`
+                SELECT id
+                FROM projects
+                ORDER BY sort_order ASC, id ASC
+            `)
+            .all();
+        const currentIds = currentResult.results.map(
+            project => Number(project.id)
+        );
+        const currentSet = new Set(currentIds);
+
+        if (
+            currentIds.length !== projectIds.length ||
+            !projectIds.every(id => currentSet.has(id))
+        ) {
+            return json({
+                error: "The project list changed. Refresh and try again."
+            }, 409);
+        }
+
+        if (projectIds.length > 0) {
+            await env.DB.batch(
+                projectIds.map((id, index) =>
+                    env.DB.prepare(`
+                        UPDATE projects
+                        SET
+                            sort_order = ?,
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE id = ?
+                    `).bind(index, id)
+                )
+            );
+        }
+
+        return json({
+            success: true,
+            project_ids: projectIds
+        });
+    } catch (error) {
+        console.error("Unable to reorder projects:", error);
+
+        return json({
+            error: "Unable to reorder projects."
+        }, 500);
+    }
+}
+
+
+/* DUPLICATE PROJECT */
+
+async function handleDuplicateProject(
+    request,
+    env,
+    projectId
+) {
+    if (request.method !== "POST") {
+        return json({
+            error: "Method not allowed."
+        }, 405);
+    }
+
+    const session = await requireAdmin(
+        request,
+        env
+    );
+
+    if (!session) {
+        return json({
+            error: "Unauthorized."
+        }, 401);
+    }
+
+    if (!env.DB) {
+        return json({
+            error: "Database is not configured."
+        }, 500);
+    }
+
+    const numericId = Number(projectId);
+
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+        return json({
+            error: "Invalid project."
+        }, 400);
+    }
+
+    let newProjectId = null;
+
+    try {
+        const source = await env.DB
+            .prepare(`
+                SELECT *
+                FROM projects
+                WHERE id = ?
+                LIMIT 1
+            `)
+            .bind(numericId)
+            .first();
+
+        if (!source) {
+            return json({
+                error: "Project not found."
+            }, 404);
+        }
+
+        const title = `${source.title} Copy`.slice(0, 200);
+        const slug = await uniqueProjectSlug(env, title);
+        const orderResult = await env.DB
+            .prepare(`
+                SELECT COALESCE(MAX(sort_order), -1) + 1 AS next_order
+                FROM projects
+            `)
+            .first();
+        const sortOrder = Number(orderResult?.next_order) || 0;
+
+        const insertResult = await env.DB
+            .prepare(`
+                INSERT INTO projects (
+                    slug,
+                    title,
+                    kicker,
+                    description,
+                    year,
+                    role,
+                    gallery_layout,
+                    page_layout_json,
+                    cover_media_id,
+                    social_title,
+                    social_description,
+                    social_media_id,
+                    sort_order,
+                    is_published
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+            `)
+            .bind(
+                slug,
+                title,
+                source.kicker,
+                source.description,
+                source.year,
+                source.role,
+                source.gallery_layout,
+                null,
+                null,
+                source.social_title,
+                source.social_description,
+                null,
+                sortOrder
+            )
+            .run();
+
+        newProjectId = Number(insertResult.meta?.last_row_id);
+
+        const sourceMediaResult = await env.DB
+            .prepare(`
+                SELECT
+                    id,
+                    r2_key,
+                    alt_text,
+                    caption,
+                    credit,
+                    external_url,
+                    focal_x,
+                    focal_y,
+                    sort_order
+                FROM project_media
+                WHERE project_id = ?
+                ORDER BY sort_order ASC, id ASC
+            `)
+            .bind(numericId)
+            .all();
+        const mediaIdMap = new Map();
+
+        for (const media of sourceMediaResult.results) {
+            const mediaInsert = await env.DB
+                .prepare(`
+                    INSERT INTO project_media (
+                        project_id,
+                        r2_key,
+                        alt_text,
+                        caption,
+                        credit,
+                        external_url,
+                        focal_x,
+                        focal_y,
+                        sort_order
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `)
+                .bind(
+                    newProjectId,
+                    media.r2_key,
+                    media.alt_text,
+                    media.caption,
+                    media.credit,
+                    media.external_url,
+                    media.focal_x,
+                    media.focal_y,
+                    media.sort_order
+                )
+                .run();
+
+            mediaIdMap.set(
+                Number(media.id),
+                Number(mediaInsert.meta?.last_row_id)
+            );
+        }
+
+        let duplicatedLayoutJson = null;
+        const sourceLayout = parsePageLayout(source.page_layout_json);
+
+        if (sourceLayout) {
+            const duplicatedLayout = {
+                ...sourceLayout,
+                blocks: sourceLayout.blocks.map(block => ({
+                    ...block,
+                    ...(block.type === "media"
+                        ? {
+                            media_id: mediaIdMap.get(
+                                Number(block.media_id)
+                            )
+                        }
+                        : {})
+                })).filter(block =>
+                    block.type !== "media" ||
+                    Number.isInteger(block.media_id)
+                )
+            };
+
+            duplicatedLayoutJson = JSON.stringify(duplicatedLayout);
+        }
+
+        const coverMediaId = mediaIdMap.get(
+            Number(source.cover_media_id)
+        ) || null;
+        const socialMediaId = mediaIdMap.get(
+            Number(source.social_media_id)
+        ) || null;
+
+        await env.DB
+            .prepare(`
+                UPDATE projects
+                SET
+                    page_layout_json = ?,
+                    cover_media_id = ?,
+                    social_media_id = ?
+                WHERE id = ?
+            `)
+            .bind(
+                duplicatedLayoutJson,
+                coverMediaId,
+                socialMediaId,
+                newProjectId
+            )
+            .run();
+
+        const projects = await getProjectsFromDatabase(env, false);
+        const project = projects.find(
+            candidate => Number(candidate.id) === newProjectId
+        );
+
+        return json({
+            success: true,
+            project
+        }, 201);
+    } catch (error) {
+        console.error("Unable to duplicate project:", error);
+
+        if (newProjectId) {
+            try {
+                await env.DB
+                    .prepare("DELETE FROM projects WHERE id = ?")
+                    .bind(newProjectId)
+                    .run();
+            } catch (cleanupError) {
+                console.error(
+                    "Unable to clean up failed project copy:",
+                    cleanupError
+                );
+            }
+        }
+
+        return json({
+            error: "Unable to duplicate the project."
+        }, 500);
+    }
+}
+
+
+/* SHAREABLE PROJECT PAGE METADATA */
+
+async function handleProjectSocialPage(
+    request,
+    env,
+    url
+) {
+    const slug = cleanText(
+        url.searchParams.get("project"),
+        "",
+        100
+    );
+
+    if (request.method !== "GET" || !slug || !env.DB) {
+        return env.ASSETS.fetch(request);
+    }
+
+    try {
+        const project = await env.DB
+            .prepare(`
+                SELECT
+                    p.title,
+                    p.description,
+                    p.social_title,
+                    p.social_description,
+                    COALESCE(
+                        social_media.r2_key,
+                        cover_media.r2_key,
+                        first_media.r2_key
+                    ) AS social_r2_key
+                FROM projects AS p
+                LEFT JOIN project_media AS social_media
+                    ON social_media.id = p.social_media_id
+                LEFT JOIN project_media AS cover_media
+                    ON cover_media.id = p.cover_media_id
+                LEFT JOIN project_media AS first_media
+                    ON first_media.id = (
+                        SELECT pm.id
+                        FROM project_media AS pm
+                        WHERE pm.project_id = p.id
+                        ORDER BY pm.sort_order ASC, pm.id ASC
+                        LIMIT 1
+                    )
+                WHERE p.slug = ? AND p.is_published = 1
+                LIMIT 1
+            `)
+            .bind(slug)
+            .first();
+
+        const assetResponse = await env.ASSETS.fetch(request);
+
+        if (!project || !assetResponse.ok) {
+            return assetResponse;
+        }
+
+        const title = cleanText(
+            project.social_title,
+            project.title || "Maybelin Works",
+            200
+        );
+        const description = cleanText(
+            project.social_description,
+            String(project.description || "Maybelin Works portfolio project")
+                .replace(/\s+/g, " ")
+                .trim()
+                .slice(0, 240),
+            500
+        );
+        const canonicalUrl = `${url.origin}/?project=${encodeURIComponent(slug)}`;
+        const imageUrl = project.social_r2_key
+            ? `${url.origin}${publicMediaUrl(project.social_r2_key)}`
+            : "";
+
+        const setContent = value => ({
+            element(element) {
+                element.setAttribute("content", value);
+            }
+        });
+
+        return new HTMLRewriter()
+            .on("title", {
+                element(element) {
+                    element.setInnerContent(`${title} — Maybelin Works`);
+                }
+            })
+            .on("[data-social-title]", setContent(title))
+            .on("[data-twitter-title]", setContent(title))
+            .on("[data-social-description]", setContent(description))
+            .on("[data-twitter-description]", setContent(description))
+            .on("[data-social-url]", setContent(canonicalUrl))
+            .on("[data-social-image]", setContent(imageUrl))
+            .on("[data-twitter-image]", setContent(imageUrl))
+            .transform(assetResponse);
+    } catch (error) {
+        console.error("Unable to build project sharing metadata:", error);
+        return env.ASSETS.fetch(request);
     }
 }
 
@@ -1935,6 +2621,29 @@ export default {
             );
         }
 
+        /* BRANDING ASSETS */
+
+        const brandingAssetMatch = url.pathname.match(
+            /^\/api\/admin\/branding\/(logo|favicon)$/
+        );
+
+        if (brandingAssetMatch) {
+            const session = await requireAdmin(request, env);
+
+            if (!session) {
+                return json({
+                    error: "Unauthorized."
+                }, 401);
+            }
+
+            return handleUploadSiteAsset(
+                request,
+                env,
+                session.username,
+                brandingAssetMatch[1]
+            );
+        }
+
         /* PUBLIC PROJECTS */
 
         if (url.pathname === "/api/projects") {
@@ -1942,6 +2651,10 @@ export default {
         }
 
         /* ADMIN PROJECT COLLECTION */
+
+        if (url.pathname === "/api/admin/projects/order") {
+            return handleReorderProjects(request, env);
+        }
 
         if (url.pathname === "/api/admin/projects") {
             if (request.method === "POST") {
@@ -1954,6 +2667,20 @@ export default {
             return handleGetAdminProjects(
                 request,
                 env
+            );
+        }
+
+        /* DUPLICATE PROJECT */
+
+        const projectDuplicateMatch = url.pathname.match(
+            /^\/api\/admin\/projects\/(\d+)\/duplicate$/
+        );
+
+        if (projectDuplicateMatch) {
+            return handleDuplicateProject(
+                request,
+                env,
+                projectDuplicateMatch[1]
             );
         }
 
@@ -2010,7 +2737,7 @@ export default {
             );
         }
 
-        /* DELETE PROJECT IMAGE */
+        /* UPDATE OR DELETE PROJECT IMAGE */
 
         const mediaDeleteMatch =
             url.pathname.match(
@@ -2027,6 +2754,14 @@ export default {
                 return json({
                     error: "Unauthorized."
                 }, 401);
+            }
+
+            if (request.method === "PUT") {
+                return handleUpdateProjectMedia(
+                    request,
+                    env,
+                    mediaDeleteMatch[1]
+                );
             }
 
             return handleDeleteProjectMedia(
@@ -2061,6 +2796,13 @@ export default {
                 request,
                 env
             );
+        }
+
+        if (
+            url.pathname === "/" &&
+            url.searchParams.has("project")
+        ) {
+            return handleProjectSocialPage(request, env, url);
         }
 
         return env.ASSETS.fetch(request);

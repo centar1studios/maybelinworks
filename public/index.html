@@ -4,12 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Portfolio of multidisciplinary artist and designer Maybelin Garcia Romero.">
+    <meta property="og:type" content="website" data-social-type>
+    <meta property="og:title" content="Maybelin Works" data-social-title>
+    <meta property="og:description" content="Portfolio of multidisciplinary artist and designer Maybelin Garcia Romero." data-social-description>
+    <meta property="og:url" content="" data-social-url>
+    <meta property="og:image" content="" data-social-image>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Maybelin Works" data-twitter-title>
+    <meta name="twitter:description" content="Portfolio of multidisciplinary artist and designer Maybelin Garcia Romero." data-twitter-description>
+    <meta name="twitter:image" content="" data-twitter-image>
     <title>Maybelin Works</title>
-    <link rel="icon" type="image/png" href="./assets/maygarcia_logo.png">
+    <link rel="icon" href="./assets/maygarcia_logo.png" data-site-favicon>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./stylesheet.css?v=20260816-9">
+    <link rel="stylesheet" href="./stylesheet.css?v=20260816-10">
 </head>
 <body>
 
@@ -31,7 +40,10 @@
 
     <!-- HEADER -->
     <header class="site-header">
-        <a class="wordmark" href="#" aria-label="Return to Homepage">Maybelin Garcia Romero</a>
+        <a class="wordmark" href="#" aria-label="Return to Homepage">
+            <img data-site-logo alt="" hidden>
+            <span data-site-wordmark>Maybelin Garcia Romero</span>
+        </a>
         <nav class="site-nav" aria-label="Site Links">
             <button class="nav-button" type="button" data-open-about>Information</button>
             <a href="https://www.instagram.com/may.sun.jar" target="_blank" rel="noreferrer">Instagram</a>
@@ -49,6 +61,7 @@
                     <h1 class="hero-title">Work that not only looks good but does good.</h1>
                     <div class="hero-bottom">
                         <button class="text-button" type="button" data-open-projects>Read More?</button>
+                        <a class="hero-home-button" href="#work" data-home-button hidden>View My Work</a>
                     </div>
                 </div>
             </div>
@@ -57,7 +70,7 @@
 
     <!-- FOOTER -->
     <footer class="site-footer">
-        <p>Maybelin Works, <span data-current-year></span></p>
+        <p><span data-footer-text>Maybelin Works</span>, <span data-current-year></span></p>
         <p> <em>Website created by Centari Studios</em> </p>
         <p> <a href="./admin-login.html">Admin Login</a> </p>
     </footer>
@@ -372,7 +385,7 @@
         </div>
     </dialog>
 
-    <script src="./site-config.js?v=20260816-9"></script>
+    <script src="./site-config.js?v=20260816-10"></script>
 
 </body>
 </html>

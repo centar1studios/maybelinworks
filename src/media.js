@@ -50,6 +50,46 @@ function cleanAltText(value) {
     return cleaned.slice(0, 500);
 }
 
+function cleanOptionalText(value, maxLength) {
+    if (typeof value !== "string") {
+        return null;
+    }
+
+    const cleaned = value.trim();
+
+    return cleaned
+        ? cleaned.slice(0, maxLength)
+        : null;
+}
+
+function cleanHttpUrl(value) {
+    const cleaned = cleanOptionalText(value, 2000);
+
+    if (!cleaned) {
+        return null;
+    }
+
+    try {
+        const url = new URL(cleaned);
+
+        return url.protocol === "http:" || url.protocol === "https:"
+            ? url.toString()
+            : null;
+    } catch {
+        return null;
+    }
+}
+
+function cleanFocalPoint(value, fallback = 50) {
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+        return fallback;
+    }
+
+    return Math.min(Math.max(number, 0), 100);
+}
+
 function safeProjectSlug(slug) {
     return String(slug || "project")
         .toLowerCase()
@@ -154,6 +194,11 @@ async function getProjectMedia(
                 project_id,
                 r2_key,
                 alt_text,
+                caption,
+                credit,
+                external_url,
+                focal_x,
+                focal_y,
                 sort_order,
                 created_at
             FROM project_media
@@ -443,6 +488,11 @@ export async function handleUploadProjectMedia(
                     project_id,
                     r2_key,
                     alt_text,
+                    caption,
+                    credit,
+                    external_url,
+                    focal_x,
+                    focal_y,
                     sort_order,
                     created_at
                 FROM project_media
@@ -474,6 +524,154 @@ export async function handleUploadProjectMedia(
 
         return json({
             error: "Unable to upload the image."
+        }, 500);
+    }
+}
+
+
+/* UPDATE PROJECT MEDIA DETAILS */
+
+export async function handleUpdateProjectMedia(
+    request,
+    env,
+    mediaId
+) {
+    if (request.method !== "PUT") {
+        return json({
+            error: "Method not allowed."
+        }, 405);
+    }
+
+    if (!env.DB) {
+        return json({
+            error: "Database is not configured."
+        }, 500);
+    }
+
+    const numericMediaId = validId(mediaId);
+
+    if (!numericMediaId) {
+        return json({
+            error: "Invalid image."
+        }, 400);
+    }
+
+    let body;
+
+    try {
+        body = await request.json();
+    } catch {
+        return json({
+            error: "Invalid request."
+        }, 400);
+    }
+
+    try {
+        const current = await env.DB
+            .prepare(`
+                SELECT *
+                FROM project_media
+                WHERE id = ?
+                LIMIT 1
+            `)
+            .bind(numericMediaId)
+            .first();
+
+        if (!current) {
+            return json({
+                error: "Image not found."
+            }, 404);
+        }
+
+        const altText = Object.prototype.hasOwnProperty.call(
+            body,
+            "alt_text"
+        )
+            ? cleanAltText(body.alt_text)
+            : current.alt_text;
+        const caption = Object.prototype.hasOwnProperty.call(
+            body,
+            "caption"
+        )
+            ? cleanOptionalText(body.caption, 1000)
+            : current.caption;
+        const credit = Object.prototype.hasOwnProperty.call(
+            body,
+            "credit"
+        )
+            ? cleanOptionalText(body.credit, 500)
+            : current.credit;
+        const externalUrl = Object.prototype.hasOwnProperty.call(
+            body,
+            "external_url"
+        )
+            ? cleanHttpUrl(body.external_url)
+            : current.external_url;
+        const focalX = cleanFocalPoint(
+            body.focal_x,
+            current.focal_x
+        );
+        const focalY = cleanFocalPoint(
+            body.focal_y,
+            current.focal_y
+        );
+
+        await env.DB
+            .prepare(`
+                UPDATE project_media
+                SET
+                    alt_text = ?,
+                    caption = ?,
+                    credit = ?,
+                    external_url = ?,
+                    focal_x = ?,
+                    focal_y = ?
+                WHERE id = ?
+            `)
+            .bind(
+                altText,
+                caption,
+                credit,
+                externalUrl,
+                focalX,
+                focalY,
+                numericMediaId
+            )
+            .run();
+
+        const media = await env.DB
+            .prepare(`
+                SELECT
+                    id,
+                    project_id,
+                    r2_key,
+                    alt_text,
+                    caption,
+                    credit,
+                    external_url,
+                    focal_x,
+                    focal_y,
+                    sort_order,
+                    created_at
+                FROM project_media
+                WHERE id = ?
+                LIMIT 1
+            `)
+            .bind(numericMediaId)
+            .first();
+
+        return json({
+            success: true,
+            media: mediaResponse(media)
+        });
+    } catch (error) {
+        console.error(
+            "Unable to update image details:",
+            error
+        );
+
+        return json({
+            error: "Unable to save the image details."
         }, 500);
     }
 }
@@ -614,6 +812,149 @@ export async function handleUploadAboutPhoto(
 }
 
 
+/* BRANDING ASSETS */
+
+export async function handleUploadSiteAsset(
+    request,
+    env,
+    username,
+    assetType
+) {
+    if (request.method !== "POST") {
+        return json({
+            error: "Method not allowed."
+        }, 405);
+    }
+
+    if (!env.DB || !env.MEDIA) {
+        return json({
+            error: "Media storage is not configured."
+        }, 500);
+    }
+
+    const assetConfig = {
+        logo: {
+            column: "logo_key",
+            folder: "logo",
+            label: "website logo"
+        },
+        favicon: {
+            column: "favicon_key",
+            folder: "favicon",
+            label: "browser icon"
+        }
+    }[assetType];
+
+    if (!assetConfig) {
+        return json({
+            error: "Invalid branding asset."
+        }, 400);
+    }
+
+    let formData;
+
+    try {
+        formData = await request.formData();
+    } catch {
+        return json({
+            error: "Invalid upload."
+        }, 400);
+    }
+
+    const file = formData.get("file");
+    const validation = validateImageFile(file);
+
+    if (validation.error) {
+        return json({
+            error: validation.error
+        }, 400);
+    }
+
+    try {
+        const current = await env.DB
+            .prepare(`
+                SELECT ${assetConfig.column} AS asset_key
+                FROM site_settings
+                WHERE id = 1
+                LIMIT 1
+            `)
+            .first();
+        const oldKey = current?.asset_key || null;
+        const newKey = `site/${assetConfig.folder}/${
+            crypto.randomUUID()
+        }.${validation.extension}`;
+
+        await env.MEDIA.put(
+            newKey,
+            file.stream(),
+            {
+                httpMetadata: {
+                    contentType: file.type,
+                    cacheControl:
+                        "public, max-age=31536000, immutable"
+                },
+                customMetadata: {
+                    originalName: String(
+                        file.name || assetConfig.folder
+                    ).slice(0, 200),
+                    uploadedBy: String(
+                        username || "admin"
+                    ).slice(0, 100),
+                    usage: assetType
+                }
+            }
+        );
+
+        try {
+            await env.DB
+                .prepare(`
+                    UPDATE site_settings
+                    SET
+                        ${assetConfig.column} = ?,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE id = 1
+                `)
+                .bind(newKey)
+                .run();
+        } catch (databaseError) {
+            await env.MEDIA.delete(newKey);
+            throw databaseError;
+        }
+
+        if (
+            oldKey &&
+            oldKey !== newKey &&
+            oldKey.startsWith(`site/${assetConfig.folder}/`)
+        ) {
+            try {
+                await env.MEDIA.delete(oldKey);
+            } catch (deleteError) {
+                console.warn(
+                    `New ${assetConfig.label} saved, but the previous object could not be removed:`,
+                    deleteError
+                );
+            }
+        }
+
+        return json({
+            success: true,
+            asset_type: assetType,
+            key: newKey,
+            url: mediaUrl(newKey)
+        }, 201);
+    } catch (error) {
+        console.error(
+            `Unable to upload ${assetConfig.label}:`,
+            error
+        );
+
+        return json({
+            error: `Unable to replace the ${assetConfig.label}.`
+        }, 500);
+    }
+}
+
+
 /* DELETE PROJECT MEDIA */
 
 export async function handleDeleteProjectMedia(
@@ -676,10 +1017,6 @@ export async function handleDeleteProjectMedia(
     }
 
     try {
-        await env.MEDIA.delete(
-            media.r2_key
-        );
-
         await env.DB
             .prepare(`
                 DELETE FROM project_media
@@ -687,6 +1024,19 @@ export async function handleDeleteProjectMedia(
             `)
             .bind(numericMediaId)
             .run();
+
+        const remainingReferences = await env.DB
+            .prepare(`
+                SELECT COUNT(*) AS reference_count
+                FROM project_media
+                WHERE r2_key = ?
+            `)
+            .bind(media.r2_key)
+            .first();
+
+        if (Number(remainingReferences?.reference_count) === 0) {
+            await env.MEDIA.delete(media.r2_key);
+        }
 
         return json({
             success: true,

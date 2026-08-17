@@ -70,6 +70,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const heroKicker = document.querySelector(".hero-kicker");
     const heroTitle = document.querySelector(".hero-title");
+    const siteLogo = document.querySelector("[data-site-logo]");
+    const siteWordmark = document.querySelector("[data-site-wordmark]");
+    const siteFavicon = document.querySelector("[data-site-favicon]");
+    const footerText = document.querySelector("[data-footer-text]");
+    const homeButton = document.querySelector("[data-home-button]");
     const currentYear = document.querySelector("[data-current-year]");
     const publicProjectList = document.querySelector(".project-list");
 
@@ -116,6 +121,62 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("/");
 
         return `/media/${encodedKey}`;
+    }
+
+    function focalPercent(value, fallback = 50) {
+        const number = Number(value);
+
+        return Number.isFinite(number)
+            ? Math.min(Math.max(number, 0), 100)
+            : fallback;
+    }
+
+    function applyMediaDetails(image, item, block = {}) {
+        const focalX = focalPercent(
+            block.focal_x,
+            focalPercent(item.focal_x)
+        );
+        const focalY = focalPercent(
+            block.focal_y,
+            focalPercent(item.focal_y)
+        );
+
+        image.style.objectPosition = `${focalX}% ${focalY}%`;
+        image.dataset.caption = item.caption || "";
+        image.dataset.credit = item.credit || "";
+        image.dataset.externalUrl = item.external_url || "";
+    }
+
+    function appendMediaCaption(figure, item) {
+        if (!figure || (!item.caption && !item.credit && !item.external_url)) {
+            return;
+        }
+
+        const caption = document.createElement("figcaption");
+        caption.className = "cms-media-caption";
+
+        if (item.caption) {
+            const text = document.createElement("span");
+            text.textContent = item.caption;
+            caption.appendChild(text);
+        }
+
+        if (item.credit) {
+            const credit = document.createElement("small");
+            credit.textContent = item.credit;
+            caption.appendChild(credit);
+        }
+
+        if (item.external_url) {
+            const link = document.createElement("a");
+            link.href = item.external_url;
+            link.target = "_blank";
+            link.rel = "noreferrer";
+            link.textContent = "View related link";
+            caption.appendChild(link);
+        }
+
+        figure.appendChild(caption);
     }
 
 
@@ -373,6 +434,57 @@ document.addEventListener("DOMContentLoaded", () => {
             .trim() || "project";
     }
 
+    function projectShareUrl(project) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("preview");
+        url.searchParams.set("project", project.slug);
+        return url.toString();
+    }
+
+    function setMetaContent(selector, value) {
+        const element = document.querySelector(selector);
+
+        if (element) {
+            element.setAttribute("content", value || "");
+        }
+    }
+
+    function updateProjectSocialMetadata(project) {
+        if (!project) {
+            return;
+        }
+
+        const title = project.social_title?.trim() ||
+            project.title ||
+            "Maybelin Works";
+        const description = project.social_description?.trim() ||
+            String(project.description || "Maybelin Works portfolio project")
+                .replace(/\s+/g, " ")
+                .trim()
+                .slice(0, 240);
+        const media = Array.isArray(project.media)
+            ? project.media
+            : [];
+        const preferredMediaId = project.social_media_id ||
+            project.cover_media_id;
+        const socialMedia = media.find(item =>
+            Number(item.id) === Number(preferredMediaId)
+        ) || media[0];
+        const shareUrl = projectShareUrl(project);
+        const imageUrl = socialMedia
+            ? new URL(getMediaUrl(socialMedia), window.location.origin).toString()
+            : "";
+
+        document.title = `${title} — Maybelin Works`;
+        setMetaContent('[data-social-title]', title);
+        setMetaContent('[data-twitter-title]', title);
+        setMetaContent('[data-social-description]', description);
+        setMetaContent('[data-twitter-description]', description);
+        setMetaContent('[data-social-url]', shareUrl);
+        setMetaContent('[data-social-image]', imageUrl);
+        setMetaContent('[data-twitter-image]', imageUrl);
+    }
+
     function updateProjectSwitcher() {
         if (!projectSwitcher) {
             return;
@@ -438,6 +550,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         currentArticle.hidden = false;
         currentArticle.classList.add("project-current");
+        updateProjectSocialMetadata(currentArticle._projectData);
         updateProjectSwitcher();
 
         if (scrollToProject && projectsDialog?.open) {
@@ -532,10 +645,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const alt = image.alt || "Portfolio artwork";
+        const captionParts = [
+            image.dataset.caption || alt,
+            image.dataset.credit || ""
+        ].filter(Boolean);
 
         lightboxImage.src = image.currentSrc || image.src;
         lightboxImage.alt = alt;
-        lightboxCaption.textContent = alt;
+        lightboxCaption.textContent = captionParts.join(" — ");
         lightboxCount.textContent =
             `${currentImageIndex + 1} / ${images.length}`;
 
@@ -673,6 +790,92 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
+    function applySiteBranding(settings) {
+        const palettes = {
+            signature: {
+                dark: "#2A3F38",
+                highlight: "#8DF688",
+                feature: "#562F54",
+                neutral: "#57585D",
+                accent: "#F650BD"
+            },
+            earth: {
+                dark: "#40362E",
+                highlight: "#E0B86C",
+                feature: "#7B4B3A",
+                neutral: "#6E625A",
+                accent: "#D97655"
+            },
+            midnight: {
+                dark: "#14283B",
+                highlight: "#8FE3CF",
+                feature: "#403A76",
+                neutral: "#4F5E6B",
+                accent: "#EA6FA9"
+            },
+            gallery: {
+                dark: "#232323",
+                highlight: "#D9FF55",
+                feature: "#4B4653",
+                neutral: "#696969",
+                accent: "#FF6BAA"
+            }
+        };
+        const palette = palettes[settings.color_palette] || palettes.signature;
+        const rootStyle = document.documentElement.style;
+
+        [
+            ["--dark-green", palette.dark],
+            ["--text", palette.dark],
+            ["--header-footer", palette.dark],
+            ["--lime", palette.highlight],
+            ["--accent-green", palette.highlight],
+            ["--accent-lime", palette.highlight],
+            ["--purple", palette.feature],
+            ["--dark-plum", palette.feature],
+            ["--charcoal", palette.neutral],
+            ["--background", palette.neutral],
+            ["--muted", palette.neutral],
+            ["--pink", palette.accent],
+            ["--line", palette.accent],
+            ["--accent-magenta", palette.accent],
+            ["--accent-pink", palette.accent],
+            ["--soft-pink", palette.accent]
+        ].forEach(([name, value]) => {
+            rootStyle.setProperty(name, value);
+        });
+
+        if (siteLogo && siteWordmark) {
+            siteLogo.hidden = !settings.logo_key;
+            siteWordmark.hidden = Boolean(settings.logo_key);
+
+            if (settings.logo_key) {
+                siteLogo.src = getMediaUrl(settings.logo_key);
+            }
+        }
+
+        if (siteFavicon && settings.favicon_key) {
+            siteFavicon.href = getMediaUrl(settings.favicon_key);
+        }
+
+        if (footerText && settings.footer_text?.trim()) {
+            footerText.textContent = settings.footer_text.trim();
+        }
+
+        if (homeButton) {
+            const hasButton = Boolean(
+                settings.home_button_label?.trim() &&
+                settings.home_button_url?.trim()
+            );
+            homeButton.hidden = !hasButton;
+
+            if (hasButton) {
+                homeButton.textContent = settings.home_button_label.trim();
+                homeButton.href = settings.home_button_url.trim();
+            }
+        }
+    }
+
     function createPagedProjectLayout(
         project,
         blocks,
@@ -689,7 +892,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         item,
                         fit: block.fit === "cover"
                             ? "cover"
-                            : "contain"
+                            : "contain",
+                        block
                     }
                     : null;
             })
@@ -716,7 +920,7 @@ document.addEventListener("DOMContentLoaded", () => {
             block => block.type === "heading" && block.text
         );
 
-        if (headingBlock) {
+        if (headingBlock && headingBlock.show_heading !== false) {
             const heading = document.createElement("h4");
             heading.className = "cms-paged-heading";
             heading.textContent = headingBlock.text;
@@ -796,7 +1000,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             group.items.forEach((mediaEntry, itemIndex) => {
-                const { item, fit } = mediaEntry;
+                const { item, fit, block } = mediaEntry;
                 const page = document.createElement("div");
                 page.className = isBook ? "cms-book-page" : "cms-slide-page";
                 page.classList.toggle("is-cropped", fit === "cover");
@@ -810,11 +1014,40 @@ document.addEventListener("DOMContentLoaded", () => {
                     : "lazy";
                 image.decoding = "async";
                 image.style.objectFit = fit;
+                applyMediaDetails(image, item, block);
 
                 prepareGalleryImage(image);
                 page.appendChild(image);
                 panel.appendChild(page);
             });
+
+            const captionItems = group.items.filter(
+                entry => entry.item.caption || entry.item.credit || entry.item.external_url
+            );
+
+            if (captionItems.length) {
+                const caption = document.createElement("figcaption");
+                caption.className = "cms-media-caption cms-paged-caption";
+
+                captionItems.forEach(({ item }) => {
+                    const line = document.createElement("span");
+                    line.textContent = [item.caption, item.credit]
+                        .filter(Boolean)
+                        .join(" — ");
+                    caption.appendChild(line);
+
+                    if (item.external_url) {
+                        const link = document.createElement("a");
+                        link.href = item.external_url;
+                        link.target = "_blank";
+                        link.rel = "noreferrer";
+                        link.textContent = "View related link";
+                        caption.appendChild(link);
+                    }
+                });
+
+                panel.appendChild(caption);
+            }
 
             stage.appendChild(panel);
             return panel;
@@ -943,6 +1176,10 @@ document.addEventListener("DOMContentLoaded", () => {
         blocks.forEach((block, index) => {
             let element;
 
+            if (block.type === "heading" && block.show_heading === false) {
+                return;
+            }
+
             if (block.type === "media") {
                 const item = mediaById.get(
                     Number(block.media_id)
@@ -965,9 +1202,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 image.style.objectFit = block.fit === "cover"
                     ? "cover"
                     : "contain";
+                applyMediaDetails(image, item, block);
 
                 prepareGalleryImage(image);
                 element.appendChild(image);
+                appendMediaCaption(element, item);
             } else if (block.type === "heading") {
                 element = document.createElement("section");
                 element.className = "cms-layout-block cms-layout-heading";
@@ -1035,7 +1274,7 @@ document.addEventListener("DOMContentLoaded", () => {
             block => block.type === "heading"
         );
 
-        if (headingBlock) {
+        if (headingBlock && headingBlock.show_heading !== false) {
             const heading = document.createElement("h4");
             heading.className = "cms-section-heading";
             heading.textContent = headingBlock.text || "Project Section";
@@ -1101,9 +1340,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 image.style.objectFit = block.fit === "cover"
                     ? "cover"
                     : "contain";
+                applyMediaDetails(image, item, block);
 
                 prepareGalleryImage(image);
                 figure.appendChild(image);
+                appendMediaCaption(figure, item);
                 mediaGrid.appendChild(figure);
             });
 
@@ -1244,6 +1485,27 @@ document.addEventListener("DOMContentLoaded", () => {
             const wrapper = document.createElement("div");
             wrapper.className =
                 `cms-project-section cms-project-section-${sectionLayout}`;
+            const background = ["none", "soft", "dark", "purple"]
+                .includes(section.section_background)
+                ? section.section_background
+                : "none";
+            const width = ["narrow", "standard", "wide"]
+                .includes(section.section_width)
+                ? section.section_width
+                : "standard";
+            const alignment = section.section_align === "center"
+                ? "center"
+                : "left";
+            const spacing = ["compact", "normal", "airy"]
+                .includes(section.section_spacing)
+                ? section.section_spacing
+                : "normal";
+            wrapper.classList.add(
+                `cms-section-background-${background}`,
+                `cms-section-width-${width}`,
+                `cms-section-align-${alignment}`,
+                `cms-section-spacing-${spacing}`
+            );
             wrapper.appendChild(content);
             mixedLayout.appendChild(wrapper);
         });
@@ -1337,6 +1599,17 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             : [];
 
+        if (project.cover_media_id) {
+            const coverIndex = media.findIndex(
+                item => Number(item.id) === Number(project.cover_media_id)
+            );
+
+            if (coverIndex > 0) {
+                const [cover] = media.splice(coverIndex, 1);
+                media.unshift(cover);
+            }
+        }
+
         const customLayout = createCustomProjectLayout(
             project,
             media
@@ -1387,6 +1660,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 `${project.title} project image`;
             image.loading = "lazy";
             image.decoding = "async";
+            applyMediaDetails(image, item);
 
             if (layout === "smart" || layout === "publication") {
                 const updateSmartWidth = () => {
@@ -1416,6 +1690,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             prepareGalleryImage(image);
             figure.appendChild(image);
+            appendMediaCaption(figure, item);
             grid.appendChild(figure);
         });
 
@@ -1427,6 +1702,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const article = document.createElement("article");
         article.className = "project cms-project";
         article.dataset.projectSlug = project.slug;
+        article._projectData = project;
 
         const gallery = createProjectGallery(project);
 
@@ -1467,12 +1743,22 @@ document.addEventListener("DOMContentLoaded", () => {
         addMetaRow(meta, "Role", project.role);
         addMetaRow(meta, "Year", project.year);
 
+        const shareLink = document.createElement("a");
+        shareLink.className = "project-share-link";
+        shareLink.href = projectShareUrl(project);
+        shareLink.textContent = "Share This Project";
+        shareLink.setAttribute(
+            "aria-label",
+            `Share ${project.title || "this project"}`
+        );
+
         info.append(
             number,
             kicker,
             title,
             description,
-            meta
+            meta,
+            shareLink
         );
 
         article.append(gallery, info);
@@ -1516,6 +1802,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             applySiteFonts(settings);
+            applySiteBranding(settings);
             applyAboutSettings(settings);
         } catch (error) {
             console.warn(
@@ -1531,6 +1818,42 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadProjects() {
         if (!publicProjectList) {
             return;
+        }
+
+        const requestedParams = new URLSearchParams(window.location.search);
+
+        if (requestedParams.get("preview") === "1") {
+            try {
+                const previewState = JSON.parse(
+                    sessionStorage.getItem("maybelin-project-preview") || "null"
+                );
+                const previewProject = previewState?.project;
+
+                if (
+                    previewProject &&
+                    Date.now() - Number(previewState.created_at || 0) < 86400000
+                ) {
+                    const previewArticle = createProjectArticle(
+                        previewProject,
+                        1
+                    );
+                    publicProjectList.replaceChildren(previewArticle);
+                    availableProjectArticles = [previewArticle];
+                    currentProjectIndex = 0;
+                    document.body.classList.add("portfolio-preview-mode");
+                    showProject(0, false);
+
+                    if (projectsDialog && !projectsDialog.open) {
+                        projectsDialog.showModal();
+                        projectsDialog.scrollTop = 0;
+                        updateDialogState();
+                    }
+
+                    return;
+                }
+            } catch (error) {
+                console.warn("The project preview could not be opened.", error);
+            }
         }
 
         try {
@@ -1566,7 +1889,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
             availableProjectArticles = dynamicArticles;
             currentProjectIndex = 0;
-            showProject(0, false);
+            const requestedSlug = requestedParams.get("project");
+            const requestedIndex = requestedSlug
+                ? dynamicArticles.findIndex(article =>
+                    article.dataset.projectSlug === requestedSlug
+                )
+                : -1;
+            showProject(requestedIndex >= 0 ? requestedIndex : 0, false);
+
+            if (
+                requestedIndex >= 0 &&
+                projectsDialog &&
+                !projectsDialog.open
+            ) {
+                projectsDialog.showModal();
+                projectsDialog.scrollTop = 0;
+                updateDialogState();
+            }
         } catch (error) {
             availableProjectArticles = [
                 ...staticProjectArticles

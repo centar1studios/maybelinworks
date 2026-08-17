@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="./admin-stylesheet.css?v=20260816-7">
+    <link rel="stylesheet" href="./admin-stylesheet.css?v=20260816-10">
 </head>
 
 <body>
@@ -144,6 +144,7 @@
                                     <label for="hero-title">Main Heading</label>
                                     <textarea id="hero-title" rows="4" maxlength="300" disabled></textarea>
                                 </div>
+                            </div>
 
                             <div class="panel-footer">
                                 <p>Save and the public homepage updates automatically.</p>
@@ -203,8 +204,19 @@
                             <div class="panel-heading">
                                 <div>
                                     <p class="panel-kicker">Website Style</p>
-                                    <h3>Current Colors</h3>
+                                    <h3>Color Palette</h3>
                                 </div>
+                            </div>
+
+                            <div class="admin-field">
+                                <label for="color-palette">Website Colors</label>
+                                <select id="color-palette" disabled>
+                                    <option value="signature">Signature Pink + Green</option>
+                                    <option value="earth">Warm Earth</option>
+                                    <option value="midnight">Midnight Blue</option>
+                                    <option value="gallery">Neutral Gallery</option>
+                                </select>
+                                <small>Your original colors stay selected unless you intentionally choose another palette.</small>
                             </div>
 
                             <div class="color-list">
@@ -213,6 +225,57 @@
                                 <div class="color-row"><span class="color-preview" style="background:#562F54"></span><div><p>Purple</p><span>Feature color</span></div></div>
                                 <div class="color-row"><span class="color-preview" style="background:#57585D"></span><div><p>Charcoal</p><span>Neutral</span></div></div>
                                 <div class="color-row"><span class="color-preview" style="background:#F650BD"></span><div><p>Pink</p><span>Accent</span></div></div>
+                            </div>
+                        </article>
+
+                        <article class="dashboard-panel large-panel branding-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <p class="panel-kicker">Brand Details</p>
+                                    <h3>Logo, Browser Icon &amp; Footer</h3>
+                                </div>
+                                <span class="panel-status">Editable</span>
+                            </div>
+
+                            <div class="branding-grid">
+                                <div class="branding-uploader">
+                                    <div class="branding-preview branding-logo-preview" data-logo-preview-wrap>
+                                        <img data-logo-preview alt="Current website logo">
+                                        <span data-logo-preview-empty>Maybelin Works</span>
+                                    </div>
+                                    <div class="admin-field">
+                                        <label for="website-logo-file">Website Logo</label>
+                                        <input type="file" id="website-logo-file" accept="image/jpeg,image/png,image/webp,image/avif,.jpg,.jpeg,.png,.webp,.avif" disabled>
+                                    </div>
+                                    <button class="media-upload-button" type="button" data-upload-logo disabled>Upload Logo</button>
+                                </div>
+
+                                <div class="branding-uploader">
+                                    <div class="branding-preview branding-favicon-preview" data-favicon-preview-wrap>
+                                        <img data-favicon-preview alt="Current browser icon">
+                                        <span data-favicon-preview-empty>MW</span>
+                                    </div>
+                                    <div class="admin-field">
+                                        <label for="website-favicon-file">Browser Icon</label>
+                                        <input type="file" id="website-favicon-file" accept="image/jpeg,image/png,image/webp,image/avif,.jpg,.jpeg,.png,.webp,.avif" disabled>
+                                    </div>
+                                    <button class="media-upload-button" type="button" data-upload-favicon disabled>Upload Browser Icon</button>
+                                </div>
+                            </div>
+
+                            <div class="form-grid branding-text-fields">
+                                <div class="admin-field full-field">
+                                    <label for="footer-text">Footer Text</label>
+                                    <input type="text" id="footer-text" maxlength="200" placeholder="Maybelin Works" disabled>
+                                </div>
+                                <div class="admin-field">
+                                    <label for="home-button-label">Homepage Button Label</label>
+                                    <input type="text" id="home-button-label" maxlength="100" placeholder="View My Work" disabled>
+                                </div>
+                                <div class="admin-field">
+                                    <label for="home-button-url">Homepage Button Link</label>
+                                    <input type="text" id="home-button-url" maxlength="2000" placeholder="#work" disabled>
+                                </div>
                             </div>
                         </article>
                     </div>
@@ -473,6 +536,32 @@
                             </select>
                             <div class="layout-help" data-layout-description></div>
                         </div>
+
+                        <div class="admin-field">
+                            <label for="project-cover-media">Project Cover</label>
+                            <select id="project-cover-media">
+                                <option value="">First Image</option>
+                            </select>
+                            <small>Used as the project’s lead image.</small>
+                        </div>
+
+                        <div class="admin-field">
+                            <label for="project-social-media">Sharing Image</label>
+                            <select id="project-social-media">
+                                <option value="">Use Project Cover</option>
+                            </select>
+                            <small>Used when the project link is shared.</small>
+                        </div>
+
+                        <div class="admin-field full-field">
+                            <label for="project-social-title">Sharing Title</label>
+                            <input type="text" id="project-social-title" maxlength="200" placeholder="Leave blank to use the project name">
+                        </div>
+
+                        <div class="admin-field full-field">
+                            <label for="project-social-description">Sharing Description</label>
+                            <textarea id="project-social-description" rows="3" maxlength="500" placeholder="Leave blank to use the beginning of the project story"></textarea>
+                        </div>
                     </div>
 
                     <label class="project-visibility-option">
@@ -555,6 +644,9 @@
                             <button type="button" data-add-layout-text>Add Text</button>
                             <button type="button" data-add-layout-spacer>Add Space</button>
                             <button type="button" data-add-layout-media>Add Missing Images</button>
+                            <button type="button" data-duplicate-layout-section>Duplicate Section</button>
+                            <button type="button" data-layout-undo disabled>Undo</button>
+                            <button type="button" data-layout-redo disabled>Redo</button>
                             <button type="button" class="layout-reset-button" data-reset-page-layout>Reset Layout</button>
                         </div>
 
@@ -588,6 +680,18 @@
                                     </select>
                                 </div>
 
+                                <div class="layout-focal-fields" data-layout-focal-fields hidden>
+                                    <div class="admin-field">
+                                        <label for="layout-block-focal-x">Crop Position: Left / Right</label>
+                                        <input type="range" id="layout-block-focal-x" min="0" max="100" step="1">
+                                    </div>
+                                    <div class="admin-field">
+                                        <label for="layout-block-focal-y">Crop Position: Top / Bottom</label>
+                                        <input type="range" id="layout-block-focal-y" min="0" max="100" step="1">
+                                    </div>
+                                    <button class="layout-use-image-crop" type="button" data-layout-use-image-crop>Use Image’s Main Crop</button>
+                                </div>
+
                                 <div class="admin-field" data-layout-section-type-field hidden>
                                     <label for="layout-section-type">Section Type</label>
                                     <select id="layout-section-type">
@@ -598,6 +702,45 @@
                                         <option value="full">Full Width</option>
                                     </select>
                                     <small>Choose how the images assigned to this section appear.</small>
+                                </div>
+
+                                <div class="layout-section-style-fields" data-layout-section-style-fields hidden>
+                                    <div class="admin-field">
+                                        <label for="layout-section-background">Background</label>
+                                        <select id="layout-section-background">
+                                            <option value="none">No Background</option>
+                                            <option value="soft">Soft Neutral</option>
+                                            <option value="dark">Dark</option>
+                                            <option value="purple">Purple</option>
+                                        </select>
+                                    </div>
+                                    <div class="admin-field">
+                                        <label for="layout-section-width">Content Width</label>
+                                        <select id="layout-section-width">
+                                            <option value="narrow">Narrow</option>
+                                            <option value="standard">Standard</option>
+                                            <option value="wide">Wide</option>
+                                        </select>
+                                    </div>
+                                    <div class="admin-field">
+                                        <label for="layout-section-align">Text Alignment</label>
+                                        <select id="layout-section-align">
+                                            <option value="left">Left</option>
+                                            <option value="center">Centered</option>
+                                        </select>
+                                    </div>
+                                    <div class="admin-field">
+                                        <label for="layout-section-spacing">Spacing</label>
+                                        <select id="layout-section-spacing">
+                                            <option value="compact">Compact</option>
+                                            <option value="normal">Normal</option>
+                                            <option value="airy">Airy</option>
+                                        </select>
+                                    </div>
+                                    <label class="project-visibility-option compact-option">
+                                        <input type="checkbox" id="layout-section-show-heading" checked>
+                                        <span><strong>Show section heading publicly</strong></span>
+                                    </label>
                                 </div>
 
                                 <div class="admin-field" data-layout-block-section-field hidden>
@@ -640,6 +783,7 @@
 
             <div class="project-editor-actions">
                 <button class="secondary-button" type="button" data-close-project-editor>Cancel</button>
+                <button class="secondary-button" type="button" data-preview-project>Preview Changes</button>
                 <button class="project-save-button" type="submit" data-save-project>Save Project</button>
             </div>
 
@@ -649,6 +793,6 @@
 
     <div class="admin-toast" data-admin-toast role="status" aria-live="polite"></div>
 
-    <script src="./admin-dashboard.js?v=20260816-7"></script>
+    <script src="./admin-dashboard.js?v=20260816-10"></script>
 </body>
 </html>
