@@ -704,42 +704,101 @@ button:disabled {
 
 /* COLORS */
 
-.color-list {
+.color-editor-help {
+    margin: 0 0 14px;
+    color: var(--muted);
+    font-size: 0.76rem;
+    line-height: 1.55;
+}
+
+.color-editor-list {
     display: grid;
     gap: 9px;
 }
 
-.color-row {
+.color-editor-row {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
     padding: 10px;
     border-radius: 10px;
     background: var(--surface-soft);
 }
 
-.color-preview {
-    width: 37px;
-    height: 37px;
-    flex: 0 0 auto;
-    border: 2px solid rgba(42, 63, 56, 0.08);
-    border-radius: 50%;
+.color-editor-label {
+    min-width: 0;
 }
 
-.color-row p,
-.color-row span {
+.color-editor-label label,
+.color-editor-label span {
     margin: 0;
 }
 
-.color-row p {
+.color-editor-label label {
+    display: block;
     color: var(--dark-green);
     font-size: 0.85rem;
     font-weight: 700;
 }
 
-.color-row div span {
+.color-editor-label span {
+    display: block;
+    margin-top: 2px;
     color: var(--muted);
     font-size: 0.73rem;
+}
+
+.color-editor-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.color-editor-controls input[type="color"] {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 auto;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: #FFFFFF;
+    cursor: pointer;
+}
+
+.color-editor-controls input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-editor-controls input[type="color"]::-webkit-color-swatch {
+    border: 0;
+    border-radius: 5px;
+}
+
+.color-editor-controls input[type="text"] {
+    width: 104px;
+    min-width: 104px;
+    padding: 10px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.color-editor-controls input[type="text"]:invalid {
+    border-color: #B42318;
+    box-shadow: 0 0 0 2px rgba(180, 35, 24, 0.1);
+}
+
+.color-editor-footer {
+    align-items: stretch;
+    flex-direction: column;
+    margin-top: 14px;
+}
+
+.color-editor-footer button {
+    width: 100%;
 }
 
 
@@ -2135,6 +2194,19 @@ body.editor-open {
 
     .form-grid {
         grid-template-columns: 1fr;
+    }
+
+    .color-editor-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .color-editor-controls {
+        width: 100%;
+    }
+
+    .color-editor-controls input[type="text"] {
+        width: 100%;
     }
 
     .branding-grid {

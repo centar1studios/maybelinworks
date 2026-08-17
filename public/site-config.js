@@ -791,37 +791,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function applySiteBranding(settings) {
-        const palettes = {
-            signature: {
-                dark: "#2A3F38",
-                highlight: "#8DF688",
-                feature: "#562F54",
-                neutral: "#57585D",
-                accent: "#F650BD"
-            },
-            earth: {
-                dark: "#40362E",
-                highlight: "#E0B86C",
-                feature: "#7B4B3A",
-                neutral: "#6E625A",
-                accent: "#D97655"
-            },
-            midnight: {
-                dark: "#14283B",
-                highlight: "#8FE3CF",
-                feature: "#403A76",
-                neutral: "#4F5E6B",
-                accent: "#EA6FA9"
-            },
-            gallery: {
-                dark: "#232323",
-                highlight: "#D9FF55",
-                feature: "#4B4653",
-                neutral: "#696969",
-                accent: "#FF6BAA"
-            }
+        const siteColor = (value, fallback) => {
+            return /^#[0-9A-F]{6}$/i.test(value || "")
+                ? value.toUpperCase()
+                : fallback;
         };
-        const palette = palettes[settings.color_palette] || palettes.signature;
+        const palette = {
+            dark: siteColor(settings.dark_green, "#2A3F38"),
+            highlight: siteColor(settings.accent_green, "#8DF688"),
+            feature: siteColor(settings.dark_plum, "#562F54"),
+            neutral: siteColor(settings.cream_color, "#57585D"),
+            accent: siteColor(settings.primary_color, "#F650BD")
+        };
         const rootStyle = document.documentElement.style;
 
         [

@@ -1,0 +1,2 @@
+ALTER TABLE site_settings
+ADD COLUMN dark_green TEXT NOT NULL DEFAULT '#2A3F38';

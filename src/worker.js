@@ -1058,6 +1058,7 @@ async function getSiteSettings(env) {
                 hero_kicker,
                 hero_title,
                 hero_description,
+                dark_green,
                 primary_color,
                 accent_green,
                 dark_plum,
@@ -1203,6 +1204,12 @@ async function handleUpdateSettings(
             5000
         );
 
+        const darkGreen =
+            typeof body.dark_green === "string" &&
+            validHexColor(body.dark_green)
+                ? body.dark_green.toUpperCase()
+                : current.dark_green;
+
         const primaryColor =
             typeof body.primary_color === "string" &&
             validHexColor(body.primary_color)
@@ -1332,6 +1339,7 @@ async function handleUpdateSettings(
                     hero_kicker = ?,
                     hero_title = ?,
                     hero_description = ?,
+                    dark_green = ?,
                     primary_color = ?,
                     accent_green = ?,
                     dark_plum = ?,
@@ -1359,6 +1367,7 @@ async function handleUpdateSettings(
                 heroKicker,
                 heroTitle,
                 heroDescription,
+                darkGreen,
                 primaryColor,
                 accentGreen,
                 darkPlum,

@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="./admin-stylesheet.css?v=20260816-10">
+    <link rel="stylesheet" href="./admin-stylesheet.css?v=20260816-11">
 </head>
 
 <body>
@@ -204,27 +204,72 @@
                             <div class="panel-heading">
                                 <div>
                                     <p class="panel-kicker">Website Style</p>
-                                    <h3>Color Palette</h3>
+                                    <h3>Website Colors</h3>
                                 </div>
                             </div>
 
-                            <div class="admin-field">
-                                <label for="color-palette">Website Colors</label>
-                                <select id="color-palette" disabled>
-                                    <option value="signature">Signature Pink + Green</option>
-                                    <option value="earth">Warm Earth</option>
-                                    <option value="midnight">Midnight Blue</option>
-                                    <option value="gallery">Neutral Gallery</option>
-                                </select>
-                                <small>Your original colors stay selected unless you intentionally choose another palette.</small>
+                            <p class="color-editor-help">Click a swatch or type an exact six-digit hex code. Colors only change on the live website after you save.</p>
+
+                            <div class="color-editor-list">
+                                <div class="color-editor-row">
+                                    <div class="color-editor-label">
+                                        <label for="dark-green-hex">Dark Green</label>
+                                        <span>Header and main dark color</span>
+                                    </div>
+                                    <div class="color-editor-controls">
+                                        <input type="color" id="dark-green-color" value="#2A3F38" aria-label="Choose dark green" disabled>
+                                        <input type="text" id="dark-green-hex" value="#2A3F38" maxlength="7" spellcheck="false" inputmode="text" aria-label="Dark green hex code" disabled>
+                                    </div>
+                                </div>
+
+                                <div class="color-editor-row">
+                                    <div class="color-editor-label">
+                                        <label for="lime-green-hex">Lime Green</label>
+                                        <span>Highlights and emphasis</span>
+                                    </div>
+                                    <div class="color-editor-controls">
+                                        <input type="color" id="lime-green-color" value="#8DF688" aria-label="Choose lime green" disabled>
+                                        <input type="text" id="lime-green-hex" value="#8DF688" maxlength="7" spellcheck="false" inputmode="text" aria-label="Lime green hex code" disabled>
+                                    </div>
+                                </div>
+
+                                <div class="color-editor-row">
+                                    <div class="color-editor-label">
+                                        <label for="purple-hex">Purple</label>
+                                        <span>Feature color</span>
+                                    </div>
+                                    <div class="color-editor-controls">
+                                        <input type="color" id="purple-color" value="#562F54" aria-label="Choose purple" disabled>
+                                        <input type="text" id="purple-hex" value="#562F54" maxlength="7" spellcheck="false" inputmode="text" aria-label="Purple hex code" disabled>
+                                    </div>
+                                </div>
+
+                                <div class="color-editor-row">
+                                    <div class="color-editor-label">
+                                        <label for="charcoal-hex">Charcoal</label>
+                                        <span>Background and neutral color</span>
+                                    </div>
+                                    <div class="color-editor-controls">
+                                        <input type="color" id="charcoal-color" value="#57585D" aria-label="Choose charcoal" disabled>
+                                        <input type="text" id="charcoal-hex" value="#57585D" maxlength="7" spellcheck="false" inputmode="text" aria-label="Charcoal hex code" disabled>
+                                    </div>
+                                </div>
+
+                                <div class="color-editor-row">
+                                    <div class="color-editor-label">
+                                        <label for="pink-hex">Pink</label>
+                                        <span>Accent color</span>
+                                    </div>
+                                    <div class="color-editor-controls">
+                                        <input type="color" id="pink-color" value="#F650BD" aria-label="Choose pink" disabled>
+                                        <input type="text" id="pink-hex" value="#F650BD" maxlength="7" spellcheck="false" inputmode="text" aria-label="Pink hex code" disabled>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="color-list">
-                                <div class="color-row"><span class="color-preview" style="background:#2A3F38"></span><div><p>Dark Green</p><span>Main dark color</span></div></div>
-                                <div class="color-row"><span class="color-preview" style="background:#8DF688"></span><div><p>Lime Green</p><span>Highlight</span></div></div>
-                                <div class="color-row"><span class="color-preview" style="background:#562F54"></span><div><p>Purple</p><span>Feature color</span></div></div>
-                                <div class="color-row"><span class="color-preview" style="background:#57585D"></span><div><p>Charcoal</p><span>Neutral</span></div></div>
-                                <div class="color-row"><span class="color-preview" style="background:#F650BD"></span><div><p>Pink</p><span>Accent</span></div></div>
+                            <div class="panel-footer color-editor-footer">
+                                <p>Your current colors stay live until you save these values.</p>
+                                <button class="disabled-button" type="button" data-save-colors disabled>Save Website Colors</button>
                             </div>
                         </article>
 
@@ -793,6 +838,6 @@
 
     <div class="admin-toast" data-admin-toast role="status" aria-live="polite"></div>
 
-    <script src="./admin-dashboard.js?v=20260816-10"></script>
+    <script src="./admin-dashboard.js?v=20260816-11"></script>
 </body>
 </html>

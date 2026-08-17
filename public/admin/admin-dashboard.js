@@ -136,7 +136,44 @@ document.addEventListener("DOMContentLoaded", () => {
     const displayFontPreview = document.querySelector("[data-display-font-preview]");
     const bodyFontPreview = document.querySelector("[data-body-font-preview]");
     const saveHomepageButton = document.querySelector("[data-save-homepage]");
-    const colorPalette = document.querySelector("#color-palette");
+    const saveColorButton = document.querySelector("[data-save-colors]");
+    const colorFields = [
+        {
+            key: "dark_green",
+            name: "Dark Green",
+            fallback: "#2A3F38",
+            picker: document.querySelector("#dark-green-color"),
+            hex: document.querySelector("#dark-green-hex")
+        },
+        {
+            key: "accent_green",
+            name: "Lime Green",
+            fallback: "#8DF688",
+            picker: document.querySelector("#lime-green-color"),
+            hex: document.querySelector("#lime-green-hex")
+        },
+        {
+            key: "dark_plum",
+            name: "Purple",
+            fallback: "#562F54",
+            picker: document.querySelector("#purple-color"),
+            hex: document.querySelector("#purple-hex")
+        },
+        {
+            key: "cream_color",
+            name: "Charcoal",
+            fallback: "#57585D",
+            picker: document.querySelector("#charcoal-color"),
+            hex: document.querySelector("#charcoal-hex")
+        },
+        {
+            key: "primary_color",
+            name: "Pink",
+            fallback: "#F650BD",
+            picker: document.querySelector("#pink-color"),
+            hex: document.querySelector("#pink-hex")
+        }
+    ];
     const footerText = document.querySelector("#footer-text");
     const homeButtonLabel = document.querySelector("#home-button-label");
     const homeButtonUrl = document.querySelector("#home-button-url");
@@ -441,13 +478,61 @@ document.addEventListener("DOMContentLoaded", () => {
     displayFont?.addEventListener("change", updateFontPreviews);
     bodyFont?.addEventListener("change", updateFontPreviews);
 
+    function validHexCode(value) {
+        return /^#[0-9A-F]{6}$/i.test(value);
+    }
+
+    function setColorFieldValue(field, value) {
+        const normalized = validHexCode(value)
+            ? value.toUpperCase()
+            : field.fallback;
+
+        if (field.picker) {
+            field.picker.value = normalized;
+        }
+
+        if (field.hex) {
+            field.hex.value = normalized;
+            field.hex.setCustomValidity("");
+        }
+    }
+
+    colorFields.forEach((field) => {
+        field.picker?.addEventListener("input", () => {
+            setColorFieldValue(field, field.picker.value);
+        });
+
+        field.hex?.addEventListener("input", () => {
+            const value = field.hex.value.trim();
+            const isValid = validHexCode(value);
+
+            field.hex.setCustomValidity(
+                isValid
+                    ? ""
+                    : "Enter a six-digit hex code such as #F650BD."
+            );
+
+            if (isValid && field.picker) {
+                field.picker.value = value.toUpperCase();
+            }
+        });
+
+        field.hex?.addEventListener("blur", () => {
+            const value = field.hex.value.trim();
+
+            if (validHexCode(value)) {
+                setColorFieldValue(field, value);
+            }
+        });
+    });
+
     function setSettingsReady(ready) {
         [
             heroKicker,
             heroTitle,
             displayFont,
             bodyFont,
-            colorPalette,
+            ...colorFields.flatMap(field => [field.picker, field.hex]),
             footerText,
             homeButtonLabel,
             homeButtonUrl,
@@ -463,17 +548,15 @@ document.addEventListener("DOMContentLoaded", () => {
             heroDescription.disabled = true;
         }
 
-        if (saveHomepageButton) {
-            saveHomepageButton.disabled = !ready;
-            saveHomepageButton.classList.toggle(
-                "disabled-button",
-                !ready
-            );
-            saveHomepageButton.classList.toggle(
-                "primary-link-button",
-                ready
-            );
-        }
+        [saveHomepageButton, saveColorButton].forEach((button) => {
+            if (!button) {
+                return;
+            }
+
+            button.disabled = !ready;
+            button.classList.toggle("disabled-button", !ready);
+            button.classList.toggle("primary-link-button", ready);
+        });
 
         if (settingsStatus) {
             settingsStatus.textContent = ready
@@ -587,9 +670,12 @@ document.addEventListener("DOMContentLoaded", () => {
             bodyFont.value = savedBodyFont;
         }
 
-        if (colorPalette) {
-            colorPalette.value = settings.color_palette || "signature";
-        }
+        colorFields.forEach((field) => {
+            setColorFieldValue(
+                field,
+                settings[field.key] || field.fallback
+            );
+        });
 
         if (footerText) {
             footerText.value = settings.footer_text || "Maybelin Works";
@@ -724,7 +810,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function saveHomepage() {
-        if (!currentSettings || !saveHomepageButton) {
+        if (!currentSettings) {
             return;
         }
 
@@ -740,9 +826,35 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const originalText = saveHomepageButton.textContent;
-        saveHomepageButton.disabled = true;
-        saveHomepageButton.textContent = "Saving...";
+        const invalidColorField = colorFields.find(
+            field => !validHexCode(field.hex?.value.trim() || "")
+        );
+
+        if (invalidColorField) {
+            showToast(
+                `${invalidColorField.name} needs a six-digit hex code, like ${invalidColorField.fallback}.`
+            );
+            invalidColorField.hex?.focus();
+            return;
+        }
+
+        const colorPayload = Object.fromEntries(
+            colorFields.map(field => [
+                field.key,
+                field.hex.value.trim().toUpperCase()
+            ])
+        );
+
+        const saveButtons = [saveHomepageButton, saveColorButton]
+            .filter(Boolean);
+        const originalButtonText = saveButtons.map(button => {
+            return button.textContent;
+        });
+
+        saveButtons.forEach((button) => {
+            button.disabled = true;
+            button.textContent = "Saving...";
+        });
 
         try {
             await saveSettingsPayload(
@@ -752,12 +864,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     hero_description: currentSettings.hero_description,
                     display_font: displayFont.value,
                     body_font: bodyFont.value,
-                    color_palette: colorPalette?.value || "signature",
+                    ...colorPayload,
                     footer_text: footerText?.value.trim() || "Maybelin Works",
                     home_button_label: homeButtonLabel?.value.trim() || null,
                     home_button_url: homeButtonUrl?.value.trim() || null
                 },
-                "Homepage and branding saved!"
+                "Website settings saved!"
             );
 
             settingsStatus.textContent = "Saved";
@@ -769,12 +881,15 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Unable to save homepage:", error);
             showToast(error.message || "Something went wrong while saving.");
         } finally {
-            saveHomepageButton.disabled = false;
-            saveHomepageButton.textContent = originalText;
+            saveButtons.forEach((button, index) => {
+                button.disabled = false;
+                button.textContent = originalButtonText[index];
+            });
         }
     }
 
     saveHomepageButton?.addEventListener("click", saveHomepage);
+    saveColorButton?.addEventListener("click", saveHomepage);
 
     async function uploadBrandingAsset(type) {
         const isLogo = type === "logo";
