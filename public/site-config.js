@@ -70,6 +70,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const heroKicker = document.querySelector(".hero-kicker");
     const heroTitle = document.querySelector(".hero-title");
+    const siteHeader = document.querySelector(".site-header");
+    const siteFooter = document.querySelector(".site-footer");
     const siteLogo = document.querySelector("[data-site-logo]");
     const siteWordmark = document.querySelector("[data-site-wordmark]");
     const siteFavicon = document.querySelector("[data-site-favicon]");
@@ -87,6 +89,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (currentYear) {
         currentYear.textContent = new Date().getFullYear();
+    }
+
+    function updateSiteChromeOffsets() {
+        const rootStyle = document.documentElement.style;
+
+        if (siteHeader) {
+            rootStyle.setProperty(
+                "--site-header-height",
+                `${Math.ceil(siteHeader.getBoundingClientRect().height)}px`
+            );
+        }
+
+        if (siteFooter) {
+            rootStyle.setProperty(
+                "--site-footer-height",
+                `${Math.ceil(siteFooter.getBoundingClientRect().height)}px`
+            );
+        }
+    }
+
+    updateSiteChromeOffsets();
+
+    if (typeof ResizeObserver === "function") {
+        const chromeObserver = new ResizeObserver(updateSiteChromeOffsets);
+
+        if (siteHeader) {
+            chromeObserver.observe(siteHeader);
+        }
+
+        if (siteFooter) {
+            chromeObserver.observe(siteFooter);
+        }
+    } else {
+        window.addEventListener("resize", updateSiteChromeOffsets);
     }
 
 
