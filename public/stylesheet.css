@@ -1879,6 +1879,12 @@ body.dialog-open {
     margin: 0;
 }
 
+.cms-section-media-item.is-cropped {
+    overflow: hidden;
+    aspect-ratio: var(--media-aspect, 4 / 3);
+    border-radius: 12px;
+}
+
 .cms-section-media-item img {
     width: 100%;
     height: auto;
@@ -1888,6 +1894,11 @@ body.dialog-open {
     border-radius: 12px;
     box-shadow: 0 12px 30px rgba(42, 63, 56, 0.09);
     cursor: zoom-in;
+}
+
+.cms-section-media-item.is-cropped img {
+    height: 100%;
+    object-fit: cover;
 }
 
 
@@ -1944,7 +1955,7 @@ body.dialog-open {
     background: linear-gradient(145deg, var(--dark-green), var(--purple));
 }
 
-.cms-book-page-turn {
+.cms-paged-page-turn {
     position: absolute;
     z-index: 3;
     top: 50%;
@@ -1967,25 +1978,25 @@ body.dialog-open {
         background-color 160ms ease;
 }
 
-.cms-book-page-turn-previous {
+.cms-paged-page-turn-previous {
     left: clamp(0.35rem, 1.2vw, 1rem);
 }
 
-.cms-book-page-turn-next {
+.cms-paged-page-turn-next {
     right: clamp(0.35rem, 1.2vw, 1rem);
 }
 
-.cms-book-page-turn:hover:not(:disabled) {
+.cms-paged-page-turn:hover:not(:disabled) {
     transform: translateY(-50%) scale(1.06);
     background: var(--pink);
 }
 
-.cms-book-page-turn:focus-visible {
+.cms-paged-page-turn:focus-visible {
     outline: 3px solid #FFFFFF;
     outline-offset: 3px;
 }
 
-.cms-book-page-turn:disabled {
+.cms-paged-page-turn:disabled {
     opacity: 0.3;
     cursor: not-allowed;
 }
@@ -2232,7 +2243,7 @@ body.dialog-open {
         padding: 0.55rem;
     }
 
-    .cms-book-page-turn {
+    .cms-paged-page-turn {
         width: 2.45rem;
         height: 2.45rem;
         font-size: 1.1rem;

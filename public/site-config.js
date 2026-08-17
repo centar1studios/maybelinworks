@@ -681,7 +681,18 @@ document.addEventListener("DOMContentLoaded", () => {
     ) {
         const mediaItems = blocks
             .filter(block => block.type === "media")
-            .map(block => mediaById.get(Number(block.media_id)))
+            .map(block => {
+                const item = mediaById.get(Number(block.media_id));
+
+                return item
+                    ? {
+                        item,
+                        fit: block.fit === "cover"
+                            ? "cover"
+                            : "contain"
+                    }
+                    : null;
+            })
             .filter(Boolean);
 
         if (!mediaItems.length) {
@@ -784,9 +795,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 panel.classList.add("is-single-page");
             }
 
-            group.items.forEach((item, itemIndex) => {
+            group.items.forEach((mediaEntry, itemIndex) => {
+                const { item, fit } = mediaEntry;
                 const page = document.createElement("div");
                 page.className = isBook ? "cms-book-page" : "cms-slide-page";
+                page.classList.toggle("is-cropped", fit === "cover");
 
                 const image = document.createElement("img");
                 image.src = getMediaUrl(item);
@@ -796,6 +809,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     ? "eager"
                     : "lazy";
                 image.decoding = "async";
+                image.style.objectFit = fit;
 
                 prepareGalleryImage(image);
                 page.appendChild(image);
@@ -806,27 +820,34 @@ document.addEventListener("DOMContentLoaded", () => {
             return panel;
         });
 
-        if (isBook && panels.length > 1) {
+        if (panels.length > 1) {
+            const previousLabel = isBook
+                ? "Turn to previous pages"
+                : "View previous slide";
+            const nextLabel = isBook
+                ? "Turn to next pages"
+                : "View next slide";
+
             stagePrevious = document.createElement("button");
             stagePrevious.type = "button";
-            stagePrevious.className =
-                "cms-book-page-turn cms-book-page-turn-previous";
-            stagePrevious.setAttribute(
-                "aria-label",
-                "Turn to previous pages"
-            );
-            stagePrevious.title = "Previous pages";
+            stagePrevious.className = `cms-paged-page-turn cms-paged-page-turn-previous ${
+                isBook
+                    ? "cms-book-page-turn cms-book-page-turn-previous"
+                    : "cms-slide-page-turn cms-slide-page-turn-previous"
+            }`;
+            stagePrevious.setAttribute("aria-label", previousLabel);
+            stagePrevious.title = previousLabel;
             stagePrevious.textContent = "←";
 
             stageNext = document.createElement("button");
             stageNext.type = "button";
-            stageNext.className =
-                "cms-book-page-turn cms-book-page-turn-next";
-            stageNext.setAttribute(
-                "aria-label",
-                "Turn to next pages"
-            );
-            stageNext.title = "Next pages";
+            stageNext.className = `cms-paged-page-turn cms-paged-page-turn-next ${
+                isBook
+                    ? "cms-book-page-turn cms-book-page-turn-next"
+                    : "cms-slide-page-turn cms-slide-page-turn-next"
+            }`;
+            stageNext.setAttribute("aria-label", nextLabel);
+            stageNext.title = nextLabel;
             stageNext.textContent = "→";
 
             stage.append(stagePrevious, stageNext);
@@ -1053,6 +1074,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 const figure = document.createElement("figure");
                 figure.className = "cms-section-media-item";
                 figure.dataset.mediaId = String(item.id);
+
+                if (block.fit === "cover") {
+                    const aspectWidth = Math.max(
+                        Number(block.w) || 1,
+                        1
+                    );
+                    const aspectHeight = Math.max(
+                        Number(block.h) || 1,
+                        1
+                    );
+
+                    figure.classList.add("is-cropped");
+                    figure.style.setProperty(
+                        "--media-aspect",
+                        `${aspectWidth} / ${aspectHeight}`
+                    );
+                }
 
                 const image = document.createElement("img");
                 image.src = getMediaUrl(item);
