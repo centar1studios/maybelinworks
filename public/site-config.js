@@ -221,6 +221,54 @@ document.addEventListener("DOMContentLoaded", () => {
         image.dataset.externalUrl = item.external_url || "";
     }
 
+    function isVideoMedia(item) {
+        return item?.media_type === "video" ||
+            String(item?.mime_type || "").startsWith("video/") ||
+            /\.(mp4|webm)$/i.test(String(item?.r2_key || ""));
+    }
+
+    function createProjectMediaElement(
+        project,
+        item,
+        block = {},
+        options = {}
+    ) {
+        const fit = block.fit === "cover"
+            ? "cover"
+            : "contain";
+
+        if (isVideoMedia(item)) {
+            const video = document.createElement("video");
+            video.className = options.className || "";
+            video.src = getMediaUrl(item);
+            video.controls = true;
+            video.playsInline = true;
+            video.preload = options.eager ? "auto" : "metadata";
+            video.style.objectFit = fit;
+            video.setAttribute(
+                "aria-label",
+                item.alt_text || `${project.title} project video`
+            );
+            applyMediaDetails(video, item, block);
+            return video;
+        }
+
+        const image = document.createElement("img");
+        image.className = options.className || "";
+        image.src = getMediaUrl(item);
+        image.alt = item.alt_text || `${project.title} project image`;
+        image.loading = options.eager ? "eager" : "lazy";
+        image.decoding = "async";
+        image.style.objectFit = fit;
+        applyMediaDetails(image, item, block);
+
+        if (options.zoom !== false) {
+            prepareGalleryImage(image);
+        }
+
+        return image;
+    }
+
     function appendMediaCaption(figure, item) {
         if (!figure || (!item.caption && !item.credit && !item.external_url)) {
             return;
@@ -537,7 +585,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 .trim()
                 .slice(0, 240);
         const media = Array.isArray(project.media)
-            ? project.media
+            ? project.media.filter(item => !isVideoMedia(item))
             : [];
         const preferredMediaId = project.social_media_id ||
             project.cover_media_id;
@@ -937,7 +985,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (siteFavicon) {
             siteFavicon.href = settings.favicon_key
                 ? getMediaUrl(settings.favicon_key)
-                : "./assets/favicon-32.png?v=20260816-19";
+                : "./assets/favicon-32.png?v=20260817-20";
         }
 
         if (footerText && settings.footer_text?.trim()) {
@@ -1087,19 +1135,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 page.className = isBook ? "cms-book-page" : "cms-slide-page";
                 page.classList.toggle("is-cropped", fit === "cover");
 
-                const image = document.createElement("img");
-                image.src = getMediaUrl(item);
-                image.alt = item.alt_text ||
-                    `${project.title} ${isBook ? "publication page" : "slide"}`;
-                image.loading = groupIndex === 0 && itemIndex === 0
-                    ? "eager"
-                    : "lazy";
-                image.decoding = "async";
-                image.style.objectFit = fit;
-                applyMediaDetails(image, item, block);
-
-                prepareGalleryImage(image);
-                page.appendChild(image);
+                const mediaElement = createProjectMediaElement(
+                    project,
+                    item,
+                    {
+                        ...block,
+                        fit
+                    },
+                    {
+                        eager: groupIndex === 0 && itemIndex === 0
+                    }
+                );
+                page.appendChild(mediaElement);
                 panel.appendChild(page);
             });
 
@@ -1275,19 +1322,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 element.className = "cms-layout-block cms-layout-media";
                 element.dataset.mediaId = String(item.id);
 
-                const image = document.createElement("img");
-                image.src = getMediaUrl(item);
-                image.alt = item.alt_text ||
-                    `${project.title} project image`;
-                image.loading = "lazy";
-                image.decoding = "async";
-                image.style.objectFit = block.fit === "cover"
-                    ? "cover"
-                    : "contain";
-                applyMediaDetails(image, item, block);
-
-                prepareGalleryImage(image);
-                element.appendChild(image);
+                const mediaElement = createProjectMediaElement(
+                    project,
+                    item,
+                    block
+                );
+                element.appendChild(mediaElement);
                 appendMediaCaption(element, item);
             } else if (block.type === "heading") {
                 element = document.createElement("section");
@@ -1413,19 +1453,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
                 }
 
-                const image = document.createElement("img");
-                image.src = getMediaUrl(item);
-                image.alt = item.alt_text ||
-                    `${project.title} project image`;
-                image.loading = "lazy";
-                image.decoding = "async";
-                image.style.objectFit = block.fit === "cover"
-                    ? "cover"
-                    : "contain";
-                applyMediaDetails(image, item, block);
-
-                prepareGalleryImage(image);
-                figure.appendChild(image);
+                const mediaElement = createProjectMediaElement(
+                    project,
+                    item,
+                    block
+                );
+                figure.appendChild(mediaElement);
                 appendMediaCaption(figure, item);
                 mediaGrid.appendChild(figure);
             });
@@ -1458,6 +1491,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "grid",
             "book",
             "slides",
+            "video",
             "full"
         ]);
 
@@ -1537,6 +1571,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             } else if (
                 sectionLayout === "grid" ||
+                sectionLayout === "video" ||
                 sectionLayout === "full"
             ) {
                 content = createStructuredProjectSection(
@@ -1712,7 +1747,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const text = document.createElement("span");
             text.textContent =
-                "No images have been added to this project yet.";
+                "No media has been added to this project yet.";
 
             empty.append(heading, text);
             gallery.appendChild(empty);
@@ -1721,7 +1756,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const heading = document.createElement("p");
         heading.className = "gallery-heading cms-gallery-heading";
-        heading.textContent = "Project Gallery";
+        heading.textContent = "Project Media";
 
         const grid = document.createElement("div");
         grid.className = "cms-gallery-grid";
@@ -1735,23 +1770,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 figure.classList.add("cms-gallery-featured");
             }
 
-            const image = document.createElement("img");
-            image.className = "cms-gallery-image";
-            image.src = getMediaUrl(item);
-            image.alt = item.alt_text ||
-                `${project.title} project image`;
-            image.loading = "lazy";
-            image.decoding = "async";
-            applyMediaDetails(image, item);
+            const videoItem = isVideoMedia(item);
+            const mediaElement = createProjectMediaElement(
+                project,
+                item,
+                {},
+                {
+                    className: videoItem
+                        ? "cms-gallery-video"
+                        : "cms-gallery-image"
+                }
+            );
+            figure.classList.toggle("cms-gallery-video-item", videoItem);
 
             if (layout === "smart" || layout === "publication") {
                 const updateSmartWidth = () => {
-                    if (!image.naturalWidth || !image.naturalHeight) {
+                    const width = videoItem
+                        ? mediaElement.videoWidth
+                        : mediaElement.naturalWidth;
+                    const height = videoItem
+                        ? mediaElement.videoHeight
+                        : mediaElement.naturalHeight;
+
+                    if (!width || !height) {
                         return;
                     }
 
-                    const ratio =
-                        image.naturalWidth / image.naturalHeight;
+                    const ratio = width / height;
 
                     figure.classList.toggle(
                         "cms-gallery-wide",
@@ -1759,19 +1804,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
                 };
 
-                image.addEventListener(
-                    "load",
+                mediaElement.addEventListener(
+                    videoItem ? "loadedmetadata" : "load",
                     updateSmartWidth,
                     { once: true }
                 );
 
-                if (image.complete) {
+                if (
+                    (!videoItem && mediaElement.complete) ||
+                    (videoItem && mediaElement.readyState >= 1)
+                ) {
                     updateSmartWidth();
                 }
             }
 
-            prepareGalleryImage(image);
-            figure.appendChild(image);
+            figure.appendChild(mediaElement);
             appendMediaCaption(figure, item);
             grid.appendChild(figure);
         });

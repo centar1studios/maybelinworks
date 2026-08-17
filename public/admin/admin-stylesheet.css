@@ -1298,7 +1298,7 @@ body.editor-open {
     background: var(--surface-soft);
 }
 
-.project-media-item-preview img {
+.project-media-item-preview :is(img, video) {
     width: 100%;
     height: 100%;
     display: block;
@@ -1587,7 +1587,7 @@ body.editor-open {
         0 8px 20px rgba(42, 63, 56, 0.14);
 }
 
-.layout-block-media img {
+.layout-block-media :is(img, video) {
     width: 100%;
     height: 100%;
     display: block;

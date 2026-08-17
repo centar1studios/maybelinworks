@@ -45,6 +45,7 @@ const ALLOWED_SECTION_LAYOUTS = [
     "grid",
     "book",
     "slides",
+    "video",
     "full"
 ];
 
@@ -709,7 +710,7 @@ function cleanPageLayout(value, allowedMediaIds) {
                 !allowedMediaIds.has(mediaId)
             ) {
                 return {
-                    error: "The custom page layout references an image that is no longer in this project."
+                    error: "The custom page layout references a media item that is no longer in this project."
                 };
             }
 
@@ -1456,6 +1457,8 @@ async function getProjectsFromDatabase(
                 pm.id,
                 pm.project_id,
                 pm.r2_key,
+                pm.media_type,
+                pm.mime_type,
                 pm.alt_text,
                 pm.caption,
                 pm.credit,
@@ -1897,7 +1900,7 @@ async function handleUpdateProject(
 
         const mediaIdResult = await env.DB
             .prepare(`
-                SELECT id
+                SELECT id, media_type
                 FROM project_media
                 WHERE project_id = ?
             `)
@@ -1910,10 +1913,16 @@ async function handleUpdateProject(
             )
         );
 
+        const allowedImageIds = new Set(
+            mediaIdResult.results
+                .filter(media => media.media_type === "image")
+                .map(media => Number(media.id))
+        );
+
         const coverMediaId = cleanMediaReference(
             body.cover_media_id,
             current.cover_media_id,
-            allowedMediaIds
+            allowedImageIds
         );
 
         const socialTitle = cleanNullableText(
@@ -1931,7 +1940,7 @@ async function handleUpdateProject(
         const socialMediaId = cleanMediaReference(
             body.social_media_id,
             current.social_media_id,
-            allowedMediaIds
+            allowedImageIds
         );
 
         const sortOrder = Math.round(
@@ -2041,6 +2050,8 @@ async function handleUpdateProject(
                     id,
                     project_id,
                     r2_key,
+                    media_type,
+                    mime_type,
                     alt_text,
                     caption,
                     credit,
@@ -2290,6 +2301,8 @@ async function handleDuplicateProject(
                 SELECT
                     id,
                     r2_key,
+                    media_type,
+                    mime_type,
                     alt_text,
                     caption,
                     credit,
@@ -2311,6 +2324,8 @@ async function handleDuplicateProject(
                     INSERT INTO project_media (
                         project_id,
                         r2_key,
+                        media_type,
+                        mime_type,
                         alt_text,
                         caption,
                         credit,
@@ -2319,11 +2334,13 @@ async function handleDuplicateProject(
                         focal_y,
                         sort_order
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 `)
                 .bind(
                     newProjectId,
                     media.r2_key,
+                    media.media_type,
+                    media.mime_type,
                     media.alt_text,
                     media.caption,
                     media.credit,
@@ -2458,13 +2475,16 @@ async function handleProjectSocialPage(
                 FROM projects AS p
                 LEFT JOIN project_media AS social_media
                     ON social_media.id = p.social_media_id
+                    AND social_media.media_type = 'image'
                 LEFT JOIN project_media AS cover_media
                     ON cover_media.id = p.cover_media_id
+                    AND cover_media.media_type = 'image'
                 LEFT JOIN project_media AS first_media
                     ON first_media.id = (
                         SELECT pm.id
                         FROM project_media AS pm
                         WHERE pm.project_id = p.id
+                            AND pm.media_type = 'image'
                         ORDER BY pm.sort_order ASC, pm.id ASC
                         LIMIT 1
                     )

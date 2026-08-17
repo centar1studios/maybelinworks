@@ -1,10 +1,16 @@
-const MAX_MEDIA_SIZE = 20 * 1024 * 1024;
+const MAX_IMAGE_SIZE = 20 * 1024 * 1024;
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
 
 const ALLOWED_IMAGE_TYPES = new Map([
     ["image/jpeg", "jpg"],
     ["image/png", "png"],
     ["image/webp", "webp"],
     ["image/avif", "avif"]
+]);
+
+const ALLOWED_VIDEO_TYPES = new Map([
+    ["video/mp4", "mp4"],
+    ["video/webm", "webm"]
 ]);
 
 
@@ -141,7 +147,7 @@ function validateImageFile(file) {
         };
     }
 
-    if (file.size > MAX_MEDIA_SIZE) {
+    if (file.size > MAX_IMAGE_SIZE) {
         return {
             error: "Images must be 20 MB or smaller."
         };
@@ -159,6 +165,60 @@ function validateImageFile(file) {
 
     return {
         extension
+    };
+}
+
+function validateProjectMediaFile(file) {
+    if (
+        !file ||
+        typeof file !== "object" ||
+        typeof file.stream !== "function"
+    ) {
+        return {
+            error: "Choose an image or video to upload."
+        };
+    }
+
+    if (!file.size || file.size <= 0) {
+        return {
+            error: "That file appears to be empty."
+        };
+    }
+
+    const imageExtension = ALLOWED_IMAGE_TYPES.get(file.type);
+
+    if (imageExtension) {
+        if (file.size > MAX_IMAGE_SIZE) {
+            return {
+                error: "Images must be 20 MB or smaller."
+            };
+        }
+
+        return {
+            extension: imageExtension,
+            mediaType: "image",
+            mimeType: file.type
+        };
+    }
+
+    const videoExtension = ALLOWED_VIDEO_TYPES.get(file.type);
+
+    if (videoExtension) {
+        if (file.size > MAX_VIDEO_SIZE) {
+            return {
+                error: "Videos must be 50 MB or smaller."
+            };
+        }
+
+        return {
+            extension: videoExtension,
+            mediaType: "video",
+            mimeType: file.type
+        };
+    }
+
+    return {
+        error: "Please upload a JPG, PNG, WebP, AVIF, MP4, or WebM file."
     };
 }
 
@@ -193,6 +253,8 @@ async function getProjectMedia(
                 id,
                 project_id,
                 r2_key,
+                media_type,
+                mime_type,
                 alt_text,
                 caption,
                 credit,
@@ -265,10 +327,11 @@ export async function handleGetMedia(
     }
 
     try {
-        const object =
-            request.method === "HEAD"
-                ? await env.MEDIA.head(key)
-                : await env.MEDIA.get(key);
+        const object = request.method === "HEAD"
+            ? await env.MEDIA.head(key)
+            : await env.MEDIA.get(key, {
+                range: request.headers
+            });
 
         if (!object) {
             return new Response(
@@ -303,12 +366,52 @@ export async function handleGetMedia(
             "inline"
         );
 
+        headers.set("Accept-Ranges", "bytes");
+
+        let status = 200;
+
+        if (
+            request.method === "GET" &&
+            request.headers.has("Range") &&
+            object.range
+        ) {
+            let offset = 0;
+            let length = object.size;
+
+            if (
+                "offset" in object.range &&
+                Number.isFinite(object.range.offset)
+            ) {
+                offset = Number(object.range.offset);
+                length = Number(object.range.length) ||
+                    Math.max(object.size - offset, 0);
+            } else if (
+                "suffix" in object.range &&
+                Number.isFinite(object.range.suffix)
+            ) {
+                length = Math.min(
+                    Number(object.range.suffix),
+                    object.size
+                );
+                offset = Math.max(object.size - length, 0);
+            }
+
+            headers.set(
+                "Content-Range",
+                `bytes ${offset}-${offset + length - 1}/${object.size}`
+            );
+            headers.set("Content-Length", String(length));
+            status = 206;
+        } else {
+            headers.set("Content-Length", String(object.size));
+        }
+
         return new Response(
             request.method === "HEAD"
                 ? null
                 : object.body,
             {
-                status: 200,
+                status,
                 headers
             }
         );
@@ -369,7 +472,7 @@ export async function handleUploadProjectMedia(
     }
 
     const file = formData.get("file");
-    const validation = validateImageFile(file);
+    const validation = validateProjectMediaFile(file);
 
     if (validation.error) {
         return json({
@@ -435,7 +538,7 @@ export async function handleUploadProjectMedia(
         );
 
         return json({
-            error: "Unable to prepare the image upload."
+            error: "Unable to prepare the media upload."
         }, 500);
     }
 
@@ -454,7 +557,7 @@ export async function handleUploadProjectMedia(
                         numericProjectId
                     ),
                     originalName: String(
-                        file.name || "image"
+                        file.name || validation.mediaType
                     ).slice(0, 200),
                     uploadedBy: String(
                         username || "admin"
@@ -468,14 +571,18 @@ export async function handleUploadProjectMedia(
                 INSERT INTO project_media (
                     project_id,
                     r2_key,
+                    media_type,
+                    mime_type,
                     alt_text,
                     sort_order
                 )
-                VALUES (?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?)
             `)
             .bind(
                 numericProjectId,
                 key,
+                validation.mediaType,
+                validation.mimeType,
                 altText,
                 nextOrder
             )
@@ -487,6 +594,8 @@ export async function handleUploadProjectMedia(
                     id,
                     project_id,
                     r2_key,
+                    media_type,
+                    mime_type,
                     alt_text,
                     caption,
                     credit,
@@ -523,7 +632,7 @@ export async function handleUploadProjectMedia(
         }
 
         return json({
-            error: "Unable to upload the image."
+            error: "Unable to upload the media file."
         }, 500);
     }
 }
@@ -552,7 +661,7 @@ export async function handleUpdateProjectMedia(
 
     if (!numericMediaId) {
         return json({
-            error: "Invalid image."
+            error: "Invalid media item."
         }, 400);
     }
 
@@ -579,7 +688,7 @@ export async function handleUpdateProjectMedia(
 
         if (!current) {
             return json({
-                error: "Image not found."
+                error: "Media item not found."
             }, 404);
         }
 
@@ -645,6 +754,8 @@ export async function handleUpdateProjectMedia(
                     id,
                     project_id,
                     r2_key,
+                    media_type,
+                    mime_type,
                     alt_text,
                     caption,
                     credit,
@@ -666,12 +777,12 @@ export async function handleUpdateProjectMedia(
         });
     } catch (error) {
         console.error(
-            "Unable to update image details:",
+            "Unable to update media details:",
             error
         );
 
         return json({
-            error: "Unable to save the image details."
+            error: "Unable to save the media details."
         }, 500);
     }
 }
@@ -841,7 +952,7 @@ export async function handleUploadSiteAsset(
         favicon: {
             column: "favicon_key",
             folder: "favicon",
-            label: "browser icon"
+            label: "tab logo"
         }
     }[assetType];
 
@@ -980,7 +1091,7 @@ export async function handleDeleteProjectMedia(
 
     if (!numericMediaId) {
         return json({
-            error: "Invalid image."
+            error: "Invalid media item."
         }, 400);
     }
 
@@ -1006,13 +1117,13 @@ export async function handleDeleteProjectMedia(
         );
 
         return json({
-            error: "Unable to find that image."
+            error: "Unable to find that media item."
         }, 500);
     }
 
     if (!media) {
         return json({
-            error: "Image not found."
+            error: "Media item not found."
         }, 404);
     }
 
@@ -1049,7 +1160,7 @@ export async function handleDeleteProjectMedia(
         );
 
         return json({
-            error: "Unable to remove the image."
+            error: "Unable to remove the media item."
         }, 500);
     }
 }
@@ -1096,7 +1207,7 @@ export async function handleReorderProjectMedia(
 
     if (!Array.isArray(body.media_ids)) {
         return json({
-            error: "Image order is required."
+            error: "Media order is required."
         }, 400);
     }
 
@@ -1112,7 +1223,7 @@ export async function handleReorderProjectMedia(
         )
     ) {
         return json({
-            error: "Invalid image order."
+            error: "Invalid media order."
         }, 400);
     }
 
@@ -1121,7 +1232,7 @@ export async function handleReorderProjectMedia(
         mediaIds.length
     ) {
         return json({
-            error: "An image was listed more than once."
+            error: "A media item was listed more than once."
         }, 400);
     }
 
@@ -1147,7 +1258,7 @@ export async function handleReorderProjectMedia(
             mediaIds.length
         ) {
             return json({
-                error: "The image list changed. Refresh and try again."
+                error: "The media list changed. Refresh and try again."
             }, 409);
         }
 
@@ -1161,7 +1272,7 @@ export async function handleReorderProjectMedia(
             )
         ) {
             return json({
-                error: "One or more images do not belong to this project."
+                error: "One or more media items do not belong to this project."
             }, 400);
         }
 
@@ -1202,7 +1313,7 @@ export async function handleReorderProjectMedia(
         );
 
         return json({
-            error: "Unable to save the image order."
+            error: "Unable to save the media order."
         }, 500);
     }
 }

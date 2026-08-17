@@ -79,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
         grid: "Portfolio Grid",
         book: "Publication / Book",
         slides: "Presentation / Slides",
+        video: "Video / Motion",
         full: "Full Width"
     };
 
@@ -436,6 +437,34 @@ document.addEventListener("DOMContentLoaded", () => {
         return `/media/${encodedKey}`;
     }
 
+    function isVideoMedia(item) {
+        return item?.media_type === "video" ||
+            String(item?.mime_type || "").startsWith("video/") ||
+            /\.(mp4|webm)$/i.test(String(item?.r2_key || ""));
+    }
+
+    function createMediaPreviewElement(item, canvasPreview = false) {
+        if (isVideoMedia(item)) {
+            const video = document.createElement("video");
+            video.src = getMediaUrl(item);
+            video.preload = "metadata";
+            video.playsInline = true;
+            video.controls = !canvasPreview;
+            video.muted = canvasPreview;
+            video.setAttribute(
+                "aria-label",
+                item.alt_text || "Project video"
+            );
+            return video;
+        }
+
+        const image = document.createElement("img");
+        image.src = getMediaUrl(item);
+        image.alt = item.alt_text || "Project image";
+        image.loading = "lazy";
+        return image;
+    }
+
 
     /* SETTINGS */
 
@@ -708,7 +737,7 @@ document.addEventListener("DOMContentLoaded", () => {
             faviconPreview,
             faviconPreviewEmpty,
             settings.favicon_key,
-            "../assets/favicon-32.png?v=20260816-19"
+            "../assets/favicon-32.png?v=20260817-20"
         );
 
         updateFontPreviews();
@@ -1244,9 +1273,9 @@ document.addEventListener("DOMContentLoaded", () => {
             layout.querySelector("strong").textContent =
                 GALLERY_LAYOUTS[project.gallery_layout]?.label || "Smart Gallery";
 
-            const images = document.createElement("div");
-            images.innerHTML = `<span>Images</span><strong></strong>`;
-            images.querySelector("strong").textContent =
+            const mediaItems = document.createElement("div");
+            mediaItems.innerHTML = `<span>Media</span><strong></strong>`;
+            mediaItems.querySelector("strong").textContent =
                 String(sortedMedia(project).length);
 
             const visible = document.createElement("div");
@@ -1256,7 +1285,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     ? "Visible"
                     : "Hidden";
 
-            meta.append(layout, images, visible);
+            meta.append(layout, mediaItems, visible);
 
             const editButton = document.createElement("button");
             editButton.className = "project-edit-button";
@@ -2060,7 +2089,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function layoutBlockLabel(block) {
         if (block.type === "media") {
             const media = mediaForLayoutBlock(block);
-            return media?.alt_text || "Project image";
+            return media?.alt_text || (
+                isVideoMedia(media)
+                    ? "Project video"
+                    : "Project image"
+            );
         }
 
         if (block.type === "heading") {
@@ -2192,7 +2225,7 @@ document.addEventListener("DOMContentLoaded", () => {
         layoutBlockHeight.value = String(block.h);
 
         removeLayoutBlockButton.textContent = block.type === "media"
-            ? "Hide Image from Layout"
+            ? "Hide Media from Layout"
             : "Remove Block";
     }
 
@@ -2372,7 +2405,7 @@ document.addEventListener("DOMContentLoaded", () => {
             empty.className = "layout-canvas-empty";
             empty.innerHTML = `
                 <strong>Your page is empty</strong>
-                <span>Add a section, text, space or project images.</span>
+                <span>Add a section, text, space or project media.</span>
             `;
             pageLayoutCanvas.appendChild(empty);
             renderLayoutInspector();
@@ -2398,15 +2431,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 const media = mediaForLayoutBlock(block);
 
                 if (media) {
-                    const image = document.createElement("img");
-                    image.src = getMediaUrl(media);
-                    image.alt = media.alt_text || "Project image";
-                    image.loading = "lazy";
-                    image.style.objectFit = block.fit || "contain";
-                    image.style.objectPosition =
+                    const mediaElement = createMediaPreviewElement(
+                        media,
+                        true
+                    );
+                    mediaElement.style.objectFit = block.fit || "contain";
+                    mediaElement.style.objectPosition =
                         `${layoutPercent(block.focal_x, layoutPercent(media.focal_x))}% ` +
                         `${layoutPercent(block.focal_y, layoutPercent(media.focal_y))}%`;
-                    content.appendChild(image);
+                    content.appendChild(mediaElement);
                 }
             } else if (block.type === "spacer") {
                 content.textContent = "Space";
@@ -2523,7 +2556,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const sectionId = activeLayoutSectionId();
 
         if (!sectionId) {
-            showToast("Add or select a section before adding images.");
+            showToast("Add or select a section before adding media.");
             return 0;
         }
 
@@ -2536,6 +2569,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const sectionLayout = activeSection?.section_layout || "custom";
         const fullWidth =
             sectionLayout === "slides" ||
+            sectionLayout === "video" ||
             sectionLayout === "full";
         const tallPages = sectionLayout === "book";
         const width = fullWidth ? 12 : 6;
@@ -2578,12 +2612,12 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         if (!appendMediaLayoutBlocks(missing)) {
-            showToast("Every project image is already on the custom page.");
+            showToast("Every project media item is already on the custom page.");
             return;
         }
 
         showToast(
-            `${missing.length} ${missing.length === 1 ? "image was" : "images were"} added to the page.`
+            `${missing.length} ${missing.length === 1 ? "media item was" : "media items were"} added to the page.`
         );
     }
 
@@ -2875,7 +2909,7 @@ document.addEventListener("DOMContentLoaded", () => {
         delete block.focal_y;
         markPageLayoutDirty();
         renderPageLayout();
-        showToast("This block now follows the image’s main crop.");
+        showToast("This block now follows the media item’s main crop.");
     });
 
     layoutSectionType?.addEventListener("change", () => {
@@ -2974,7 +3008,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         projectEditorIntro.textContent = creating
             ? "Enter the project details below."
-            : "Update project details, images and page layout.";
+            : "Update project details, media and page layout.";
 
         saveProjectButton.textContent = creating
             ? "Create Project"
@@ -3267,7 +3301,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 renderProjectMedia();
                 renderPageLayout();
 
-                showToast("Project created! Now add images, then turn on visibility when you're ready.");
+                showToast("Project created! Now add media, then turn on visibility when you're ready.");
             } else {
                 editingProject = data.project;
                 projects = projects.map(project =>
@@ -3312,6 +3346,7 @@ document.addEventListener("DOMContentLoaded", () => {
         preserveSelection = false
     ) {
         const media = sortedMedia(project);
+        const images = media.filter(item => !isVideoMedia(item));
 
         [projectCoverMedia, projectSocialMedia].forEach((select, index) => {
             if (!select) {
@@ -3334,7 +3369,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 : "Use Project Cover";
             select.appendChild(automatic);
 
-            media.forEach((item, mediaIndex) => {
+            images.forEach((item, mediaIndex) => {
                 const option = document.createElement("option");
                 option.value = String(item.id);
                 option.textContent = item.alt_text || `Image ${mediaIndex + 1}`;
@@ -3354,11 +3389,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return field;
     }
 
-    function buildMediaDetails(item, previewImage) {
+    function buildMediaDetails(item, previewElement) {
         const details = document.createElement("details");
         details.className = "project-media-details";
         const summary = document.createElement("summary");
-        summary.textContent = "Edit image details";
+        summary.textContent = isVideoMedia(item)
+            ? "Edit video details"
+            : "Edit image details";
         const grid = document.createElement("div");
         grid.className = "project-media-details-grid";
 
@@ -3391,7 +3428,7 @@ document.addEventListener("DOMContentLoaded", () => {
         focalYInput.value = String(layoutPercent(item.focal_y));
 
         const updatePreviewCrop = () => {
-            previewImage.style.objectPosition =
+            previewElement.style.objectPosition =
                 `${focalXInput.value}% ${focalYInput.value}%`;
         };
         focalXInput.addEventListener("input", updatePreviewCrop);
@@ -3409,7 +3446,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const save = document.createElement("button");
         save.type = "button";
         save.className = "media-detail-save-button";
-        save.textContent = "Save Image Details";
+        save.textContent = "Save Media Details";
         save.addEventListener("click", () => {
             updateProjectMediaDetails(
                 item,
@@ -3450,7 +3487,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || "Unable to save image details.");
+                throw new Error(data.error || "Unable to save media details.");
             }
 
             updateEditingProjectMedia(
@@ -3460,9 +3497,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         : media
                 )
             );
-            showToast("Image details saved!");
+            showToast("Media details saved!");
         } catch (error) {
-            showToast(error.message || "Unable to save image details.");
+            showToast(error.message || "Unable to save media details.");
             button.disabled = false;
             button.textContent = originalText;
         }
@@ -3478,15 +3515,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (projectMediaCount) {
             projectMediaCount.textContent =
-                `${media.length} ${media.length === 1 ? "Image" : "Images"}`;
+                `${media.length} ${media.length === 1 ? "Media Item" : "Media Items"}`;
         }
 
         if (!media.length) {
             const empty = document.createElement("div");
             empty.className = "project-media-empty";
             empty.innerHTML = `
-                <strong>No images yet</strong>
-                <p>Upload the first image above.</p>
+                <strong>No media yet</strong>
+                <p>Upload the first image or video above.</p>
             `;
             projectMediaList.appendChild(empty);
             return;
@@ -3499,24 +3536,27 @@ document.addEventListener("DOMContentLoaded", () => {
             const preview = document.createElement("div");
             preview.className = "project-media-item-preview";
 
-            const image = document.createElement("img");
-            image.src = getMediaUrl(item);
-            image.alt = item.alt_text || "Project image";
-            image.loading = "lazy";
-            image.style.objectPosition =
+            const mediaElement = createMediaPreviewElement(item);
+            mediaElement.style.objectPosition =
                 `${layoutPercent(item.focal_x)}% ${layoutPercent(item.focal_y)}%`;
-            preview.appendChild(image);
+            preview.appendChild(mediaElement);
 
             const info = document.createElement("div");
             info.className = "project-media-item-info";
 
             const position = document.createElement("strong");
-            position.textContent = `Image ${index + 1}`;
+            position.textContent = isVideoMedia(item)
+                ? `Video ${index + 1}`
+                : `Image ${index + 1}`;
 
             const alt = document.createElement("span");
-            alt.textContent = item.alt_text || "No image description";
+            alt.textContent = item.alt_text || "No media description";
 
-            info.append(position, alt, buildMediaDetails(item, image));
+            info.append(
+                position,
+                alt,
+                buildMediaDetails(item, mediaElement)
+            );
 
             const controls = document.createElement("div");
             controls.className = "project-media-controls";
@@ -3600,13 +3640,32 @@ document.addEventListener("DOMContentLoaded", () => {
         const file = projectMediaFile?.files?.[0];
 
         if (!file) {
-            showToast("Choose an image first.");
+            showToast("Choose an image or video first.");
             projectMediaFile?.focus();
             return;
         }
 
-        if (file.size > 20 * 1024 * 1024) {
+        const isVideo = file.type === "video/mp4" ||
+            file.type === "video/webm";
+        const isImage = [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "image/avif"
+        ].includes(file.type);
+
+        if (!isImage && !isVideo) {
+            showToast("Choose a JPG, PNG, WebP, AVIF, MP4 or WebM file.");
+            return;
+        }
+
+        if (isImage && file.size > 20 * 1024 * 1024) {
             showToast("Images must be 20 MB or smaller.");
+            return;
+        }
+
+        if (isVideo && file.size > 50 * 1024 * 1024) {
+            showToast("Videos must be 50 MB or smaller.");
             return;
         }
 
@@ -3640,7 +3699,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!response.ok) {
                 throw new Error(
-                    data.error || "Unable to upload image."
+                    data.error || "Unable to upload media."
                 );
             }
 
@@ -3655,10 +3714,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             projectMediaFile.value = "";
             projectMediaAlt.value = "";
-            showToast("Image uploaded!");
+            showToast(isVideo ? "Video uploaded!" : "Image uploaded!");
         } catch (error) {
-            console.error("Unable to upload image:", error);
-            showToast(error.message || "We couldn't upload that image.");
+            console.error("Unable to upload media:", error);
+            showToast(error.message || "We couldn't upload that media file.");
         } finally {
             uploadProjectMediaButton.disabled = false;
             uploadProjectMediaButton.textContent = originalText;
@@ -3731,7 +3790,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!response.ok) {
                 throw new Error(
-                    data.error || "Unable to reorder images."
+                    data.error || "Unable to reorder media."
                 );
             }
 
@@ -3739,11 +3798,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateEditingProjectMedia(data.media);
             }
 
-            showToast("Image order saved!");
+            showToast("Media order saved!");
         } catch (error) {
-            console.error("Unable to reorder images:", error);
+            console.error("Unable to reorder media:", error);
             updateEditingProjectMedia(current);
-            showToast("We couldn't save that image order.");
+            showToast("We couldn't save that media order.");
         }
     }
 
@@ -3753,7 +3812,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const confirmed = window.confirm(
-            "Remove this image from the project?"
+            "Remove this media item from the project?"
         );
 
         if (!confirmed) {
@@ -3781,7 +3840,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!response.ok) {
                 throw new Error(
-                    data.error || "Unable to remove image."
+                    data.error || "Unable to remove media."
                 );
             }
 
@@ -3791,10 +3850,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 )
             );
 
-            showToast("Image removed.");
+            showToast("Media removed.");
         } catch (error) {
-            console.error("Unable to remove image:", error);
-            showToast(error.message || "We couldn't remove that image.");
+            console.error("Unable to remove media:", error);
+            showToast(error.message || "We couldn't remove that media item.");
         }
     }
 
