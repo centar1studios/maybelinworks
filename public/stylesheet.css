@@ -106,7 +106,7 @@ a:hover, button:hover {
     color: var(--pink);
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 400;
+    font-weight: 600;
     text-transform: none;
     letter-spacing: 0.04em;
 }
