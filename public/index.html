@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Portfolio of multidisciplinary artist and designer Maybelin Garcia Romero.">
+    <meta property="og:type" content="website" data-social-type>
+    <meta property="og:title" content="Maybelin Works" data-social-title>
+    <meta property="og:description" content="Portfolio of designer Maybelin Garcia Romero." data-social-description>
     <title>Maybelin Works</title>
-    <link rel="icon" type="image/png" href="./assets/maygarcia_logo.png">
+    <link rel="icon" href="./assets/favicon-32.png?v=20260817-20" type="image/png" sizes="32x32" data-site-favicon>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./stylesheet.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./stylesheet.css?v=20260817-20">
 </head>
 <body>
 
@@ -25,32 +28,32 @@
         <source src="https://pub-cc011682079448388e2f0a3b4000b951.r2.dev/bkg_video_16-9.mp4" type="video/mp4">
     </video>
     <div class="background-overlay"></div>
-
-    <!-- SKIP LINK -->
     <a class="skip-link" href="#main-content">Skip to Content</a>
 
     <!-- HEADER -->
     <header class="site-header">
-        <a class="wordmark" href="#" aria-label="Return to Homepage">Maybelin Garcia Romero</a>
+        <a class="wordmark" href="#" aria-label="Return to Homepage">
+            <img src="./assets/maygarcia_logo_lime.png" data-site-logo alt="Maybelin Garcia Romero monogram">
+            <span data-site-wordmark>Maybelin Garcia Romero</span>
+        </a>
         <nav class="site-nav" aria-label="Site Links">
-            <button class="nav-button" type="button" data-open-about>Information</button>
-            <a href="mailto:#">Email Me</a>
-            <a href="tel:#">Call Me</a>
-            <a href="#" target="_blank" rel="noreferrer">Instagram</a>
-            <a href="#" target="_blank" rel="noreferrer">LinkedIn</a>
-            <a href="#" target="_blank" rel="noreferrer">Behance</a>
+            <button class="nav-button" type="button" data-open-about>ABOUT</button>
+            <a href="https://www.instagram.com/may.sun.jar" target="_blank" rel="noreferrer">Instagram</a>
+            <a href="mailto:maygarcia227@gmail.com">Email Me</a>
+            <a href="tel:+12623657992">Call Me</a>
         </nav>
     </header>
 
-    <!-- HERO -->
+    <!-- Large center textbox -->
     <main id="main-content">
         <section class="hero">
             <div class="hero-text-box">
                 <div class="hero-inner">
                     <p class="hero-kicker">Freelance Artist</p>
-                    <h1 class="hero-title">Work that not only looks good but does good.</h1>
+                    <h1 class="hero-title">Work that looks good<br>&amp; does good</h1>
                     <div class="hero-bottom">
-                        <button class="text-button" type="button" data-open-projects>Read More?</button>
+                        <button class="text-button" type="button" data-open-projects>Explore Works</button>
+                        <a class="hero-home-button" href="#work" data-home-button hidden>View My Work</a>
                     </div>
                 </div>
             </div>
@@ -59,9 +62,8 @@
 
     <!-- FOOTER -->
     <footer class="site-footer">
-        <p>Maybelin Works, <span data-current-year></span></p>
+        <p><span data-footer-text>Maybelin Works</span> <span data-current-year></span></p>
         <p> <em>Website created by Centari Studios</em> </p>
-        <p> <em>Powered by Cloudflare</em> </p>
         <p> <a href="./admin-login.html">Admin Login</a> </p>
     </footer>
 
@@ -76,9 +78,7 @@
             <header class="portfolio-intro">
                 <h2>Projects and Creative Works</h2>
                 <p>
-                    A selection of branding, editorial, typography,
-                    photography, and educational design work shaped
-                    by lived experience, culture, motherhood, and curiosity.
+                    A selection of my best projects.
                 </p>
             </header>
 
@@ -238,7 +238,7 @@
                 <!-- CASA GUADALUPE -->
                 <article class="project">
                     <div class="project-gallery presentation-gallery">
-                        <img class="presentation-image" src="./assets/casa/casa_pres1.png" alt="Casa Guadalupe Education Center brand presentation" loading="lazy" decoding="async">
+                        <img class="presentation-image" src="./assets/casa/casa_pres1.png" alt="Casa Guadalupe brand presentation" loading="lazy" decoding="async">
                         <div class="project-gallery-section">
                             <p class="gallery-heading">Identity</p>
                             <div class="project-image-pair">
@@ -312,10 +312,10 @@
         </div>
     </dialog>
 
-    <!-- INFORMATION -->
+    <!-- ABOUT -->
     <dialog data-about-dialog>
         <div class="dialog-toolbar">
-            <p>Information</p>
+            <p>ABOUT</p>
             <button class="dialog-close" type="button" data-close-about>Close</button>
         </div>
 
@@ -375,7 +375,7 @@
         </div>
     </dialog>
 
-    <script src="./site-config.js"></script>
+    <script src="./site-config.js?v=20260817-20"></script>
 
 </body>
 </html>
