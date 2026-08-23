@@ -82,7 +82,7 @@ a:hover, button:hover {
     justify-content: space-between;
     gap: 1rem;
     padding: 1.15rem 1.5rem;
-    background: rgba(42, 63, 56, 0.97);
+    background: var(--purple);
     color: var(--light-text);
     border-bottom: 2px solid var(--pink);
     box-shadow: 0 8px 30px rgba(42, 63, 56, 0.18);
@@ -260,7 +260,7 @@ a:hover, button:hover {
 .hero-title {
     max-width: 900px;
     margin: 0 auto;
-    color: var(--light-text);
+    color: var(--pink);
     font-family: var(--font-display);
     font-size: clamp(3.2rem, 6vw, 6.7rem);
     font-weight: 400;
@@ -315,7 +315,7 @@ a:hover, button:hover {
     justify-content: space-between;
     gap: 1rem;
     padding: 0.95rem 1.5rem;
-    background: rgba(42, 63, 56, 0.97);
+    background: var(--purple);
     color: rgba(255, 255, 255, 0.82);
     border-top: 2px solid var(--lime);
     box-shadow: 0 -8px 30px rgba(42, 63, 56, 0.15);
