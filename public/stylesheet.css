@@ -82,7 +82,7 @@ a:hover, button:hover {
     justify-content: space-between;
     gap: 1rem;
     padding: 1.15rem 1.5rem;
-    background: var(--purple);
+    background: rgba(42, 63, 56, 0.97);
     color: var(--light-text);
     border-bottom: 2px solid var(--pink);
     box-shadow: 0 8px 30px rgba(42, 63, 56, 0.18);
@@ -102,7 +102,7 @@ a:hover, button:hover {
     pointer-events: auto;
 }
 
-.header-logo {
+.wordmark {
     color: var(--light-text);
     font-family: var(--font-display);
     font-size: 1.35rem;
@@ -111,7 +111,7 @@ a:hover, button:hover {
     letter-spacing: 0.04em;
 }
 
-.header-logo:hover {
+.wordmark:hover {
     color: var(--lime);
 }
 
@@ -204,6 +204,57 @@ a:hover, button:hover {
     flex-direction: column;
     align-items: center;
     pointer-events: auto;
+}
+
+.hero-text-box {
+    position: relative;
+    width: min(70vw, 980px);
+    margin: 0 auto;
+    padding: 38px 52px;
+    background: linear-gradient(145deg,rgba(86, 47, 84, 0.90), rgba(73, 47, 72, 0.88));
+    border: 1px solid rgba(246, 80, 189, 0.60);
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 26px 70px rgba(42, 63, 56, 0.35), 0 0 40px rgba(246, 80, 189, 0.12);
+    text-align: center;
+    pointer-events: auto;
+}
+
+.hero-text-box::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 38px;
+    height: 38px;
+    border-top: 2px solid var(--lime);
+    border-left: 2px solid var(--lime);
+    border-radius: 5px 0 0 0;
+    pointer-events: none;
+}
+
+.hero-text-box::after {
+    content: "";
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 38px;
+    height: 38px;
+    border-right: 2px solid var(--pink);
+    border-bottom: 2px solid var(--pink);
+    border-radius: 0 0 5px 0;
+    pointer-events: none;
+}
+
+.hero-kicker {
+    margin: 0 0 0.8rem;
+    color: var(--lime);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
 }
 
 .hero-title {
@@ -1677,5 +1728,171 @@ body.dialog-open {
     .gallery-layout-smart .cms-gallery-wide,
     .gallery-layout-featured .cms-gallery-featured {
         grid-column: auto;
+    }
+}
+
+
+/* Public header */
+.site-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 1.5rem;
+    min-height: 82px;
+    padding: 0.85rem 1.5rem;
+}
+
+.site-name,
+.site-logo {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--light-text);
+    pointer-events: auto;
+}
+
+.site-name {
+    justify-self: start;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 400;
+    line-height: 1.15;
+    text-align: left;
+    text-transform: none;
+    letter-spacing: 0.03em;
+}
+
+.site-logo {
+    justify-self: center;
+}
+
+.site-logo img {
+    display: block;
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+}
+
+.site-nav {
+    justify-self: end;
+}
+
+.site-nav button {
+    color: var(--light-text);
+}
+
+.site-name:hover,
+.site-name:focus-visible,
+.site-logo:hover,
+.site-logo:focus-visible,
+.site-nav button:hover,
+.site-nav button:focus-visible {
+    color: var(--lime);
+}
+
+/* Homepage */
+.hero {
+    padding-top: 7rem;
+    padding-bottom: 5rem;
+}
+
+.hero-inner {
+    max-width: 1000px;
+}
+
+.hero-title {
+    text-shadow: 0 4px 28px rgba(20, 28, 25, 0.35);
+}
+
+/* Public dialog headers */
+.public-dialog-header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+
+.public-dialog-ready > .dialog-toolbar {
+    display: none;
+}
+
+.project-dialog-nav {
+    position: sticky;
+    top: 82px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1.5rem;
+    background: rgba(255, 255, 255, 0.97);
+    border-bottom: 1px solid rgba(86, 47, 84, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.project-dialog-nav .project-switcher {
+    width: 100%;
+    margin: 0;
+}
+
+@media (max-width: 760px) {
+    .site-header {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 0.75rem;
+        min-height: 70px;
+        padding: 0.7rem 1rem;
+    }
+
+    .site-name {
+        max-width: 34vw;
+        font-size: 0.82rem;
+    }
+
+    .site-logo img {
+        width: 46px;
+        height: 46px;
+    }
+
+    .site-nav {
+        justify-content: flex-end;
+        gap: 0.4rem 0.75rem;
+    }
+
+    .site-nav button {
+        font-size: 0.58rem;
+    }
+
+    .hero {
+        padding: 6.5rem 1rem 4.5rem;
+    }
+
+    .project-dialog-nav {
+        top: 70px;
+        padding: 0.7rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .site-header {
+        gap: 0.5rem;
+        padding: 0.65rem 0.75rem;
+    }
+
+    .site-name {
+        max-width: 32vw;
+        font-size: 0.72rem;
+    }
+
+    .site-logo img {
+        width: 42px;
+        height: 42px;
+    }
+
+    .site-nav {
+        gap: 0.35rem 0.55rem;
+    }
+
+    .site-nav button {
+        font-size: 0.54rem;
+        letter-spacing: 0.08em;
     }
 }
