@@ -103,7 +103,7 @@ a:hover, button:hover {
 }
 
 .wordmark {
-    color: var(--light-text);
+    color: var(--pink);
     font-family: var(--font-display);
     font-size: 1.35rem;
     font-weight: 400;
@@ -316,7 +316,7 @@ a:hover, button:hover {
     gap: 1rem;
     padding: 0.95rem 1.5rem;
     background: var(--purple);
-    color: rgba(255, 255, 255, 0.82);
+    color: var(--pink);
     border-top: 2px solid var(--lime);
     box-shadow: 0 -8px 30px rgba(42, 63, 56, 0.15);
     font-family: var(--font-body);
@@ -337,7 +337,7 @@ a:hover, button:hover {
 }
 
 .site-footer a:hover {
-    color: var(--pink);
+    color: var(--lime);
 }
 
 /* Dialogs and portfolio */
@@ -388,7 +388,7 @@ dialog[open] {
     padding: 1.15rem 1.5rem;
     border-bottom: 2px solid var(--pink);
     background: rgba(42, 63, 56, 0.98);
-    color: var(--light-text);
+    color: var(--pink);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     font-family: var(--font-body);
@@ -404,7 +404,7 @@ dialog[open] {
 }
 
 .dialog-close {
-    color: var(--lime);
+    color: var(--pink);
     font-family: var(--font-body);
     font-size: 0.72rem;
     font-weight: 600;
@@ -413,7 +413,7 @@ dialog[open] {
 }
 
 .dialog-close:hover {
-    color: var(--pink);
+    color: var(--lime);
 }
 
 .portfolio-dialog-content {
