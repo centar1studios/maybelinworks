@@ -82,7 +82,7 @@ a:hover, button:hover {
     justify-content: space-between;
     gap: 1rem;
     padding: 1.15rem 1.5rem;
-    background: var(--pink);
+    background: var(--purple);
     color: var(--light-text);
     border-bottom: 2px solid var(--pink);
     box-shadow: 0 8px 30px rgba(42, 63, 56, 0.18);
