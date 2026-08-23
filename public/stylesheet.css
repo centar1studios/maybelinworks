@@ -262,8 +262,8 @@ a:hover, button:hover {
     margin: 0 auto;
     color: var(--pink);
     font-family: var(--font-display);
-    font-size: clamp(3.2rem, 6vw, 6.7rem);
-    font-weight: 400;
+    font-size: 100px;
+    font-weight: 800;
     line-height: 0.98;
     letter-spacing: 0.01em;
     text-align: center;
