@@ -105,8 +105,8 @@ a:hover, button:hover {
 .wordmark {
     color: var(--pink);
     font-family: var(--font-display);
-    font-size: 1.35rem;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 800;
     text-transform: none;
     letter-spacing: 0.04em;
 }
