@@ -6,21 +6,14 @@
     --purple: #562F54;
     --charcoal: #57585D;
     --pink: #F650BD;
-
+    
     --background: #57585D;
     --text: #2A3F38;
     --muted: #57585D;
     --line: #F650BD;
     --panel: #FFFFFF;
-
-    --accent-magenta: #F650BD;
-    --accent-pink: #F650BD;
-    --accent-green: #8DF688;
-    --accent-lime: #8DF688;
-
-    --header-footer: #2A3F38;
-    --dark-plum: #562F54;
-
+    
+    --header-footer: #562F54;
     --light-text: #FFFFFF;
     --soft-pink: #F650BD;
 
@@ -36,8 +29,7 @@ html {
     scroll-behavior: smooth;
 }
 
-html,
-body {
+html, body {
     width: 100%;
     min-height: 100%;
 }
@@ -49,11 +41,7 @@ body {
     font-family: var(--font-body);
 }
 
-button,
-a,
-input,
-textarea,
-select {
+button, a, input, textarea, select {
     color: inherit;
     font: inherit;
 }
@@ -66,8 +54,7 @@ a {
     text-decoration: none;
 }
 
-a:hover,
-button:hover {
+a:hover, button:hover {
     color: var(--accent-green);
 }
 
@@ -99,7 +86,7 @@ button:hover {
     justify-content: space-between;
     gap: 1rem;
     padding: 1.15rem 1.5rem;
-    background: rgba(42, 63, 56, 0.97);
+    background: var(--header-footer);
     color: var(--light-text);
     border-bottom: 2px solid var(--pink);
     box-shadow: 0 8px 30px rgba(42, 63, 56, 0.18);
@@ -113,22 +100,21 @@ button:hover {
     pointer-events: none;
 }
 
-.site-header a,
-.site-header button,
-.site-nav {
+.site-header a, .site-header button,.site-nav {
     pointer-events: auto;
 }
 
-.wordmark {
+.header-logo {
     color: var(--light-text);
     font-family: var(--font-display);
     font-size: 1.35rem;
     font-weight: 400;
     text-transform: none;
+    align-items: center;
     letter-spacing: 0.04em;
 }
 
-.wordmark:hover {
+.header-logo:hover {
     color: var(--lime);
 }
 
@@ -138,23 +124,17 @@ button:hover {
     gap: 1.3rem;
 }
 
-.nav-button,
-.text-button,
-.dialog-close {
+.nav-button,.text-button,.dialog-close {
     padding: 0;
     border: 0;
     background: none;
 }
 
-.site-nav a,
-.site-nav button,
-.text-button {
+.site-nav a, .site-nav button, .text-button {
     position: relative;
 }
 
-.site-nav a::after,
-.site-nav button::after,
-.text-button::after {
+.site-nav a::after, .site-nav button::after, .text-button::after {
     content: "";
     position: absolute;
     right: 0;
@@ -225,57 +205,6 @@ button:hover {
     flex-direction: column;
     align-items: center;
     pointer-events: auto;
-}
-
-.hero-text-box {
-    position: relative;
-    width: min(70vw, 980px);
-    margin: 0 auto;
-    padding: 38px 52px;
-    background: linear-gradient(145deg,rgba(86, 47, 84, 0.90), rgba(73, 47, 72, 0.88));
-    border: 1px solid rgba(246, 80, 189, 0.60);
-    border-radius: 18px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 26px 70px rgba(42, 63, 56, 0.35), 0 0 40px rgba(246, 80, 189, 0.12);
-    text-align: center;
-    pointer-events: auto;
-}
-
-.hero-text-box::before {
-    content: "";
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    width: 38px;
-    height: 38px;
-    border-top: 2px solid var(--lime);
-    border-left: 2px solid var(--lime);
-    border-radius: 5px 0 0 0;
-    pointer-events: none;
-}
-
-.hero-text-box::after {
-    content: "";
-    position: absolute;
-    right: 12px;
-    bottom: 12px;
-    width: 38px;
-    height: 38px;
-    border-right: 2px solid var(--pink);
-    border-bottom: 2px solid var(--pink);
-    border-radius: 0 0 5px 0;
-    pointer-events: none;
-}
-
-.hero-kicker {
-    margin: 0 0 0.8rem;
-    color: var(--lime);
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
 }
 
 .hero-title {
@@ -396,7 +325,6 @@ dialog[open] {
         opacity: 1;
         transform: translateY(0);
     }
-
 }
 
 .dialog-toolbar {
