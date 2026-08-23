@@ -4,16 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Portfolio of Maybelin Garcia Romero.">
+    <meta property="og:type" content="website" data-social-type>
+    <meta property="og:title" content="Maybelin Works" data-social-title>
+    <meta property="og:description" content="Portfolio of Maybelin Garcia Romero." data-social-description>
+    <meta property="og:url" content="" data-social-url>
+    <meta property="og:image" content="" data-social-image>
     <title>Maybelin Works</title>
-    <link rel="icon" href="assets/maygarcia_logo.png" type="image/png" sizes="32x32" data-site-favicon>
+    <link rel="icon" href="./assets/favicon-32.png?v=20260817-20" type="image/png" sizes="32x32" data-site-favicon>
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=20260817-20" sizes="180x180">
+    <meta name="theme-color" content="#2A3F38">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./stylesheet.css?v=20260817-20">
 </head>
 <body>
-
-    <-- Background Video -->
 <video
         class="background-video"
         autoplay
@@ -24,42 +29,33 @@
         <source src="https://pub-cc011682079448388e2f0a3b4000b951.r2.dev/bkg_video_16-9.mp4" type="video/mp4">
     </video>
     <div class="background-overlay"></div>
-
 <a class="skip-link" href="#main-content">Skip to Content</a>
-
-<-- Header -->
 <header class="site-header">
-        <a class="header-logo" href="#" aria-label="Return to Homepage">
-            <center><img src="./assets/maygarcia_logo.png" data-site-logo alt="Maybelin Works Logo"></center>
-            <span data-site-wordmark>Maybelin Garcia Romero</span>
-        </a>
+        <button class="site-name" type="button" data-go-home>
+            Maybelin Garcia Romero
+        </button>
 
-        <nav class="site-nav" aria-label="Site Links">
-            <button class="nav-button" type="button" data-open-about>ABOUT</button>
+        <button class="site-logo" type="button" data-go-home aria-label="Return to homepage">
+            <img src="./assets/maygarcia_logo.png" data-site-logo alt="Maybelin Works logo">
+        </button>
+
+        <nav class="site-nav" aria-label="Site links">
+            <button class="nav-button" type="button" data-open-projects>Explore Works</button>
+            <button class="nav-button" type="button" data-open-about>About</button>
         </nav>
     </header>
-    
-<-- Middle Hero -->
 <main id="main-content">
         <section class="hero">
-                <div class="hero-inner">
-                    <h1 class="hero-title">Work that looks good<br>&amp; does good</h1>
-                    <div class="hero-bottom">
-                        <button class="text-button" type="button" data-open-projects>Explore Works</button>
-                        <a class="hero-home-button" href="#work" data-home-button hidden>View My Work</a>
-                    </div>
-                </div>
+            <div class="hero-inner">
+                <h1 class="hero-title">Work that looks good<br>&amp; does good</h1>
             </div>
         </section>
     </main>
-    
-<-- Footer -->
 <footer class="site-footer">
-        <p><span data-footer-text>©<span data-current-year>Maybelin Works</span></span></p>
+        <p><span data-footer-text>Maybelin Works</span>, <span data-current-year></span></p>
         <p><em>Website created by Centari Studios</em></p>
-        <p><a href="./admin-login.html">Site Manager</a></p>
+        <p><a href="./admin-login.html">Admin Login</a></p>
     </footer>
-
 <dialog data-projects-dialog>
         <div class="dialog-toolbar">
             <p>Selected Work</p>
@@ -288,6 +284,7 @@
     </dialog>
 
     <script src="./site-config.js?v=20260817-20"></script>
+    <script src="./public-header.js?v=20260823-1"></script>
 
 </body>
 </html>
