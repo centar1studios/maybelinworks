@@ -1,295 +1,177 @@
-<!DOCTYPE HTML>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en"
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Portfolio of Maybelin Garcia Romero.">
-    <meta property="og:type" content="website" data-social-type>
-    <meta property="og:title" content="Maybelin Works" data-social-title>
-    <meta property="og:description" content="Portfolio of Maybelin Garcia Romero." data-social-description>
-    <meta property="og:url" content="" data-social-url>
-    <meta property="og:image" content="" data-social-image>
+    <meta charset="utf-8">
     <title>Maybelin Works</title>
-    <link rel="icon" href="./assets/mayharcia_logo.png" type="image/png" sizes="32x32" data-site-favicon>
-    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=20260817-20" sizes="180x180">
-    <meta name="theme-color" content="#2A3F38">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./stylesheet.css?v=20260817-20">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Portfolio for Maybelin Garcia Romero">
+    <meta name="author" content="Maybelin Garcia Romero">
+    <link rel="canonical" href="https://maybelinworks.com/">
+    <link rel="icon" type="image/png" href="./assets/maygarcia_logo.png">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Maybelin Works">
+    <meta property="og:description" content="Portfolio for Maybelin Works">
+    <meta property="og:url" content="https://maybelinworks.com">
+    <meta property="og:image" content="https://maybelinworks.com/assets/maygarcia_logo.png">
+    <meta property="twitter:name" content="Maybelin Works">
+    <meta property="twitter:description" content="Portfolio for Maybelin Works">
+    <meta property="twitter:image" content="https://maybelinworks.com/assets/maygarcia_logo.png">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="pinterest" content="nopin">
+    <link rel="stylesheet" href="stylesheet.css">
+    <script src="site-config.js" defer></script>
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": "Maybelin Garcia Romero",
+            "url": "https://maybelinworks.com/",
+            "jobTitle": "Brand Designer"
+        }
+    </script>
 </head>
+
 <body>
-<video
-        class="background-video"
-        autoplay
-        muted
-        loop
-        playsinline 
-        preload="auto">
-        <source src="https://pub-cc011682079448388e2f0a3b4000b951.r2.dev/bkg_video_16-9.mp4" type="video/mp4">
-    </video>
-    <div class="background-overlay"></div>
-<a class="skip-link" href="#main-content">Skip to Content</a>
-<header class="site-header">
-        <button class="site-name" type="button" data-go-home>
-            Maybelin Garcia Romero
-        </button>
+    <a class="skip-link" href="#main-content">Skip to Main Content</a>
 
-        <button class="site-logo" type="button" data-go-home aria-label="Return to homepage">
-            <img src="./assets/maygarcia_logo.png" data-site-logo alt="Maybelin Works logo">
-        </button>
+    <!-- Site Header -->
+     <header class="site-header" id="site-header">
+        <div class="header-content">
+            <a class="site-logo" href="#" aria-label="Maybelin Works Home">
+                <img id="site-logo" src="./assets/maygarcia_logo.png" alt="Maybelin Works" width="240" height="90">
+            </a>
 
-        <nav class="site-nav" aria-label="Site links">
-            <button class="nav-button" type="button" data-open-projects>Explore Works</button>
-            <button class="nav-button" type="button" data-open-about>About</button>
-        </nav>
-    </header>
-<main id="main-content">
-        <section class="hero">
-            <div class="hero-inner">
-                <h1 class="hero-title">Work that looks good<br>&amp; does good</h1>
-            </div>
-        </section>
-    </main>
-<footer class="site-footer">
-        <p><span data-footer-text>Maybelin Works</span>, <span data-current-year></span></p>
-        <p><em>Website created by Centari Studios</em></p>
-        <p><a href="./admin-login.html">Admin Login</a></p>
-    </footer>
-<dialog data-projects-dialog>
-        <div class="dialog-toolbar">
-            <p>Selected Work</p>
-            <button class="dialog-close" type="button" data-close-projects>Close</button>
+            <nav class="site-nav" aria-label="Primary Site Navigation">
+                <button class="site-nav_link" type="button" data-panel-open="panel_works" data-cms="site-nav_works-label">EXPLORE WORKS</button>
+                <button class="site-nav_link" type="button" data-panel-open="panel_about" data-cms="site-nav_about-label">ABOUT</button>
+            </nav>
         </div>
+     </header>
 
-        <div class="portfolio-dialog-content">
-            <header class="portfolio-intro">
-                <h2>Projects and Creative Works</h2>
-                <p>
-                   A taste of my best works.
-                </p>
+    <!-- Main Content -->
+     <main id="main-content">
+
+         <section class="hero" id="hero" aria-labelledby="hero-title">
+
+            <!-- Background Video -->
+            <video class="hero_video" id="hero_video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+                <source id="hero_video" src="https://pub-cc011682079448388e2f0a3b4000b951.r2.dev/bkg_video_16-9.mp4" type="video/mp4">
+            </video>
+            <div class="hero_overlay" aria-hidden="true"></div>
+
+            <!--Hero Content-->
+            <div class="hero_content">
+                <h1 class="hero_title" id="hero_title">
+                    <span class="hero_tagline-top" data-cms="hero_tagline-top">Work that looks good</span>
+                    <span class="hero_and" aria-hidden="true">&amp;</span>
+                    <span class="hero_tagline-bottom" data-cms="hero_tagline-bottom">does good</span>
+                </h1>
+            </div>
+         </section>
+
+     <!-- Explore Works Panel -->
+       <section class="panel_works" id="panel_works" artia-labelledby="works_title" hidden>
+        <div class="panel_content">
+            <header class="panel_header">
+                <p class="panel_label" data-cms="hero_works-label">SELECTED WORKS</p>
+                <h2 class="panel_title" id="works_title" data-cms="works_title">Projects &amp; Creative Works</h2>
+                <p class="panel_tagline" data-cms="works_intro">A taste of the best.</p>
             </header>
 
-            <div class="project-list">
-<article class="project">
-                    <div class="project-gallery">
-                        <div class="project-gallery-section">
-                            <p class="gallery-heading">Publication</p>
+            <!-- Projects -->
+             <div class="project_grid" id="featured">
 
-                            <div class="publication-gallery">
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_01.png" alt="Fenix publication page 1" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_02.png" alt="Fenix publication page 2" loading="lazy">
-                                </div>
+                <!-- Fenix Publication-->
+                 <article class="project">
+                    <a class="project_link" href="./assets/fenix_pub">
+                        <img class="project_cover" src="/assets/fenix_pub/sugar.png" alt="Fenix Travel Publication" width="1600" height="1200" loading="lazy">
 
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_03.png" alt="Fenix publication page 3" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_04.png" alt="Fenix publication page 4" loading="lazy">
-                                </div>
-
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_05.png" alt="Fenix publication page 5" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_06.png" alt="Fenix publication page 6" loading="lazy">
-                                </div>
-
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_07.png" alt="Fenix publication page 7" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_08.png" alt="Fenix publication page 8" loading="lazy">
-                                </div>
-
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_09.png" alt="Fenix publication page 9" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_10.png" alt="Fenix publication page 10" loading="lazy">
-                                </div>
-
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_11.png" alt="Fenix publication page 11" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_12.png" alt="Fenix publication page 12" loading="lazy">
-                                </div>
-
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_13.png" alt="Fenix publication page 13" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_14.png" alt="Fenix publication page 14" loading="lazy">
-                                </div>
-
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_15.png" alt="Fenix publication page 15" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_16.png" alt="Fenix publication page 16" loading="lazy">
-                                </div>
-
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_17.png" alt="Fenix publication page 17" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_18.png" alt="Fenix publication page 18" loading="lazy">
-                                </div>
-
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_19.png" alt="Fenix publication page 19" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_20.png" alt="Fenix publication page 20" loading="lazy">
-                                </div>
-
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_21.png" alt="Fenix publication page 21" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_22.png" alt="Fenix publication page 22" loading="lazy" >
-                                </div>
-
-                                <div class="publication-spread">
-                                    <img src="./assets/fenix_pub/page_23.png" alt="Fenix publication page 23" loading="lazy">
-                                    <img src="./assets/fenix_pub/page_24.png" alt="Fenix publication page 24" loading="lazy">
-                                </div>
+                        <div class="project_content">
+                            <div class="project_meta">
+                                <span>PROJECT 01</span>
+                                <span>TRAVEL PUBLICATION</span>
                             </div>
+
+                            <h3 class="project_title">Fenix Publication</h3>
+                            <p class="project_desc">I’d like to see if you could include this spread and highlight that the typography was created by hand with sprinkles from my pantry and tweezers, using an Old English typeface. 
+                            This spread is from a publication I called Fenix (in my last semester of college), and it was a blog-type publication for Arizona travel with my daughter. 
+                            It was created so other single moms would be in the know about kid-friendly spots in Arizona. 
+                            All design, typography, and photos by me.</p>
+                            <span class="project_button">EXPLORE PROJECT</span>
                         </div>
-<div class="project-gallery-section">
-                            <p class="gallery-heading">Typography</p>
-                            <div class="project-image-pair">
-                                <img src="./assets/fenix_pub/fenix_pub_typeface1.jpg" alt="Custom typography study created for Fenix" loading="lazy">
-                                <img src="./assets/fenix_pub/fenix_pub_typeface2.jpg" alt="Custom typography detail created for Fenix" loading="lazy">
+                    </a>
+                 </article>
+
+                 <!-- Casa Guadalupe -->
+                  <article class="project">
+                    <a class="project_link" href="/assets/casa">
+                        <img class="project_cover" src="assets/casa/casa_ryg.png" alt="Casa Guadalupe Branding Identity" width="1600" height="1600" loading="lazy">
+                        
+                        <div class="project_content">
+                            <div class="project_meta">
+                                <span>PROJECT 02</span>
+                                <span>BRANDING IDENTITY</span>
                             </div>
-                            <img class="presentation-image" src="./assets/fenix_pub/sugar.png" alt="Handmade sprinkle typography used in the Fenix publication" loading="lazy">
+
+                            <h3 class="project_title">Casa Guadalupe Education Center Branding Indentity</h3>
+                            <p class="project_desc">Designed to engage 25- 35-year-old parents with children. 
+                                I have cool logo concepts for these; ultimately, I chose a pattern and colors that alluded to a zarape blanket that I discovered while traveling 
+                                to Downtown Old Los Angeles with my family–a week before the world went into shutdown for COVID. 
+                                Growing up in LA, I would often visit with my family for yearly Mexican festivities and traditions.
+                                We would often go to the Placita Olvera, where hundreds of vendors would line up to sell Hispanic goods. 
+                                This reminded me of a melting pot and community, so I wanted to bring that same vibrant feeling to the logo and brand identity of Casa.</p>
+                            <span class="project_button">EXPLORE PROJECT</span>
                         </div>
-<div class="project-gallery-section">
-                            <p class="gallery-heading">Photography</p> 
-                            <img class="presentation-image" src="./assets/fenix_pub/fenix_pub_photography1_final_pages.png" alt="Photography work created for the Fenix publication" loading="lazy">
-                            <img class="presentation-image" src="./assets/fenix_pub/fenix_pub_photography2_final_pages.png" alt="Additional photography work created for the Fenix publication" loading="lazy">
-                        </div>
-<div class="project-gallery-section">
-                            <p class="gallery-heading">Editorial Development</p> 
-                            <img class="presentation-image" src="./assets/fenix_pub/fenix_pub_dep1_final_pages.png" alt="Editorial development for the Fenix publication" loading="lazy">
-                            <img class="presentation-image" src="./assets/fenix_pub/fenix_pub_depa1_final_pages.png" alt="Additional editorial development for the Fenix publication" loading="lazy">
-                        </div>
-<div class="project-gallery-section">
-                            <p class="gallery-heading">Moodboard</p>
-                            <img class="presentation-image" src="./assets/fenix_pub/fenix_pub_moodboard.png" alt="Fenix publication moodboard and visual development" loading="lazy">
-                        </div>
-                    </div>
+                    </a>
+                  </article>
+             </div>
+        </div>
+       </section>
 
-                    <div class="project-info">
-                        <p class="project-number">Project 01</p>
-                        <p class="project-kicker">Educational Publication</p>
-                        <h3>Fenix</h3>
-                        <div class="project-description">
-                            <p>
-                                Fenix is a travel-focused publication documenting
-                                kid-friendly destinations across Arizona.
-                            </p>
+     <!-- About Panel -->
+      <section class="panel_about" id="panel_about" aria-labelledby="about_title" hidden>
+        <div class="panel_content">
+            <header class="panel_header">
+                <p class="panel_label" data-cms="hero_about-label">ABOUT</p>
+                <h2 class="panel_title" id="about_title" data-cms="about_title">MAYBELIN GARCIA ROMERO</h2>
+            </header>
 
-                            <p>
-                                The project combines editorial design, typography,
-                                photography, and travel recommendations.
-                            </p>
-
-                            <p>
-                                One featured spread uses an Old English-inspired
-                                typeface recreated entirely by hand using sprinkles.
-                            </p>
-
-                            <p>
-                                All design, typography, and photography were created
-                                by Maybelin Garcia Romero.
-                            </p>
-                        </div>
-
-                        <dl class="project-meta">
-                            <div>
-                                <dt>Type</dt>
-                                <dd>Educational Publication</dd>
-                            </div>
-                            <div>
-                                <dt>Role</dt>
-                                <dd>Editorial Design, Typography &amp; Photography</dd>
-                            </div>
-                        </dl>
-                    </div>
-                </article>
-<article class="project">
-                    <div class="project-gallery presentation-gallery">
-                        <img class="presentation-image" src="./assets/casa/casa_pres1.png" alt="Casa Guadalupe brand presentation" loading="lazy">
-                        <div class="project-gallery-section">
-                            <p class="gallery-heading">Identity</p>
-                            <div class="project-image-pair">
-                                <img src="./assets/casa/casa_red.png" alt="Casa Guadalupe red logo variation" loading="lazy">
-                                <img src="./assets/casa/casa_ryg.png" alt="Casa Guadalupe colorful logo variation" loading="lazy">
-                            </div>
-                        </div>
-                        <img class="presentation-image" src="./assets/casa/casa_pres2.png" alt="Casa Guadalupe visual identity presentation" loading="lazy">
-                        <img class="presentation-image" src="./assets/casa/casa_pres3.png" alt="Casa Guadalupe branding presentation" loading="lazy">
-                        <div class="project-gallery-section">
-                            <p class="gallery-heading">Logo Variations</p>
-                            <div class="project-image-pair">
-                                <img src="./assets/casa/casa_bw.png" alt="Casa Guadalupe black and white logo variation" loading="lazy">
-                                <img src="./assets/casa/casa_square.png" alt="Casa Guadalupe square logo design" loading="lazy">
-                            </div>
-                        </div>
-                        <img class="presentation-image" src="./assets/casa/casa_pres4.png" alt="Casa Guadalupe brand application presentation" loading="lazy">
-                        <img class="presentation-image" src="./assets/casa/casa_pres5.png" alt="Casa Guadalupe design system presentation" loading="lazy">
-                        <img class="presentation-image" src="./assets/casa/casa_pres6.png" alt="Casa Guadalupe final brand presentation" loading="lazy">
-                    </div>
-
-                    <div class="project-info">
-                        <p class="project-number">Project 02</p>
-                        <p class="project-kicker">Educational Branding</p>
-                        <h3>Casa Guadalupe</h3>
-                        <div class="project-description">
-                            <p>
-                                Casa Guadalupe is a conceptual brand identity created
-                                to build a welcoming sense of community around education.
-                            </p>
-
-                            <p>
-                                The visual direction draws from the colors and patterns
-                                of traditional zarape textiles.
-                            </p>
-
-                            <p>
-                                The resulting branding uses vibrant color and pattern
-                                to create a visual language rooted in education,
-                                connection, warmth, and cultural memory.
-                            </p>
-                        </div>
-
-                        <dl class="project-meta">
-                            <div>
-                                <dt>Type</dt>
-                                <dd>Educational Branding</dd>
-                            </div>
-                            <div>
-                                <dt>Role</dt>
-                                <dd>Identity, Branding &amp; Art Direction</dd>
-                            </div>
-                        </dl>
-                    </div>
-                </article>
+            <div class="about_content">
+                <!-- Headshot Photo -->
+                 <img id="about_photo" src="assets/may_photo.jpg" alt="Maybelin Garcia Romero" width="1000" height="1250" loading="lazy">
             </div>
-        </div>
-    </dialog>
-<dialog data-about-dialog>
-        <div class="dialog-toolbar">
-            <p>ABOUT</p>
-            <button class="dialog-close" type="button" data-close-about>Close</button>
-        </div>
 
-        <div class="about-intro">
-    <div class="about-photo">
-        <img src="./assets/may_photo.jpg" alt="Portrait of Maybelin Garcia Romero">
-    </div>
-    <h2>Maybelin Garcia Romero</h2>
-</div>
-            <div class="about-copy">
-                <p>
-                    The artworks I share here take me back to a time when life was simpler, and I was just beginning to discover the curious, wandering young girl within me.
+            <!-- About Content -->
+             <div class="about_text">
+                <p>The artworks I share here take me back to a time when life was simpler, and I was just beginning to discover the curious, wandering young girl within me. 
                     Growing up in LA, I was exposed to so many trends and cultures. 
-                    Thanks to my parents, I visited museums, sunset beaches, amusement parks, taquerias, third spaces like public parks, and a lot of public art.
+                    Thanks to my parents, I visited museums, sunset beaches, amusement parks, taquerias, third spaces like public parks, and a lot of public art. 
                     My works mirror who I was, who I am, and who I want to become. 
                     This often translates into bold, unapologetic work, using my artistic voice to talk about hard things like identity and bias. 
-                    I am a woman first, then an artist. This is often reflected in my typography designs, which are carefully nurtured to convey femininity.
+                    I am a woman first, then an artist. 
+                    This is often reflected in my typography designs, which are carefully nurtured to convey femininity. 
                     As a mom to an 18-year-old, I value education–that is evident in my work through lived experiences. 
                     I never gave myself the label of multidisciplinary artist, but as I evolve internally, I am more comfortable embracing that externally to share with others.
-                </p>
-            </div>
+             </div>
         </div>
-    </dialog>
+      </section>  
+     </main>  
 
-    <script src="./site-config.js?v=20260817-20"></script>
-    <script src="./public-header.js?v=20260823-1"></script>
+     <!-- Site Footer -->
+      <footer class="site-footer" id-="site-footer">
+        <div class="footer_content">
+            <p class="footer_brand" data-cms="footer_brand">© <span id="year"></span> Maybelin Works</p>
+        </div>
 
+        <div class="footer_meta">
+            <p><span data-cms="footer_credit">Website created by</span> <a href="https://centaristudios.com/" target="_blank" rel="noopener noreferrer">Centari Studios</a></p>
+            <a class="admin_link" href="/admin/admin_login.html" rel="nofollow">SITE MANAGER</a>
+        </div>
+      </footer>
+
+    <script src="/site-config.js" defer></script>
 </body>
 </html>
