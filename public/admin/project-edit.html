@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Project Editor | Maybelin Works Site Manager</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Add or edit a Maybelin Works portfolio project">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="/admin/admin.css">
+    <script src="/admin/admin.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#admin_main">Skip to Main Content</a>
+
+    <!-- Header -->
+    <header class="admin_header" id="admin_header">
+        <div class="header_content">
+            <a class="site-logo" href="/admin/" aria-label="Maybelin Works Site Manager Home">
+                <img id="site-logo" src="/assets/maygarcia_logo.png" alt="Maybelin Works" width="200" height="75"></a>
+
+            <nav class="admin_nav" aria-label="Site Manager Navigation">
+                <a class="admin_header-link" href="/" target="_blank" rel="noopener noreferrer">VIEW SITE</a>
+                <a class="admin_header-link" href="/cdn-cgi/access/logout">SIGN OUT</a>
+            </nav>
+        </div>
+    </header>
+
+
+    <!-- Admin Layout -->
+    <div class="admin_layout">
+
+        <!-- Side Bar -->
+        <aside class="admin_nav" id="admin_nav">
+            <nav aria-label="Site Manager Sections">
+                <ul class="admin_nav-list">
+                    <li><a class="admin_nav-link" href="/admin/">DASHBOARD</a></li>
+                    <li><a class="admin_nav-link" href="/admin/homepage.html">HOMEPAGE</a></li>
+                    <li><a class="admin_nav-link active" href="/admin/projects.html" aria-current="page">PROJECTS</a></li>
+                    <li><a class="admin_nav-link" href="/admin/about.html">ABOUT</a></li>
+                    <li><a class="admin_nav-link" href="/admin/media.html">MEDIA</a></li>
+                    <li><a class="admin_nav-link" href="/admin/branding.html">BRANDING</a></li>
+                    <li><a class="admin_nav-link" href="/admin/seo.html">SEARCH ENGINE OPTIMIZATION</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+
+        <!-- Main Project Editor -->
+        <main class="admin_main" id="admin_main">
+
+            <!-- Page Header -->
+            <section class="admin_dash-header">
+                <div>
+                    <p class="admin_dash-label">PROJECTS</p>
+                    <h1 id="project_editor-title">ADD PROJECT</h1>
+                    <p>Add project information, images, written content, and publishing settings.</p>
+                </div>
+
+                <div class="editor_actions">
+                    <a class="preview_link" id="project_preview" href="#" target="_blank" rel="noopener noreferrer" aria-disabled="true">PREVIEW PROJECT</a>
+                    <a class="back_link" href="/admin/projects.html">BACK TO PROJECTS</a>
+                </div>
+            </section>
+
+            <!-- Project Form -->
+            <form class="admin_form" id="project_form">
+                <!-- Used later when editing a D1 record -->
+                <input type="hidden" id="project_id" name="project_id" value="">
+
+                <!-- Project Information -->
+                <section class="admin_form-section" aria-labelledby="project_info-title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="project_info-title">Project Information</h2>
+                            <p>The basic information shown throughout the portfolio.</p>
+                        </div>
+                    </div>
+
+                    <!-- Project Title -->
+                    <div class="form_group">
+                        <label class="form_label" for="project_title">Project Title</label>
+                        <input class="form_input" type="text" id="project_title" name="project_title" placeholder="Fenix Publication" maxlength="300" required>
+                    </div>
+
+                    <!-- Catgory -->
+                    <div class="form_group">
+                        <label class="form_label" for="project_cat">Project Category</label>
+                        <input class="form_input" type="text" id="project_cat" name="project_cat" placeholder="Travel Publication" maxlength="200" required>
+                        <p class="form_help">Example: Travel Publication, Branding Identity, Editorial Design.</p>
+                    </div>
+
+
+                    <!-- Project Number -->
+                    <div class="form_group">
+                        <label class="form_label" for="project_number">Project Number</label>
+                        <input class="form_input" type="number" id="project_number" name="project_number" value="1" min="1" step="1">
+                        <p class="form_help">Controls labels such as PROJECT 01.</p>
+                    </div>
+
+                    <!-- URL Slug -->
+                    <div class="form_group">
+                        <labelclass="form_label" for="project_slug">Project URL</label>
+                        <div class="slug_input">
+                            <span>maybelinworks.com/work/</span>
+                            <input class="form_input" type="text" id="project_slug" name="project_slug" placeholder="fenix" maxlength="100" pattern="[a-z0-9-]+" required>
+                        </div>
+                        <p class="form_help">Use lowercase letters, numbers, and hyphens.</p>
+                    </div>
+                </section>
+
+                <!-- Project Cover -->
+                <section class="admin_form-section" aria-labelledby="cover_title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="cover_title">Project Cover</h2>
+                            <p>Choose the image used to represent this project in Explore Works.</p>
+                        </div>
+                    </div>
+
+                    <!-- Cover Preview -->
+                    <div class="cover_preview" id="cover_preview">
+                        <div class="cover_placeholder" id="cover_placeholder">No cover image selected</div>
+                        <img id="project_cover-preview" src="" alt="" hidden>
+                    </div>
+
+
+                    <!-- Cover URL -->
+                    <div class="form_group">
+                        <label class="form_label" for="project_cover">Cover Image</label>
+                        <input class="form_input" type="url" id="project_cover" name="project_cover" placeholder="https://...">
+                    </div>
+                    <!-- Choose From Media -->
+                    <a class="media_button" href="/admin/media.html">CHOOSE FROM MEDIA</a>
+
+                    <!-- Alt Text -->
+                    <div class="form_group">
+                        <label class="form_label" for="project_alt">Image Description</label>
+                        <input class="form_input" type="text" id="project_alt" name="project_alt" maxlength="200" placeholder="Cover of the Fenix travel publication">
+                        <p class="form_help">Describe the image for visitors using screen readers.</p>
+                    </div>
+                </section>
+
+
+                <!-- Explore Works Content -->
+                <section class="admin_form-section" aria-labelledby="project_summary-title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="project_summary-title">Explore Works Content</h2>
+                            <p>This information appears on the main portfolio project card.</p>
+                        </div>
+                    </div>
+
+                    <!-- Short Description -->
+                    <div class="form_group">
+                        <label class="form_label" for="project_desc">Project Description </label>
+                        <textarea class="form_textarea" id="project_desc" name="project_desc" rows="7" maxlength="4000" placeholder="Write a short introduction to the project..."></textarea>
+                        <div class="form_counter">
+                            <span id="project_desc-count">0</span>
+                            <span> / 4000</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Project Page Introduction -->
+                <section class="admin_form-section" aria-labelledby="project_content-title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="project_content-title">Project Page</h2>
+                            <p>Add the main written introduction shown when someone opens the full project.</p>
+                        </div>
+                    </div>
+
+
+                    <!-- Full Introduction -->
+                    <div class="form_group">
+                        <label class="form_label" for="project_intro">Project Introduction</label>
+                        <textarea class="form_textarea" id="project_intro" name="project_intro" rows="12" placeholder="Tell the story behind the project..."></textarea>
+                    </div>
+                </section>
+
+                <!-- Project Sections -->
+                <section class="admin_form-section" aria-labelledby="sections_title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="sections_title">Project Sections</h2>
+                            <p>Build the project page using sections for text, images, process work, galleries, and other content.</p>
+                        </div>
+                    </div>
+
+                    <div class="project_sections" id="project_sections">
+                        <!-- Default Section -->
+                        <article class="project_section" data-section-id="1">
+                            <div class="section_controls">
+                                <span class="section_number">SECTION 01</span>
+                                <div class="section_buttons">
+                                    <button class="section_move" type="button" data-move="up" aria-label="Move section up" disabled>↑</button>
+                                    <button class="section_move" type="button" data-move="down" aria-label="Move section down">↓</button>
+                                    <button class="section_remove" type="button" data-remove-section>REMOVE</button>
+                                </div>
+                            </div>
+
+
+                            <!-- Section Title -->
+                            <div class="form_group">
+                                <label class="form_label" for="section_title-1">Section Title</label>
+                                <input class="form_input" type="text" id="section_title-1" name="section_title-1" placeholder="Typography" maxlength="150">
+                            </div>
+
+
+                            <!-- Section Text -->
+                            <div class="form_group">
+                                <label class="form_label" for="section_text-1">Section Text</label>
+                                <textarea class="form_textarea" id="section_text-1" name="section_text-1" rows="8" placeholder="Describe this part of the project..."></textarea>
+                            </div>
+
+                            <!-- Section Media -->
+                            <div class="form_group">
+                                <label class="form_label">Section Media</label>
+                                <div class="section_media" data-section-media="1">
+                                    <p class="media_empty"> No media added to this section.</p>
+                                </div>
+                            </div>
+
+                            <button class="media_button" type="button" data-add-media="1">ADD MEDIA</button>
+                        </article>
+                    </div>
+
+                    <!-- Add Section -->
+                    <button class="add_section-button" id="add_section" type="button">+ ADD SECTION</button>
+                </section>
+
+                <!-- Publishing -->
+                <section class="admin_form-section" aria-labelledby="publish_title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="publish_title">Publishing</h2>
+                            <p>Choose whether the project is visible on the public website.</p>
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="form_group">
+                        <label class="form_label" for="project_status">Project Status</label>
+                        <select class="form_select" id="project_status"name="project_status">
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                        </select>
+                        <p class="form_help">Draft projects are saved in Site Manager but do not appear publicly.</p>
+                    </div>
+
+                    <!-- Feature Project -->
+                    <div class="form_check">
+                        <input type="checkbox" id="project_featured" name="project_featured" value="1">
+                        <label for="project_featured">Feature this project in Explore Works</label>
+                    </div>
+                </section>
+
+                <!-- Save -->
+                <section class="form_actions">
+                    <div class="save_status" id="save_status" role="status" aria-live="polite"></div>
+                    <button class="save_button" type="submit">SAVE PROJECT</button>
+                </section>
+            </form>
+
+            <!-- Danger Zone -->
+            <section class="admin_danger" id="admin_danger" aria-labelledby="danger_title" hidden>
+                <div class="admin_section-header">
+                    <div>
+                        <h2 id="danger_title">Delete Project</h2>
+                        <p>Permanently remove this project and its project content from the website.</p>
+                    </div>
+                </div>
+
+                <button class="delete_button" id="delete_project" type="button">DELETE PROJECT</button>
+            </section>
+
+            <!-- Admin Footer -->
+            <footer class="admin_footer">
+                <p>© <span id="year"></span> Maybelin Works</p>
+                <a href="/" target="_blank" rel="noopener noreferrer">View Website</a>
+            </footer>
+        </main>
+    </div>
+</body>
+</html>

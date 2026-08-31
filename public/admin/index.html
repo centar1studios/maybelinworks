@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Maybelin Works | Site Manager</title>
+        <meta charset="utf-8">
+        <meta name=viewport content="width=device-width, initial-scale=1">
+        <meta name="description" content="Maybelin Works Site Manager">
+        <meta name="robots" content="noindex, nofollow">
+        <link rel="stylesheet" href="/admin/admin.css">
+        <script src="admin.js" defer></script>
+    </head>
+
+    <body>
+        <a class="skip-link" href="#admin-main">Skip to Main Content</a>
+
+    <!-- Header -->
+     <header class="admin_header" id="admin_header">
+        <div class="header_content">
+            <a class="site-logo" href="./admin/index.html" aria-label="Maybelin Works Site Manager Home">
+                <img id="site-logo" src="./assets/maygarcia_logo.png" alt="Maybelin Works" width="200" height="75">
+            </a>
+
+            <nav class="admin_nav" aria-label="Site Manager Navigation">
+                <a class="admin_header-link" href="/" target="_blank" rel="noopener noreferrer">VIEW SITE</a>
+                <a class="admin_header-link" href="/cdn-cgi/access/logout">SIGN OUT</a>
+            </nav>
+        </div>
+     </header>
+
+     <!-- Admin Layout-->
+      <div class="admin_layout">
+        <!-- Side Bar-->
+         <aside class="admin_nav" id="admin_nav">
+            <nav aria-label="Site Manager Sections">
+                <ul class="admin_nav-list">
+                    <li><a class="admin_nav-link active" href="/admin/index.html" aria-current="page">DASHBOARD</a></li>
+                    <li><a class="admin_nav-link" href="/admin/homepage.html">HOMEPAGE</a></li>
+                    <li><a class="admin_nav-link" href="/admin/projects.html">PROJECTS</a></li>
+                    <li><a class="admin_nav-link" href="/admin/about.html">ABOUT</a></li>
+                    <li><a class="admin_nav-link" href="/admin/media.html">MEDIA</a></li>
+                    <li><a class="admin_nav-link" href="/admin/branding.html">BRANDING</a></li>
+                    <li><a class="admin_nav-link" href="/admin/seo.html">SEARCH ENGINE OPTIMIZATION</a></li>
+                </ul>
+            </nav>
+         </aside>
+
+         <!-- Main Dashboard -->
+          <main class="admin_main" id="admin_main">
+            <section class="admin_dash-header">
+                <div>
+                    <p class="admin_dash-label">MAYBELIN WORKS</p>
+                    <h1>SITE MANAGER</h1>
+                    <p> Manage your website content, projects, media, branding, and site settings.</p>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+             <section class="admin_quick" aria-labelledby="admin_quick-title">
+                <div class="admin_section-header">
+                    <h2 id="admin_quick-title">Quick Actions</h2>
+                </div>
+
+                <div class="quick-actions">
+                    <a class="quick-action" href="/admin/homepage.html">
+                        <span class="quick-title">Edit Homepage</span>
+                        <span class="quick-text">Update homepage text, video, and navigation</span>
+                    </a>
+
+                    <a class="quick-action" href="/admin/project-edit.html">
+                            <span class="quick-title">Add Project</span>
+                            <span class="quick-text">Create & publish a new portfolio project</span>
+                    </a>
+
+                    <a class="quick-action" href="/admin/media.html">
+                        <span class="quick-title">Upload Media</span>
+                        <span class="quick-text">Add new images, videos, and other things for the site</span>
+                    </a>
+                </div>
+             </section>
+
+             <!-- Site Overview -->
+              <section class="admin_dashboard" aria-labelledby="overview_title">
+                <div class="admin_dash-header">
+                    <h2 id="overview_title">Site Overview</h2>
+                </div>
+
+                <div class="dash_stats">
+                    <article class="stats_card">
+                        <p class="stats_label">SITE STATUS</p>
+                        <p class="stats_value" id="site-status">Published</p>
+                    </article>
+
+                    <article class="stats_card">
+                        <p class="stats_label">PROJECTS</p>
+                        <p class="stats_value" id="stats_projects">0</p>
+                    </article>
+
+                    <article class="stats_card">
+                        <p class="stats_label">PUBLISHED</p>
+                        <p class="stats_value" id="stats_published">0</p>
+                    </article>
+
+                    <article class="stats_card">
+                        <p class="stats_label">MEDIA</p>
+                        <p class="stats_value" id="stats_media">0</p>
+                    </article>
+                </div>
+              </section>
+
+              <!-- Recent Projects -->
+               <section class="admin_dashboard" aria-labelledby="rprojects_title">
+                <div class="admin_dash-header">
+                    <h2 id="rprojects_title">Recent Projects</h2>
+                    <a class="rprojects_link" href="/admin/projects.html">VIEW ALL</a>
+                </div>
+
+                <div class="admin_rprojects" id="admin_rprojects">
+                    <!-- What is below this is defaults/fallbacks in case of Cloudflare issues-->
+                     <!-- Fenix Publication -->
+                      <article class="project_row">
+                        <div class="project_info">
+                            <p class="project_title">Fenix Publication</p>
+                        </div>
+                        
+                        <div class="project_status">
+                            <span class="status_pub">PUBLISHED</span>
+                        </div>
+
+                        <div class="project_actions">
+                            <a href="/admin/project-edit.html?id=1">EDIT</a>
+                        </div>
+                      </article>
+
+                      <!-- Casa Quadalupe -->
+                       <article class="project_row">
+                        <div class="project_info">
+                            <p class="project_title">Casa Guadalupe</p>
+                            <p class="project_cat">Branding Identity</p>
+                        </div>
+                        
+                        <div class="project_status">
+                            <span class="status_pub">PUBLISHED</span>
+                        </div>
+
+                        <div class="project_actions">
+                            <a href="/admin/project-edit.html?id=2">EDIT</a>
+                        </div>
+                       </article>
+                </div>
+               </section>
+
+               <!-- Website Settings -->
+                <section class="admin_dashboard" aria-labelledby="settings_title">
+                    <div class="admin_dash-header">
+                        <h2 id="settings_title">Site Settings</h2>
+                    </div>
+
+                    <div class="settings_grid">
+                        <!-- Branding Settings -->
+                         <a class="settings_card" href="/admin/branding.html">
+                            <h3>Branding Settings</h3>
+                            <p>Manage logo, favicon, colors, typography and other visual settings</p>
+                         </a>
+
+                        <!-- SEO Settings -->
+                         <a class="settings_card" href="/admin/seo.html">
+                            <h3>SEO Settings</h3>
+                            <p> Manage page titles, descriptions, and social sharing information</p>
+                         </a>
+
+                        <!-- About Settings -->
+                         <a class="settings_card" href="/admin/about.html">
+                            <h3>About Settings</h3>
+                            <p>Update your portrait, bio, and other About content</p>
+                         </a>
+
+                        <!-- Media Settings -->
+                         <a class="settings_card" href="/admin/media.html">
+                            <h3>Media Settings</h3>
+                            <p>Manage uploaded images, videos, logos, and project assets</p>
+                         </a>
+                    </div>
+                </section>
+
+                <!-- Dashboard Footer -->
+                 <footer class="admin_footer">
+                    <p>© <span id="year"></span> Maybelin Works</p>
+                    <a href="/" target="_blank" rel="noopener noreferrer">View Website</a>
+                 </footer>
+          </main>
+      </div>
+    </body>
+</html>

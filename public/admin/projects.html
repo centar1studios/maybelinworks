@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Projects | Maybelin Works Site Manager</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Manage Maybelin Works portfolio projects">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="/admin/admin.css">
+    <script src="/admin/admin.js" defer></script>
+</head>
+
+<body>
+    <a class="skip-link" href="#admin_main">Skip to Main Content</a>
+
+    <!-- Header -->
+    <header class="admin_header" id="admin_header">
+        <div class="header_content">
+            <a class="site-logo" href="/admin/" aria-label="Maybelin Works Site Manager Home">
+                <img id="site-logo" src="/assets/maygarcia_logo.png" alt="Maybelin Works" width="200" height="75">
+            </a>
+
+            <nav class="admin_nav" aria-label="Site Manager Navigation">
+                <a class="admin_header-link" href="/" target="_blank" rel="noopener noreferrer">VIEW SITE</a>
+                <a class="admin_header-link" href="/cdn-cgi/access/logout">SIGN OUT</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Admin Layout -->
+    <div class="admin_layout">
+
+        <!-- Side Bar -->
+        <aside class="admin_nav" id="admin_nav">
+            <nav aria-label="Site Manager Sections">
+                <ul class="admin_nav-list">
+                    <li><a class="admin_nav-link" href="/admin/">DASHBOARD</a></li>
+                    <li><a class="admin_nav-link" href="/admin/homepage.html">HOMEPAGE</a></li>
+                    <li><a class="admin_nav-link active" href="/admin/projects.html" aria-current="page">PROJECTS</a></li>
+                    <li><a class="admin_nav-link" href="/admin/about.html">ABOUT</a></li>
+                    <li><a class="admin_nav-link" href="/admin/media.html">MEDIA</a></li>
+                    <li><a class="admin_nav-link" href="/admin/branding.html">BRANDING</a></li>
+                    <li><a class="admin_nav-link" href="/admin/seo.html">SEARCH ENGINE OPTIMIZATION</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Projects Manager -->
+        <main class="admin_main" id="admin_main">
+            <!-- Page Header -->
+            <section class="admin_dash-header">
+                <div>
+                    <p class="admin_dash-label">PROJECTS</p>
+                    <h1>MANAGE PROJECTS</h1>
+                    <p> Add, edit, organize, and publish portfolio projects.</p>
+                </div>
+
+                <a class="add_button" href="/admin/project-edit.html">ADD PROJECT</a>
+            </section>
+
+            <!-- Project Overview -->
+            <section class="admin_dashboard" aria-labelledby="project-overview_title">
+                <div class="admin_section-header">
+                    <h2 id="project-overview_title">Project Overview</h2>
+                </div>
+
+                <div class="dash_stats">
+                    <article class="stats_card">
+                        <p class="stats_label">PROJECTS</p>
+                        <p class="stats_value" id="stats_projects">2</p>
+                    </article>
+
+                    <article class="stats_card">
+                        <p class="stats_label">PUBLISHED</p>
+                        <p class="stats_value" id="stats_published">2</p>
+                    </article>
+
+                    <article class="stats_card">
+                        <p class="stats_label">DRAFTS</p>
+                        <p class="stats_value" id="stats_drafts">0</p>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Project List -->
+            <section class="admin_dashboard" aria-labelledby="projects_title">
+                <div class="admin_section-header">
+                    <div>
+                        <h2 id="projects_title">Portfolio Projects</h2>
+                        <p>Projects appear on the website in the order shown below.</p>
+                    </div>
+                </div>
+
+                <div class="projects_list" id="projects_list">
+                    <!-- The projects below are fallback content.
+                        admin.js will eventually replace this list
+                        with project data from Cloudflare D1.-->
+
+                    <!-- Fenix Publication -->
+                    <article class="project_row" data-project-id="1" data-status="published" data-order="1">
+                        <div class="project_order">
+                            <span class="order_number">01</span>
+                            <div class="order_buttons">
+                                <button class="order_button" type="button" data-move="up" aria-label="Move Fenix Publication up" disabled>↑</button>
+                                <button class="order_button" type="button" data-move="down" aria-label="Move Fenix Publication down">↓</button>
+                            </div>
+                        </div>
+
+                        <div class="project_image">
+                            <img src="/assets/fenix_pub/sugar.png" alt=""width="160" height="120" loading="lazy">
+                        </div>
+
+                        <div class="project_info">
+                            <p class="project_title">Fenix Publication</p>
+                            <p class="project_cat">Travel Publication</p>
+                            <p class="project_slug">/work/fenix/</p>
+                        </div>
+
+                        <div class="project_status">
+                            <span class="status_pub">PUBLISHED</span>
+                        </div>
+
+                        <div class="project_actions">
+                            <a href="/admin/project-edit.html?id=1">EDIT</a>
+                            <a href="/work/fenix/" target="_blank" rel="noopener noreferrer">VIEW</a>
+                        </div>
+                    </article>
+
+                    <!-- Casa Guadalupe -->
+                    <article class="project_row" data-project-id="2" data-status="published" data-order="2">
+                        <div class="project_order">
+                            <span class="order_number">02</span>
+                            <div class="order_buttons">
+                                <button class="order_button" type="button" data-move="up" aria-label="Move Casa Guadalupe up">↑</button>
+                                <button class="order_button" type="button" data-move="down" aria-label="Move Casa Guadalupe down" disabled>↓</button>
+                            </div>
+                        </div>
+
+                        <div class="project_image">
+                            <img src="/assets/casa/casa_ryg.png" alt="" width="160" height="120" loading="lazy">
+                        </div>
+ 
+                        <div class="project_info"> 
+                            <p class="project_title">Casa Guadalupe</p>
+                            <p class="project_cat">Branding Identity</p> 
+                            <p class="project_slug">/work/casa-guadalupe/</p>
+                        </div>
+
+                        <div class="project_status">
+                            <span class="status_pub">PUBLISHED
+                            </span>
+                        </div>
+
+                        <div class="project_actions">
+                            <a href="/admin/project-edit.html?id=2">EDIT</a>
+                            <a href="/work/casa-guadalupe/" target="_blank" rel="noopener noreferrer">VIEW</a>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Empty Project Message -->
+                <div class="projects_empty" id="projects_empty" hidden>
+                    <h3>No Projects Yet</h3>
+                    <p>Add your first portfolio project to get started.</p>
+                    <a class="add_button" href="/admin/project-edit.html">ADD PROJECT</a>
+                </div>
+            </section>
+
+            <!-- Project Help -->
+            <section class="admin_dashboard" aria-labelledby="project-help_title">
+                <div class="admin_section-header">
+                    <h2 id="project-help_title">Project Display</h2>
+                </div>
+
+                <div class="project_help">
+                    <p>Published projects appear in the Explore Works section of the website.</p>
+                    <p>Draft projects stay saved in the Site Manager without appearing publicly.</p>
+                    <p>Use the arrows beside each project to change the order projects appear on the site.</p>
+                </div>
+            </section>
+
+            <!-- Admin Footer -->
+            <footer class="admin_footer">
+                <p>© <span id="year"></span> Maybelin Works</p>
+                <a href="/" target="_blank" rel="noopener noreferrer">View Website</a>
+            </footer>
+        </main>
+    </div>
+</body>
+</html>

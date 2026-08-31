@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>About | Maybelin Works Site Manager</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Edit the Maybelin Works About section">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="/admin/admin.css">
+    <script src="/admin/admin.js" defer></script>
+</head>
+
+<body>
+    <a class="skip-link" href="#admin_main">Skip to Main Content</a>
+
+    <!-- Header -->
+    <header class="admin_header" id="admin_header">
+        <div class="header_content">
+            <a class="site-logo" href="/admin/" aria-label="Maybelin Works Site Manager Home">
+                <img id="site-logo" src="./assets/maygarcia_logo.png" alt="Maybelin Works" width="200" height="75"></a>
+
+            <nav class="admin_nav" aria-label="Site Manager Navigation">
+                <a class="admin_header-link" href="/" target="_blank" rel="noopener noreferrer">VIEW SITE</a>
+                <a class="admin_header-link" href="/cdn-cgi/access/logout">SIGN OUT</a>
+            </nav>
+        </div>
+    </header>
+  
+    <!-- Admin Layout -->
+    <div class="admin_layout">
+
+        <!-- Side Bar -->
+        <aside class="admin_nav" id="admin_nav">
+            <nav aria-label="Site Manager Sections">
+                <ul class="admin_nav-list">
+                    <li><a class="admin_nav-link" href="/admin/">DASHBOARD</a></li>
+                    <li><a class="admin_nav-link" href="/admin/homepage.html">HOMEPAGE</a></li>
+                    <li><a class="admin_nav-link" href="/admin/projects.html">PROJECTS</a></li>
+                    <li><a class="admin_nav-link active" href="/admin/about.html" aria-current="page">ABOUT</a></li>
+                    <li><a class="admin_nav-link" href="/admin/media.html">MEDIA</a></li>
+                    <li><aclass="admin_nav-link" href="/admin/branding.html">BRANDING</a></li>
+                    <li><a class="admin_nav-link" href="/admin/seo.html">SEARCH ENGINE OPTIMIZATION</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main About Editor -->
+        <main class="admin_main" id="admin_main">
+
+            <!-- Page Header -->
+            <section class="admin_dash-header">
+                <div>
+                    <p class="admin_dash-label">ABOUT</p>
+                    <h1>EDIT ABOUT</h1>
+                    <p>Manage the portrait, biography, and text shown in the About section.</p>
+                </div>
+                <a class="preview_link" href="/" target="_blank" rel="noopener noreferrer">PREVIEW SITE</a>
+            </section>
+
+            <!-- About Form -->
+            <form class="admin_form" id="about_form">
+
+                <!-- About Heading -->
+                <section class="admin_form-section" aria-labelledby="about_heading-title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="about_heading-title"> About Heading</h2>
+                            <p>Edit the heading shown at the top of the About panel.</p> 
+                        </div>
+                    </div>
+
+                    <!-- About Label -->
+                    <div class="form_group">
+                        <label class="form_label" for="about_label">Section Label</label>
+                        <input class="form_input" type="text" id="about_label" name="about_label" value="ABOUT" maxlength="50">
+                    </div>
+
+                    <!-- Name -->
+                    <div class="form_group">
+                        <label class="form_label" for="about_title">Name</label>
+                        <input class="form_input" type="text" id="about_title" name="about_title" value="MAYBELIN GARCIA ROMERO" maxlength="150">
+                    </div>
+                </section>
+
+                <!-- Portrait -->
+                <section class="admin_form-section" aria-labelledby="about_photo-title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="about_photo-title">Portrait</h2>
+                            <p>Manage the photo shown in the About section.</p>
+                        </div>
+                    </div>
+
+                    <!-- Current Portrait -->
+                    <div class="about_preview">
+                        <img id="about_photo-preview" src="/assets/may_photo.jpg" alt="Maybelin Garcia Romero" width="400" height="500">
+                    </div>
+
+                    <!-- Portrait URL --> 
+                    <div class="form_group">
+                        <label class="form_label" for="about_photo">Portrait</label>
+                        <input class="form_input" type="url" id="about_photo" name="about_photo" value="/assets/may_photo.jpg">
+                        <p class="form_help">Media uploads will eventually be managed through Cloudflare R2.</p>
+                    </div>
+
+                    <a class="media_button" href="/admin/media.html">CHOOSE FROM MEDIA</a>
+
+                    <!-- Alt Text -->
+                    <div class="form_group">
+                        <label class="form_label" for="about_photo-alt">Image Description   </label>
+                        <input class="form_input" type="text" id="about_photo-alt" name="about_photo-alt" value="Maybelin Garcia Romero" maxlength="200">
+                    </div>
+                </section>
+
+                <!-- Biography -->
+                <section class="admin_form-section" aria-labelledby="about_bio-title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="about_bio-title">Biography</h2>
+                            <p>Edit the main text shown beside the portrait.</p>
+                        </div>
+                    </div>
+
+                    <div class="form_group">
+                        <label class="form_label" for="about_text">About Text</label>
+                        <textarea class="form_textarea" id="about_text" name="about_text" rows="18">
+                        The artworks I share here take me back to a time when life was simpler, and I was just beginning to discover the curious, wandering young girl within me.
+                        Growing up in LA, I was exposed to so many trends and cultures. 
+                        Thanks to my parents, I visited museums, sunset beaches, amusement parks, taquerias, third spaces like public parks, and a lot of public art.
+                        My works mirror who I was, who I am, and who I want to become. 
+                        This often translates into bold, unapologetic work, using my artistic voice to talk about hard things like identity and bias. 
+                        I am a woman first, then an artist. This is often reflected in my typography designs, which are carefully nurtured to convey femininity.
+                        As a mom to an 18-year-old, I value education–that is evident in my work through lived experiences. 
+                        I never gave myself the label of multidisciplinary artist, but as I evolve internally, I am more comfortable embracing that externally to share with others.</textarea>
+                        <p class="form_help">Paragraph breaks entered here can be preserved when the About section is displayed.</p></div>
+                </section>
+
+                <!-- Save Changes -->
+                <section class="form_actions">
+                    <div class="save_status" id="save_status" role="status" aria-live="polite"></div>
+                    <button class="save_button" type="submit">SAVE CHANGES</button>
+                </section>
+            </form>
+
+            <!-- Admin Footer -->
+            <footer class="admin_footer">
+                <p>© <span id="year"></span> Maybelin Works</p>
+                <a href="/" target="_blank" rel="noopener noreferrer">View Website</a>
+            </footer>
+        </main>
+    </div>
+</body>
+</html>

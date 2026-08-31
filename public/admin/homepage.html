@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Homepage Settings | Maybeline Works Site Manager</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Edit the Maybelin Works Homepage">
+        <meta name="robots" content="noindex, nofollow">
+        <link rel="stylesheet" href="/admin/admin.css">
+        <script src="/admin/admin.js" defer></script>
+    </head>
+    <body>
+        <a class="skip-link" href="#admin_main">Skip to Main Content</a>
+
+        <!-- Header -->
+         <header class="admin_header" id="admin_header">
+            <a class="site-logo" href="/admin/" aria-label="Maybelin Works Site Manager Home">
+                <img id="site-logo" src="/assets/maygarcia_logo.png" alt="Maybelin Works" width="200" height="75">
+            </a>
+
+            <nav class="admin_nav" aria-label="Site Manager Navigation">
+                <a class="admin_header-link" href="/" target="_blank" rel="noopener noreferrer">VIEW SITE</a>
+                <a class="admin_header-link" href="/cdn-cgi/access/logout">SIGN OUT</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Admin Layout -->
+    <div class="admin_layout">
+        <!-- Side Bar -->
+        <aside class="admin_nav" id="admin_nav">
+            <nav aria-label="Site Manager Sections">
+                <ul class="admin_nav-list">
+                    <li><a class="admin_nav-link" href="/admin/">DASHBOARD</a></li>
+                    <li><a class="admin_nav-link active" href="/admin/homepage.html" aria-current="page">HOMEPAGE</a></li>
+                    <li><a class="admin_nav-link" href="/admin/projects.html">PROJECTS</a></li>
+                    <li><a class="admin_nav-link" href="/admin/about.html">ABOUT</a></li>
+                    <li><a class="admin_nav-link" href="/admin/media.html">MEDIA</a></li>
+                    <li><a class="admin_nav-link" href="/admin/branding.html">BRANDING</a></li>
+                    <li><a class="admin_nav-link" href="/admin/seo.html">SEARCH ENGINE OPTIMIZATION</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Homepage Editor -->
+        <main class="admin_main" id="admin_main">
+
+            <!-- Page Header -->
+            <section class="admin_dash-header">
+                <div>
+                    <p class="admin_dash-label">HOMEPAGE</p>
+                    <h1>EDIT HOMEPAGE</h1>
+                    <p>Manage the text, video, navigation, and footer content shown on the homepage.</p>
+                </div>
+
+                <a class="preview_link" href="/" target="_blank" rel="noopener noreferrer">PREVIEW SITE</a>
+            </section>
+
+            <!-- Homepage Form -->
+            <form class="admin_form" id="homepage_form">
+                <!-- Hero -->
+                <section class="admin_form" aria-labelledby="hero_title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="hero_title">Hero</h2>
+                            <p>Edit the main text shown over the homepage video.</p>
+                        </div>
+                    </div>
+
+                    <!-- Top Tagline -->
+                    <div class="form_group">
+                        <label class="form_label" for="hero_tagline">Top Tagline</label>
+                        <input class="form_input" type="text" id="hero_tagline" name="hero_tagline" value="Work that looks good" maxlength="100">
+                    </div>
+
+                    <!-- Bottom Tagline -->
+                    <div class="form_group">
+                        <label class="form_label" for="hero_tagline-bottom">Bottom Tagline</label>
+                        <input class="form_input" type="text" id="hero_tagline-bottom" name="hero_tagline-bottom" value="does good" maxlength="100">
+                        <p class="form_help">The ampersand stays styled separately between the two lines.</p>
+                    </div>
+                </section>
+
+                <!-- Background Video -->
+                <section class="admin_form" aria-labelledby="video_title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="video_title">Background Video</h2>
+                            <p>Choose the video shown behind the homepage tagline.</p>
+                        </div>
+                    </div>
+
+                    <!-- Current Video Preview -->
+                    <div class="video_preview">
+                        <video id="hero_video-preview" muted loop playsinline controls>
+                            <source src="https://pub-cc011682079448388e2f0a3b4000b951.r2.dev/bkg_video_16-9.mp4" type="video/mp4">
+                        </video>
+                    </div>
+
+                    <div class="form_group">
+                        <label class="form_label" for="hero_video">Video URL</label>
+                        <input class="form_input" type="url" id="hero_video" name="hero_video" value="https://pub-cc011682079448388e2f0a3b4000b951.r2.dev/bkg_video_16-9.mp4">
+                        <p class="form_help">Media uploads come from Cloudflare R2</p>
+                    </div>
+
+                    <a class="media_button" href="/admin/media.html">CHOOSE FROM MEDIA</a>
+                </section>
+
+
+
+                <!-- Header Navigation -->
+                <section class="admin_form" aria-labelledby="nav_title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="nav_title">Header Navigation</h2>
+                            <p>Change the text shown in the main site header.</p>
+                        </div>
+                    </div>
+
+                    <div class="form_group">
+                        <label class="form_label" for="site-nav_works-label">Explore Works</label>
+                        <input class="form_input" type="text" id="site-nav_works-label" name="site-nav_works-label" value="EXPLORE WORKS" maxlength="50">
+                    </div>
+
+                    <div class="form_group">
+                        <label class="form_label" for="site-nav_about-label">About</label>
+                        <input class="form_input" type="text" id="site-nav_about-label" name="site-nav_about-label" value="ABOUT" maxlength="50">
+                    </div>
+                </section>
+
+                <!-- Hero Links -->
+                <section class="admin_form" aria-labelledby="links_title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="links_title">Hero Links</h2>
+                            <p>Change the navigation labels shown underneath the main tagline.</p>
+                        </div>
+                    </div>
+
+                    <div class="form_group">
+                        <label class="form_label" for="hero_works-label">Explore Works</label>
+                        <input class="form_input" type="text" id="hero_works-label" name="hero_works-label" value="EXPLORE WORKS" maxlength="50">
+                    </div>
+
+                    <div class="form_group">
+                        <label class="form_label" for="hero_about-label">About</label>
+                        <input class="form_input" type="text" id="hero_about-label" name="hero_about-label" value="ABOUT" maxlength="50">
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <section class="admin_form" aria-labelledby="footer_title">
+                    <div class="admin_section-header">
+                        <div>
+                            <h2 id="footer_title">Footer</h2>
+                            <p>Edit the content shown at the bottom of the site.</p>
+                        </div>
+                    </div>
+
+                    <div class="form_group">
+                        <label class="form_label" for="footer_brand">Company/Brand Name</label>
+                        <input class="form_input" type="text" id="footer_brand" name="footer_brand" value="Maybelin Works" maxlength="100">
+                        <p class="form_help">The current year is added automatically.</p>
+                    </div>
+
+                    <div class="form_group">
+                        <label class="form_label" for="footer_credit">Website Credit</label>
+                        <input class="form_input" type="text" id="footer_credit" name="footer_credit" value="Website created by" maxlength="100">
+                    </div>
+                </section>
+
+                <!-- Save Button -->
+                <section class="form_actions">
+                    <div class="save_status" id="save_status" role="status" aria-live="polite"></div>
+                    <button class="save_button" type="submit">SAVE CHANGES</button>
+                </section>
+            </form>
+
+            <!-- Admin Footer -->
+            <footer class="admin_footer">
+                <p>© <span id="year"></span> Maybelin Works/p>
+                <a href="/" target="_blank" rel="noopener noreferrer">View Website</a>
+            </footer>
+        </main>
+    </div>
+</body>
+</html>
