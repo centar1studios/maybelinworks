@@ -8,3 +8,6 @@ Thumbs.db
 
 # Large website media
 public/assets/*.mp4
+
+# backups
+maybelinworks-before-frontend-reconcile.sql
