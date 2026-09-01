@@ -1,24 +1,60 @@
 "use strict";
+
 export default {
     async fetch(request, env) {
         const url = new URL(request.url);
         const pathname = url.pathname;
-            if (pathname === "/api/site" && request.method === "GET") {
+
+        if (
+            pathname === "/api/site" &&
+            request.method === "GET"
+        ) {
             return handleGetSite(env);
         }
 
-        if (pathname === "/api/health" && request.method === "GET") {
+        if (
+            pathname.startsWith("/api/projects/") &&
+            request.method === "GET"
+        ) {
+            const slug = pathname
+                .slice("/api/projects/".length)
+                .replace(/\/+$/, "");
+
+            return handleGetProject(env, slug);
+        }
+
+        if (
+            pathname === "/api/health" &&
+            request.method === "GET"
+        ) {
             return json({
                 ok: true,
                 site: "Maybelin Works"
             });
         }
 
-         if (pathname === "/admin" || pathname === "/admin/"
+        if (
+            pathname === "/admin" ||
+            pathname === "/admin/"
         ) {
             return Response.redirect(
                 `${url.origin}/admin/index.html`,
                 302
+            );
+        }
+
+        const projectRoute = pathname.match(
+            /^\/work\/([a-z0-9-]+)\/?$/i
+        );
+
+        if (
+            projectRoute &&
+            request.method === "GET"
+        ) {
+            return serveProjectPage(
+                request,
+                env,
+                url
             );
         }
 
@@ -30,38 +66,45 @@ export default {
             );
         }
 
-         if (pathname.startsWith("/api/")) {
+        if (pathname.startsWith("/api/")) {
             return json(
                 {
                     error: "API route not found."
-                }, 404
+                },
+                404
             );
         }
+
         return env.ASSETS.fetch(request);
     }
 };
 
-function json(
-    data,
-    status = 200
-) {
+function json(data, status = 200) {
     return new Response(
         JSON.stringify(data),
         {
             status,
             headers: {
-                "Content-Type":
-                    "application/json; charset=utf-8",
-
-                "Cache-Control":
-                    "no-store",
-
-                "X-Content-Type-Options":
-                    "nosniff"
+                "Content-Type": "application/json; charset=utf-8",
+                "Cache-Control": "no-store",
+                "X-Content-Type-Options": "nosniff"
             }
         }
     );
+}
 
+async function serveProjectPage(request, env, url) {
+    const assetUrl = new URL(
+        "/work/",
+        url.origin
+    );
+
+    const assetRequest = new Request(assetUrl, {
+        method: "GET",
+        headers: request.headers
+    });
+
+    return env.ASSETS.fetch(assetRequest);
 }
 
 async function handleGetSite(env) {
@@ -69,9 +112,11 @@ async function handleGetSite(env) {
         return json(
             {
                 error: "Database binding is unavailable."
-            }, 500
+            },
+            500
         );
     }
+
     try {
         const settings = await env.DB
             .prepare(`
@@ -107,7 +152,7 @@ async function handleGetSite(env) {
             );
         }
 
-           const projectsResult = await env.DB
+        const projectsResult = await env.DB
             .prepare(`
                 SELECT
                     id,
@@ -131,10 +176,8 @@ async function handleGetSite(env) {
 
         return json({
             settings,
-            projects:
-                projectsResult.results || []
+            projects: projectsResult.results || []
         });
-
     } catch (error) {
         console.error(
             "Unable to load frontend content:",
@@ -148,6 +191,123 @@ async function handleGetSite(env) {
             500
         );
     }
+}
+
+async function handleGetProject(env, slug) {
+    if (!env.DB) {
+        return json(
+            {
+                error: "Database binding is unavailable."
+            },
+            500
+        );
+    }
+
+    if (!slug) {
+        return json(
+            {
+                error: "Project not found."
+            },
+            404
+        );
+    }
+
+    let decodedSlug;
+
+    try {
+        decodedSlug = decodeURIComponent(slug);
+    } catch {
+        return json(
+            {
+                error: "Invalid project."
+            },
+            400
+        );
+    }
+
+    try {
+        const project = await env.DB
+            .prepare(`
+                SELECT
+                    id,
+                    slug,
+                    project_number,
+                    category,
+                    title,
+                    description,
+                    cover_url,
+                    cover_alt,
+                    project_url,
+                    sort_order
+                FROM projects
+                WHERE
+                    slug = ?
+                    AND is_published = 1
+                LIMIT 1
+            `)
+            .bind(decodedSlug)
+            .first();
+
+        if (!project) {
+            return json(
+                {
+                    error: "Project not found."
+                },
+                404
+            );
+        }
+
+        const mediaResult = await env.DB
+            .prepare(`
+                SELECT
+                    id,
+                    project_id,
+                    r2_key,
+                    alt_text,
+                    sort_order,
+                    created_at
+                FROM project_media
+                WHERE project_id = ?
+                ORDER BY
+                    sort_order ASC,
+                    id ASC
+            `)
+            .bind(project.id)
+            .all();
+
+        const media = (
+            mediaResult.results || []
+        ).map((item) => ({
+            ...item,
+            url: mediaUrl(item.r2_key)
+        }));
+
+        return json({
+            project,
+            media
+        });
+    } catch (error) {
+        console.error(
+            "Unable to load project:",
+            error
+        );
+
+        return json(
+            {
+                error: "Unable to load project."
+            },
+            500
+        );
+    }
+}
+
+function mediaUrl(r2Key) {
+    const encodedKey = r2Key
+        .split("/")
+        .map((part) => encodeURIComponent(part))
+        .join("/");
+
+    return `/media/${encodedKey}`;
 }
 
 async function handleMedia(
@@ -183,11 +343,8 @@ async function handleMedia(
 
     try {
         key = decodeURIComponent(
-            pathname.slice(
-                "/media/".length
-            )
+            pathname.slice("/media/".length)
         );
-
     } catch {
         return new Response(
             "Invalid media path.",
@@ -197,9 +354,12 @@ async function handleMedia(
         );
     }
 
-
-    if (!key || key.startsWith("/") || key.includes("..")
-    ) {return new Response(
+    if (
+        !key ||
+        key.startsWith("/") ||
+        key.includes("..")
+    ) {
+        return new Response(
             "Invalid media path.",
             {
                 status: 400
@@ -207,10 +367,7 @@ async function handleMedia(
         );
     }
 
-    const object = await env.MEDIA.get(
-        key
-    );
-
+    const object = await env.MEDIA.get(key);
 
     if (!object) {
         return new Response(
@@ -219,15 +376,11 @@ async function handleMedia(
                 status: 404
             }
         );
-
     }
 
-    const headers =
-        new Headers();
-    object.writeHttpMetadata(
-        headers
-    );
+    const headers = new Headers();
 
+    object.writeHttpMetadata(headers);
 
     if (object.httpEtag) {
         headers.set(
@@ -236,16 +389,11 @@ async function handleMedia(
         );
     }
 
-    if (
-        !headers.has(
-            "Cache-Control"
-        )
-    ) {
+    if (!headers.has("Cache-Control")) {
         headers.set(
             "Cache-Control",
             "public, max-age=3600"
         );
-
     }
 
     headers.set(
@@ -253,9 +401,7 @@ async function handleMedia(
         "nosniff"
     );
 
-    if (
-        request.method === "HEAD"
-    ) {
+    if (request.method === "HEAD") {
         return new Response(
             null,
             {
@@ -273,6 +419,3 @@ async function handleMedia(
         }
     );
 }
-
-
-

@@ -7,29 +7,23 @@ const ALLOWED_IMAGE_TYPES = new Map([
     ["image/avif", "avif"]
 ]);
 
-
-/* RESPONSE */
-
 function json(data, status = 200) {
-    return new Response(JSON.stringify(data), {
-        status,
-        headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-store"
+    return new Response(
+        JSON.stringify(data),
+        {
+            status,
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-store"
+            }
         }
-    });
+    );
 }
-
-
-/* HELPERS */
 
 function validId(value) {
     const id = Number(value);
 
-    if (
-        !Number.isInteger(id) ||
-        id <= 0
-    ) {
+    if (!Number.isInteger(id) || id <= 0) {
         return null;
     }
 
@@ -51,16 +45,19 @@ function cleanAltText(value) {
 }
 
 function safeProjectSlug(slug) {
-    return String(slug || "project")
-        .toLowerCase()
-        .replace(/[^a-z0-9-]+/g, "-")
-        .replace(/^-+|-+$/g, "") || "project";
+    return (
+        String(slug || "project")
+            .toLowerCase()
+            .replace(/[^a-z0-9-]+/g, "-")
+            .replace(/^-+|-+$/g, "") ||
+        "project"
+    );
 }
 
 function mediaUrl(r2Key) {
     const encodedKey = r2Key
         .split("/")
-        .map(part => encodeURIComponent(part))
+        .map((part) => encodeURIComponent(part))
         .join("/");
 
     return `/media/${encodedKey}`;
@@ -77,7 +74,7 @@ function decodeMediaKey(rawKey) {
     try {
         return rawKey
             .split("/")
-            .map(part => decodeURIComponent(part))
+            .map((part) => decodeURIComponent(part))
             .join("/");
     } catch {
         return null;
@@ -107,9 +104,7 @@ function validateImageFile(file) {
         };
     }
 
-    const extension = ALLOWED_IMAGE_TYPES.get(
-        file.type
-    );
+    const extension = ALLOWED_IMAGE_TYPES.get(file.type);
 
     if (!extension) {
         return {
@@ -121,9 +116,6 @@ function validateImageFile(file) {
         extension
     };
 }
-
-
-/* PROJECT LOOKUP */
 
 async function getProject(env, projectId) {
     return env.DB
@@ -140,13 +132,7 @@ async function getProject(env, projectId) {
         .first();
 }
 
-
-/* PROJECT MEDIA */
-
-async function getProjectMedia(
-    env,
-    projectId
-) {
+async function getProjectMedia(env, projectId) {
     const result = await env.DB
         .prepare(`
             SELECT
@@ -165,19 +151,10 @@ async function getProjectMedia(
         .bind(projectId)
         .all();
 
-    return result.results.map(
-        mediaResponse
-    );
+    return result.results.map(mediaResponse);
 }
 
-
-/* SERVE MEDIA */
-
-export async function handleGetMedia(
-    request,
-    env,
-    rawKey
-) {
+export async function handleGetMedia(request, env, rawKey) {
     if (
         request.method !== "GET" &&
         request.method !== "HEAD"
@@ -238,10 +215,12 @@ export async function handleGetMedia(
 
         object.writeHttpMetadata(headers);
 
-        headers.set(
-            "ETag",
-            object.httpEtag
-        );
+        if (object.httpEtag) {
+            headers.set(
+                "ETag",
+                object.httpEtag
+            );
+        }
 
         headers.set(
             "Cache-Control",
@@ -282,9 +261,6 @@ export async function handleGetMedia(
     }
 }
 
-
-/* UPLOAD PROJECT MEDIA */
-
 export async function handleUploadProjectMedia(
     request,
     env,
@@ -292,25 +268,32 @@ export async function handleUploadProjectMedia(
     username
 ) {
     if (request.method !== "POST") {
-        return json({
-            error: "Method not allowed."
-        }, 405);
+        return json(
+            {
+                error: "Method not allowed."
+            },
+            405
+        );
     }
 
     if (!env.DB || !env.MEDIA) {
-        return json({
-            error: "Media storage is not configured."
-        }, 500);
+        return json(
+            {
+                error: "Media storage is not configured."
+            },
+            500
+        );
     }
 
-    const numericProjectId = validId(
-        projectId
-    );
+    const numericProjectId = validId(projectId);
 
     if (!numericProjectId) {
-        return json({
-            error: "Invalid project."
-        }, 400);
+        return json(
+            {
+                error: "Invalid project."
+            },
+            400
+        );
     }
 
     let formData;
@@ -318,18 +301,24 @@ export async function handleUploadProjectMedia(
     try {
         formData = await request.formData();
     } catch {
-        return json({
-            error: "Invalid upload."
-        }, 400);
+        return json(
+            {
+                error: "Invalid upload."
+            },
+            400
+        );
     }
 
     const file = formData.get("file");
     const validation = validateImageFile(file);
 
     if (validation.error) {
-        return json({
-            error: validation.error
-        }, 400);
+        return json(
+            {
+                error: validation.error
+            },
+            400
+        );
     }
 
     const altText = cleanAltText(
@@ -349,20 +338,24 @@ export async function handleUploadProjectMedia(
             error
         );
 
-        return json({
-            error: "Unable to find that project."
-        }, 500);
+        return json(
+            {
+                error: "Unable to find that project."
+            },
+            500
+        );
     }
 
     if (!project) {
-        return json({
-            error: "Project not found."
-        }, 404);
+        return json(
+            {
+                error: "Project not found."
+            },
+            404
+        );
     }
 
-    const slug = safeProjectSlug(
-        project.slug
-    );
+    const slug = safeProjectSlug(project.slug);
 
     const key =
         `projects/${slug}/${crypto.randomUUID()}.${validation.extension}`;
@@ -389,9 +382,12 @@ export async function handleUploadProjectMedia(
             error
         );
 
-        return json({
-            error: "Unable to prepare the image upload."
-        }, 500);
+        return json(
+            {
+                error: "Unable to prepare the image upload."
+            },
+            500
+        );
     }
 
     try {
@@ -405,9 +401,7 @@ export async function handleUploadProjectMedia(
                         "public, max-age=31536000, immutable"
                 },
                 customMetadata: {
-                    projectId: String(
-                        numericProjectId
-                    ),
+                    projectId: String(numericProjectId),
                     originalName: String(
                         file.name || "image"
                     ).slice(0, 200),
@@ -453,10 +447,13 @@ export async function handleUploadProjectMedia(
             .bind(key)
             .first();
 
-        return json({
-            success: true,
-            media: mediaResponse(media)
-        }, 201);
+        return json(
+            {
+                success: true,
+                media: mediaResponse(media)
+            },
+            201
+        );
     } catch (error) {
         console.error(
             "Unable to upload project media:",
@@ -472,14 +469,14 @@ export async function handleUploadProjectMedia(
             );
         }
 
-        return json({
-            error: "Unable to upload the image."
-        }, 500);
+        return json(
+            {
+                error: "Unable to upload the image."
+            },
+            500
+        );
     }
 }
-
-
-/* ABOUT PHOTO */
 
 export async function handleUploadAboutPhoto(
     request,
@@ -487,15 +484,21 @@ export async function handleUploadAboutPhoto(
     username
 ) {
     if (request.method !== "POST") {
-        return json({
-            error: "Method not allowed."
-        }, 405);
+        return json(
+            {
+                error: "Method not allowed."
+            },
+            405
+        );
     }
 
     if (!env.DB || !env.MEDIA) {
-        return json({
-            error: "Media storage is not configured."
-        }, 500);
+        return json(
+            {
+                error: "Media storage is not configured."
+            },
+            500
+        );
     }
 
     let formData;
@@ -503,18 +506,24 @@ export async function handleUploadAboutPhoto(
     try {
         formData = await request.formData();
     } catch {
-        return json({
-            error: "Invalid upload."
-        }, 400);
+        return json(
+            {
+                error: "Invalid upload."
+            },
+            400
+        );
     }
 
     const file = formData.get("file");
     const validation = validateImageFile(file);
 
     if (validation.error) {
-        return json({
-            error: validation.error
-        }, 400);
+        return json(
+            {
+                error: validation.error
+            },
+            400
+        );
     }
 
     let current;
@@ -534,12 +543,17 @@ export async function handleUploadAboutPhoto(
             error
         );
 
-        return json({
-            error: "Unable to prepare the photo upload."
-        }, 500);
+        return json(
+            {
+                error: "Unable to prepare the photo upload."
+            },
+            500
+        );
     }
 
-    const oldKey = current?.about_photo_key || null;
+    const oldKey =
+        current?.about_photo_key || null;
+
     const newKey =
         `site/about/${crypto.randomUUID()}.${validation.extension}`;
 
@@ -596,25 +610,28 @@ export async function handleUploadAboutPhoto(
             }
         }
 
-        return json({
-            success: true,
-            about_photo_key: newKey,
-            url: mediaUrl(newKey)
-        }, 201);
+        return json(
+            {
+                success: true,
+                about_photo_key: newKey,
+                url: mediaUrl(newKey)
+            },
+            201
+        );
     } catch (error) {
         console.error(
             "Unable to upload About photo:",
             error
         );
 
-        return json({
-            error: "Unable to replace the About photo."
-        }, 500);
+        return json(
+            {
+                error: "Unable to replace the About photo."
+            },
+            500
+        );
     }
 }
-
-
-/* DELETE PROJECT MEDIA */
 
 export async function handleDeleteProjectMedia(
     request,
@@ -622,25 +639,32 @@ export async function handleDeleteProjectMedia(
     mediaId
 ) {
     if (request.method !== "DELETE") {
-        return json({
-            error: "Method not allowed."
-        }, 405);
+        return json(
+            {
+                error: "Method not allowed."
+            },
+            405
+        );
     }
 
     if (!env.DB || !env.MEDIA) {
-        return json({
-            error: "Media storage is not configured."
-        }, 500);
+        return json(
+            {
+                error: "Media storage is not configured."
+            },
+            500
+        );
     }
 
-    const numericMediaId = validId(
-        mediaId
-    );
+    const numericMediaId = validId(mediaId);
 
     if (!numericMediaId) {
-        return json({
-            error: "Invalid image."
-        }, 400);
+        return json(
+            {
+                error: "Invalid image."
+            },
+            400
+        );
     }
 
     let media;
@@ -664,21 +688,25 @@ export async function handleDeleteProjectMedia(
             error
         );
 
-        return json({
-            error: "Unable to find that image."
-        }, 500);
+        return json(
+            {
+                error: "Unable to find that image."
+            },
+            500
+        );
     }
 
     if (!media) {
-        return json({
-            error: "Image not found."
-        }, 404);
+        return json(
+            {
+                error: "Image not found."
+            },
+            404
+        );
     }
 
     try {
-        await env.MEDIA.delete(
-            media.r2_key
-        );
+        await env.MEDIA.delete(media.r2_key);
 
         await env.DB
             .prepare(`
@@ -698,14 +726,14 @@ export async function handleDeleteProjectMedia(
             error
         );
 
-        return json({
-            error: "Unable to remove the image."
-        }, 500);
+        return json(
+            {
+                error: "Unable to remove the image."
+            },
+            500
+        );
     }
 }
-
-
-/* REORDER PROJECT MEDIA */
 
 export async function handleReorderProjectMedia(
     request,
@@ -713,25 +741,32 @@ export async function handleReorderProjectMedia(
     projectId
 ) {
     if (request.method !== "PUT") {
-        return json({
-            error: "Method not allowed."
-        }, 405);
+        return json(
+            {
+                error: "Method not allowed."
+            },
+            405
+        );
     }
 
     if (!env.DB) {
-        return json({
-            error: "Database is not configured."
-        }, 500);
+        return json(
+            {
+                error: "Database is not configured."
+            },
+            500
+        );
     }
 
-    const numericProjectId = validId(
-        projectId
-    );
+    const numericProjectId = validId(projectId);
 
     if (!numericProjectId) {
-        return json({
-            error: "Invalid project."
-        }, 400);
+        return json(
+            {
+                error: "Invalid project."
+            },
+            400
+        );
     }
 
     let body;
@@ -739,40 +774,52 @@ export async function handleReorderProjectMedia(
     try {
         body = await request.json();
     } catch {
-        return json({
-            error: "Invalid request."
-        }, 400);
+        return json(
+            {
+                error: "Invalid request."
+            },
+            400
+        );
     }
 
     if (!Array.isArray(body.media_ids)) {
-        return json({
-            error: "Image order is required."
-        }, 400);
+        return json(
+            {
+                error: "Image order is required."
+            },
+            400
+        );
     }
 
     const mediaIds = body.media_ids.map(
-        value => Number(value)
+        (value) => Number(value)
     );
 
     if (
         mediaIds.some(
-            id =>
+            (id) =>
                 !Number.isInteger(id) ||
                 id <= 0
         )
     ) {
-        return json({
-            error: "Invalid image order."
-        }, 400);
+        return json(
+            {
+                error: "Invalid image order."
+            },
+            400
+        );
     }
 
     if (
         new Set(mediaIds).size !==
         mediaIds.length
     ) {
-        return json({
-            error: "An image was listed more than once."
-        }, 400);
+        return json(
+            {
+                error: "An image was listed more than once."
+            },
+            400
+        );
     }
 
     try {
@@ -788,31 +835,37 @@ export async function handleReorderProjectMedia(
             .bind(numericProjectId)
             .all();
 
-        const existingIds = currentMedia.results.map(
-            media => Number(media.id)
-        );
+        const existingIds =
+            currentMedia.results.map(
+                (media) => Number(media.id)
+            );
 
         if (
             existingIds.length !==
             mediaIds.length
         ) {
-            return json({
-                error: "The image list changed. Refresh and try again."
-            }, 409);
+            return json(
+                {
+                    error: "The image list changed. Refresh and try again."
+                },
+                409
+            );
         }
 
-        const existingSet = new Set(
-            existingIds
-        );
+        const existingSet =
+            new Set(existingIds);
 
         if (
             !mediaIds.every(
-                id => existingSet.has(id)
+                (id) => existingSet.has(id)
             )
         ) {
-            return json({
-                error: "One or more images do not belong to this project."
-            }, 400);
+            return json(
+                {
+                    error: "One or more images do not belong to this project."
+                },
+                400
+            );
         }
 
         if (mediaIds.length > 0) {
@@ -851,8 +904,11 @@ export async function handleReorderProjectMedia(
             error
         );
 
-        return json({
-            error: "Unable to save the image order."
-        }, 500);
+        return json(
+            {
+                error: "Unable to save the image order."
+            },
+            500
+        );
     }
 }

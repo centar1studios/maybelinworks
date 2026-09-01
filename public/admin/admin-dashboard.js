@@ -1,6 +1,6 @@
-document.addEventListener("DOMContentLoaded", () => {
-    /* FONT OPTIONS */
+"use strict";
 
+document.addEventListener("DOMContentLoaded", () => {
     const GOOGLE_FONTS = new Map([
         ["Playfair Display", "Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400"],
         ["Cormorant Garamond", "Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400"],
@@ -23,64 +23,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const GALLERY_LAYOUTS = {
         smart: {
             label: "Smart Gallery",
-            description:
-                "Best all-around choice. Wide artwork automatically gets more space while portrait and square work can sit side by side."
+            description: "Best all-around choice. Wide artwork automatically gets more space while portrait and square work can sit side by side."
         },
         publication: {
             label: "Publication / Book",
-            description:
-                "Best for magazines, books and page-based work. Images are shown two at a time like page spreads."
+            description: "Best for magazines, books and page-based work. Images are shown two at a time like page spreads."
         },
         full: {
             label: "Full Width",
-            description:
-                "Every image is stacked large, one after another. Great for branding decks and presentation boards."
+            description: "Every image is stacked large, one after another. Great for branding decks and presentation boards."
         },
         grid: {
             label: "Classic Grid",
-            description:
-                "A consistent two-column image grid. Great for photography, artwork and collections with similarly sized pieces."
+            description: "A consistent two-column image grid. Great for photography, artwork and collections with similarly sized pieces."
         },
         featured: {
             label: "Featured + Grid",
-            description:
-                "The first image gets a large featured position, then the rest continue in a two-column grid."
+            description: "The first image gets a large featured position, then the rest continue in a two-column grid."
         }
     };
-
-    function loadGoogleFont(fontName) {
-        if (!fontName || loadedFonts.has(fontName)) {
-            return;
-        }
-
-        const googleName = GOOGLE_FONTS.get(fontName);
-
-        if (!googleName) {
-            return;
-        }
-
-        const link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.href =
-            `https://fonts.googleapis.com/css2?family=${googleName}&display=swap`;
-
-        document.head.appendChild(link);
-        loadedFonts.add(fontName);
-    }
-
-    function fontStack(fontName, type) {
-        return type === "display"
-            ? `"${fontName}", Georgia, serif`
-            : `"${fontName}", Arial, sans-serif`;
-    }
-
-
-    /* ELEMENTS */
 
     const usernameElements = document.querySelectorAll(
         "[data-admin-username], [data-account-username]"
     );
-
     const avatar = document.querySelector("[data-user-avatar]");
     const logoutButtons = document.querySelectorAll("[data-logout]");
     const toast = document.querySelector("[data-admin-toast]");
@@ -147,8 +112,30 @@ document.addEventListener("DOMContentLoaded", () => {
     let editingProject = null;
     let editorMode = "edit";
 
+    function loadGoogleFont(fontName) {
+        if (!fontName || loadedFonts.has(fontName)) {
+            return;
+        }
 
-    /* MESSAGES */
+        const googleName = GOOGLE_FONTS.get(fontName);
+
+        if (!googleName) {
+            return;
+        }
+
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = `https://fonts.googleapis.com/css2?family=${googleName}&display=swap`;
+
+        document.head.appendChild(link);
+        loadedFonts.add(fontName);
+    }
+
+    function fontStack(fontName, type) {
+        return type === "display"
+            ? `"${fontName}", Georgia, serif`
+            : `"${fontName}", Arial, sans-serif`;
+    }
 
     function showToast(message) {
         if (!toast) {
@@ -164,17 +151,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function handleExpiredLogin() {
-        showToast(
-            "Your login expired. Please sign in again."
-        );
+        showToast("Your login expired. Please sign in again.");
 
         window.setTimeout(() => {
             window.location.href = "../admin-login.html";
         }, 1200);
     }
-
-
-    /* SESSION */
 
     function setUsername(username) {
         usernameElements.forEach((element) => {
@@ -182,25 +164,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         if (avatar) {
-            avatar.textContent = username
-                .charAt(0)
-                .toUpperCase();
+            avatar.textContent = username.charAt(0).toUpperCase();
         }
     }
 
     async function checkSession() {
         try {
-            const response = await fetch(
-                "/api/admin/session",
-                {
-                    method: "GET",
-                    credentials: "include",
-                    headers: {
-                        "Accept": "application/json"
-                    },
-                    cache: "no-store"
-                }
-            );
+            const response = await fetch("/api/admin/session", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Accept": "application/json"
+                },
+                cache: "no-store"
+            });
 
             if (!response.ok) {
                 throw new Error("Unable to verify session.");
@@ -234,16 +211,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         try {
-            const response = await fetch(
-                "/api/admin/logout",
-                {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        "Accept": "application/json"
-                    }
+            const response = await fetch("/api/admin/logout", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Accept": "application/json"
                 }
-            );
+            });
 
             if (!response.ok) {
                 throw new Error("Unable to log out.");
@@ -265,9 +239,6 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", logout);
     });
 
-
-    /* MEDIA URL */
-
     function getMediaUrl(value) {
         const key = typeof value === "string"
             ? value
@@ -279,14 +250,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const encodedKey = key
             .split("/")
-            .map(part => encodeURIComponent(part))
+            .map((part) => encodeURIComponent(part))
             .join("/");
 
         return `/media/${encodedKey}`;
     }
-
-
-    /* SETTINGS */
 
     function makeSureFontExists(select, value) {
         if (!select || !value) {
@@ -294,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const exists = Array.from(select.options)
-            .some(option => option.value === value);
+            .some((option) => option.value === value);
 
         if (exists) {
             return;
@@ -303,6 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const option = document.createElement("option");
         option.value = value;
         option.textContent = value;
+
         select.appendChild(option);
     }
 
@@ -314,13 +283,17 @@ document.addEventListener("DOMContentLoaded", () => {
         loadGoogleFont(regular);
 
         if (displayFontPreview) {
-            displayFontPreview.style.fontFamily =
-                fontStack(heading, "display");
+            displayFontPreview.style.fontFamily = fontStack(
+                heading,
+                "display"
+            );
         }
 
         if (bodyFontPreview) {
-            bodyFontPreview.style.fontFamily =
-                fontStack(regular, "body");
+            bodyFontPreview.style.fontFamily = fontStack(
+                regular,
+                "body"
+            );
         }
     }
 
@@ -345,10 +318,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (saveHomepageButton) {
             saveHomepageButton.disabled = !ready;
+
             saveHomepageButton.classList.toggle(
                 "disabled-button",
                 !ready
             );
+
             saveHomepageButton.classList.toggle(
                 "primary-link-button",
                 ready
@@ -379,10 +354,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (saveAboutButton) {
             saveAboutButton.disabled = !ready;
+
             saveAboutButton.classList.toggle(
                 "disabled-button",
                 !ready
             );
+
             saveAboutButton.classList.toggle(
                 "primary-link-button",
                 ready
@@ -420,17 +397,27 @@ document.addEventListener("DOMContentLoaded", () => {
         heroKicker.value = settings.hero_kicker || "";
         heroTitle.value = settings.hero_title || "";
         heroDescription.value = "";
-        heroDescription.placeholder =
-            "This isn't shown on the homepage right now.";
+        heroDescription.placeholder = "This isn't shown on the homepage right now.";
 
-        const savedDisplayFont = settings.display_font || "Playfair Display";
-        const savedBodyFont = settings.body_font || "Lato";
+        const savedDisplayFont =
+            settings.display_font || "Playfair Display";
 
-        makeSureFontExists(displayFont, savedDisplayFont);
-        makeSureFontExists(bodyFont, savedBodyFont);
+        const savedBodyFont =
+            settings.body_font || "Lato";
+
+        makeSureFontExists(
+            displayFont,
+            savedDisplayFont
+        );
+
+        makeSureFontExists(
+            bodyFont,
+            savedBodyFont
+        );
 
         displayFont.value = savedDisplayFont;
         bodyFont.value = savedBodyFont;
+
         updateFontPreviews();
 
         aboutKicker.value = settings.about_kicker || "";
@@ -439,7 +426,10 @@ document.addEventListener("DOMContentLoaded", () => {
         contactEmail.value = settings.contact_email || "";
         contactPhone.value = settings.contact_phone || "";
         instagramUrl.value = settings.instagram_url || "";
-        setAboutPhotoPreview(settings.about_photo_key);
+
+        setAboutPhotoPreview(
+            settings.about_photo_key
+        );
     }
 
     async function loadSettings() {
@@ -447,33 +437,37 @@ document.addEventListener("DOMContentLoaded", () => {
         setAboutReady(false);
 
         try {
-            const response = await fetch(
-                "/api/settings",
-                {
-                    method: "GET",
-                    credentials: "include",
-                    headers: {
-                        "Accept": "application/json"
-                    },
-                    cache: "no-store"
-                }
-            );
+            const response = await fetch("/api/settings", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Accept": "application/json"
+                },
+                cache: "no-store"
+            });
 
             if (!response.ok) {
-                throw new Error("Unable to load website settings.");
+                throw new Error(
+                    "Unable to load website settings."
+                );
             }
 
             const data = await response.json();
 
             if (!data.settings) {
-                throw new Error("Website settings were not found.");
+                throw new Error(
+                    "Website settings were not found."
+                );
             }
 
             populateSettings(data.settings);
             setSettingsReady(true);
             setAboutReady(true);
         } catch (error) {
-            console.error("Settings failed to load:", error);
+            console.error(
+                "Settings failed to load:",
+                error
+            );
 
             if (settingsStatus) {
                 settingsStatus.textContent = "Couldn't Load";
@@ -483,11 +477,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 aboutStatus.textContent = "Couldn't Load";
             }
 
-            showToast("We couldn't load the website settings. Try refreshing the page.");
+            showToast(
+                "We couldn't load the website settings. Try refreshing the page."
+            );
         }
     }
 
-    async function saveSettingsPayload(payload, successMessage) {
+    async function saveSettingsPayload(
+        payload,
+        successMessage
+    ) {
         const response = await fetch(
             "/api/admin/settings",
             {
@@ -510,7 +509,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!response.ok) {
             throw new Error(
-                data.error || "Unable to save website settings."
+                data.error ||
+                "Unable to save website settings."
             );
         }
 
@@ -519,6 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         showToast(successMessage);
+
         return data.settings || currentSettings;
     }
 
@@ -528,7 +529,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (!heroKicker.value.trim()) {
-            showToast("Add the small text above your heading before saving.");
+            showToast(
+                "Add the small text above your heading before saving."
+            );
+
             heroKicker.focus();
             return;
         }
@@ -539,7 +543,9 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const originalText = saveHomepageButton.textContent;
+        const originalText =
+            saveHomepageButton.textContent;
+
         saveHomepageButton.disabled = true;
         saveHomepageButton.textContent = "Saving...";
 
@@ -558,18 +564,29 @@ document.addEventListener("DOMContentLoaded", () => {
             settingsStatus.textContent = "Saved";
 
             window.setTimeout(() => {
-                settingsStatus.textContent = "Ready to Edit";
+                settingsStatus.textContent =
+                    "Ready to Edit";
             }, 1800);
         } catch (error) {
-            console.error("Unable to save homepage:", error);
-            showToast(error.message || "Something went wrong while saving.");
+            console.error(
+                "Unable to save homepage:",
+                error
+            );
+
+            showToast(
+                error.message ||
+                "Something went wrong while saving."
+            );
         } finally {
             saveHomepageButton.disabled = false;
             saveHomepageButton.textContent = originalText;
         }
     }
 
-    saveHomepageButton?.addEventListener("click", saveHomepage);
+    saveHomepageButton?.addEventListener(
+        "click",
+        saveHomepage
+    );
 
     async function saveAbout() {
         if (!currentSettings || !saveAboutButton) {
@@ -577,18 +594,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (!aboutTitle.value.trim()) {
-            showToast("Your About Me section needs a heading.");
+            showToast(
+                "Your About Me section needs a heading."
+            );
+
             aboutTitle.focus();
             return;
         }
 
         if (!aboutBio.value.trim()) {
-            showToast("Add your About Me biography before saving.");
+            showToast(
+                "Add your About Me biography before saving."
+            );
+
             aboutBio.focus();
             return;
         }
 
-        const originalText = saveAboutButton.textContent;
+        const originalText =
+            saveAboutButton.textContent;
+
         saveAboutButton.disabled = true;
         saveAboutButton.textContent = "Saving...";
 
@@ -614,39 +639,65 @@ document.addEventListener("DOMContentLoaded", () => {
             aboutStatus.textContent = "Saved";
 
             window.setTimeout(() => {
-                aboutStatus.textContent = "Ready to Edit";
+                aboutStatus.textContent =
+                    "Ready to Edit";
             }, 1800);
         } catch (error) {
-            console.error("Unable to save About Me:", error);
-            showToast(error.message || "Something went wrong while saving About Me.");
+            console.error(
+                "Unable to save About Me:",
+                error
+            );
+
+            showToast(
+                error.message ||
+                "Something went wrong while saving About Me."
+            );
         } finally {
             saveAboutButton.disabled = false;
             saveAboutButton.textContent = originalText;
         }
     }
 
-    saveAboutButton?.addEventListener("click", saveAbout);
+    saveAboutButton?.addEventListener(
+        "click",
+        saveAbout
+    );
 
     async function replaceAboutPhoto() {
-        const file = aboutPhotoFile?.files?.[0];
+        const file =
+            aboutPhotoFile?.files?.[0];
 
         if (!file) {
-            showToast("Choose a new About Me photo first.");
+            showToast(
+                "Choose a new About Me photo first."
+            );
+
             aboutPhotoFile?.focus();
             return;
         }
 
         if (file.size > 20 * 1024 * 1024) {
-            showToast("Photos must be 20 MB or smaller.");
+            showToast(
+                "Photos must be 20 MB or smaller."
+            );
+
             return;
         }
 
-        const originalText = replaceAboutPhotoButton.textContent;
-        replaceAboutPhotoButton.disabled = true;
-        replaceAboutPhotoButton.textContent = "Uploading...";
+        const originalText =
+            replaceAboutPhotoButton.textContent;
 
-        const formData = new FormData();
-        formData.append("file", file);
+        replaceAboutPhotoButton.disabled = true;
+        replaceAboutPhotoButton.textContent =
+            "Uploading...";
+
+        const formData =
+            new FormData();
+
+        formData.append(
+            "file",
+            file
+        );
 
         try {
             const response = await fetch(
@@ -663,28 +714,45 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
-                    data.error || "Unable to replace the photo."
+                    data.error ||
+                    "Unable to replace the photo."
                 );
             }
 
             currentSettings = {
                 ...currentSettings,
-                about_photo_key: data.about_photo_key
+                about_photo_key:
+                    data.about_photo_key
             };
 
-            setAboutPhotoPreview(data.about_photo_key);
+            setAboutPhotoPreview(
+                data.about_photo_key
+            );
+
             aboutPhotoFile.value = "";
-            showToast("About Me photo replaced!");
+
+            showToast(
+                "About Me photo replaced!"
+            );
         } catch (error) {
-            console.error("Unable to replace About photo:", error);
-            showToast(error.message || "We couldn't replace that photo.");
+            console.error(
+                "Unable to replace About photo:",
+                error
+            );
+
+            showToast(
+                error.message ||
+                "We couldn't replace that photo."
+            );
         } finally {
             replaceAboutPhotoButton.disabled = false;
-            replaceAboutPhotoButton.textContent = originalText;
+            replaceAboutPhotoButton.textContent =
+                originalText;
         }
     }
 
@@ -693,22 +761,22 @@ document.addEventListener("DOMContentLoaded", () => {
         replaceAboutPhoto
     );
 
-
-    /* PROJECT HELPERS */
-
     function sortedMedia(project) {
         if (!Array.isArray(project?.media)) {
             return [];
         }
 
-        return [...project.media].sort((a, b) => {
-            const orderDifference =
-                (Number(a.sort_order) || 0) -
-                (Number(b.sort_order) || 0);
+        return [...project.media].sort(
+            (a, b) => {
+                const orderDifference =
+                    (Number(a.sort_order) || 0) -
+                    (Number(b.sort_order) || 0);
 
-            return orderDifference ||
-                Number(a.id) - Number(b.id);
-        });
+                return orderDifference ||
+                    Number(a.id) -
+                    Number(b.id);
+            }
+        );
     }
 
     function makeProjectPreview(description) {
@@ -729,20 +797,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function updateProjectSummary() {
         if (projectCount) {
-            projectCount.textContent = String(projects.length);
+            projectCount.textContent =
+                String(projects.length);
         }
 
         const totalMedia = projects.reduce(
-            (total, project) => total + sortedMedia(project).length,
+            (total, project) =>
+                total + sortedMedia(project).length,
             0
         );
 
         if (mediaCount) {
-            mediaCount.textContent = String(totalMedia);
+            mediaCount.textContent =
+                String(totalMedia);
         }
 
         if (mediaCountLarge) {
-            mediaCountLarge.textContent = String(totalMedia);
+            mediaCountLarge.textContent =
+                String(totalMedia);
         }
 
         if (!projectSummary) {
@@ -750,20 +822,27 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const visible = projects.filter(
-            project => Number(project.is_published) === 1
+            (project) =>
+                Number(project.is_published) === 1
         );
 
         if (!visible.length) {
-            projectSummary.textContent = "No projects are currently visible";
+            projectSummary.textContent =
+                "No projects are currently visible";
+
             return;
         }
 
-        const names = visible.map(project => project.title);
+        const names = visible.map(
+            (project) => project.title
+        );
 
         if (names.length === 1) {
-            projectSummary.textContent = names[0];
+            projectSummary.textContent =
+                names[0];
         } else if (names.length === 2) {
-            projectSummary.textContent = `${names[0]} and ${names[1]}`;
+            projectSummary.textContent =
+                `${names[0]} and ${names[1]}`;
         } else {
             projectSummary.textContent =
                 `${names.slice(0, -1).join(", ")}, and ${names.at(-1)}`;
@@ -777,17 +856,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
         projectList.replaceChildren();
 
-        const sortedProjects = [...projects].sort((a, b) => {
-            const orderDifference =
-                (Number(a.sort_order) || 0) -
-                (Number(b.sort_order) || 0);
+        const sortedProjects =
+            [...projects].sort(
+                (a, b) => {
+                    const orderDifference =
+                        (Number(a.sort_order) || 0) -
+                        (Number(b.sort_order) || 0);
 
-            return orderDifference || Number(a.id) - Number(b.id);
-        });
+                    return orderDifference ||
+                        Number(a.id) -
+                        Number(b.id);
+                }
+            );
 
         if (!sortedProjects.length) {
-            const empty = document.createElement("article");
-            empty.className = "project-admin-card project-loading-card";
+            const empty =
+                document.createElement("article");
+
+            empty.className =
+                "project-admin-card project-loading-card";
+
             empty.innerHTML = `
                 <div class="project-admin-number">00</div>
                 <div class="project-admin-content">
@@ -796,71 +884,165 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p>Use “Add a Project” to create the first one.</p>
                 </div>
             `;
+
             projectList.appendChild(empty);
             updateProjectSummary();
+
             return;
         }
 
-        sortedProjects.forEach((project, index) => {
-            const card = document.createElement("article");
-            card.className = "project-admin-card";
+        sortedProjects.forEach(
+            (project, index) => {
+                const card =
+                    document.createElement("article");
 
-            if (Number(project.is_published) !== 1) {
-                card.classList.add("project-is-hidden");
+                card.className =
+                    "project-admin-card";
+
+                if (
+                    Number(project.is_published) !== 1
+                ) {
+                    card.classList.add(
+                        "project-is-hidden"
+                    );
+                }
+
+                const number =
+                    document.createElement("div");
+
+                number.className =
+                    "project-admin-number";
+
+                number.textContent =
+                    String(index + 1).padStart(
+                        2,
+                        "0"
+                    );
+
+                const content =
+                    document.createElement("div");
+
+                content.className =
+                    "project-admin-content";
+
+                const type =
+                    document.createElement("p");
+
+                type.className =
+                    "project-admin-type";
+
+                type.textContent =
+                    project.kicker ||
+                    "Portfolio Project";
+
+                const title =
+                    document.createElement("h3");
+
+                title.textContent =
+                    project.title ||
+                    "Untitled Project";
+
+                const description =
+                    document.createElement("p");
+
+                description.textContent =
+                    makeProjectPreview(
+                        project.description
+                    );
+
+                content.append(
+                    type,
+                    title,
+                    description
+                );
+
+                const meta =
+                    document.createElement("div");
+
+                meta.className =
+                    "project-admin-meta";
+
+                const layout =
+                    document.createElement("div");
+
+                layout.innerHTML =
+                    "<span>Layout</span><strong></strong>";
+
+                layout.querySelector(
+                    "strong"
+                ).textContent =
+                    GALLERY_LAYOUTS[
+                        project.gallery_layout
+                    ]?.label ||
+                    "Smart Gallery";
+
+                const images =
+                    document.createElement("div");
+
+                images.innerHTML =
+                    "<span>Images</span><strong></strong>";
+
+                images.querySelector(
+                    "strong"
+                ).textContent =
+                    String(
+                        sortedMedia(
+                            project
+                        ).length
+                    );
+
+                const visible =
+                    document.createElement("div");
+
+                visible.innerHTML =
+                    "<span>Website</span><strong></strong>";
+
+                visible.querySelector(
+                    "strong"
+                ).textContent =
+                    Number(
+                        project.is_published
+                    ) === 1
+                        ? "Visible"
+                        : "Hidden";
+
+                meta.append(
+                    layout,
+                    images,
+                    visible
+                );
+
+                const editButton =
+                    document.createElement("button");
+
+                editButton.className =
+                    "project-edit-button";
+
+                editButton.type = "button";
+                editButton.textContent =
+                    "Edit Project";
+
+                editButton.addEventListener(
+                    "click",
+                    () => {
+                        openProjectEditor(
+                            project.slug
+                        );
+                    }
+                );
+
+                card.append(
+                    number,
+                    content,
+                    meta,
+                    editButton
+                );
+
+                projectList.appendChild(
+                    card
+                );
             }
-
-            const number = document.createElement("div");
-            number.className = "project-admin-number";
-            number.textContent = String(index + 1).padStart(2, "0");
-
-            const content = document.createElement("div");
-            content.className = "project-admin-content";
-
-            const type = document.createElement("p");
-            type.className = "project-admin-type";
-            type.textContent = project.kicker || "Portfolio Project";
-
-            const title = document.createElement("h3");
-            title.textContent = project.title || "Untitled Project";
-
-            const description = document.createElement("p");
-            description.textContent = makeProjectPreview(project.description);
-
-            content.append(type, title, description);
-
-            const meta = document.createElement("div");
-            meta.className = "project-admin-meta";
-
-            const layout = document.createElement("div");
-            layout.innerHTML = `<span>Layout</span><strong></strong>`;
-            layout.querySelector("strong").textContent =
-                GALLERY_LAYOUTS[project.gallery_layout]?.label || "Smart Gallery";
-
-            const images = document.createElement("div");
-            images.innerHTML = `<span>Images</span><strong></strong>`;
-            images.querySelector("strong").textContent =
-                String(sortedMedia(project).length);
-
-            const visible = document.createElement("div");
-            visible.innerHTML = `<span>Website</span><strong></strong>`;
-            visible.querySelector("strong").textContent =
-                Number(project.is_published) === 1
-                    ? "Visible"
-                    : "Hidden";
-
-            meta.append(layout, images, visible);
-
-            const editButton = document.createElement("button");
-            editButton.className = "project-edit-button";
-            editButton.type = "button";
-            editButton.textContent = "Edit Project";
-            editButton.addEventListener("click", () => {
-                openProjectEditor(project.slug);
-            });
-
-            card.append(number, content, meta, editButton);
-            projectList.appendChild(card);
-        });
+        );
 
         updateProjectSummary();
     }
@@ -885,27 +1067,41 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (!response.ok) {
-                throw new Error("Unable to load projects.");
+                throw new Error(
+                    "Unable to load projects."
+                );
             }
 
-            const data = await response.json();
-            projects = Array.isArray(data.projects)
+            const data =
+                await response.json();
+
+            projects = Array.isArray(
+                data.projects
+            )
                 ? data.projects
                 : [];
 
             renderProjects();
         } catch (error) {
-            console.error("Projects failed to load:", error);
-            showToast("We couldn't load your projects. Try refreshing the page.");
+            console.error(
+                "Projects failed to load:",
+                error
+            );
+
+            showToast(
+                "We couldn't load your projects. Try refreshing the page."
+            );
         }
     }
 
-
-    /* GALLERY LAYOUT */
-
     function updateLayoutDescription() {
-        const layout = projectLayout?.value || "smart";
-        const info = GALLERY_LAYOUTS[layout] || GALLERY_LAYOUTS.smart;
+        const layout =
+            projectLayout?.value ||
+            "smart";
+
+        const info =
+            GALLERY_LAYOUTS[layout] ||
+            GALLERY_LAYOUTS.smart;
 
         if (layoutDescription) {
             layoutDescription.innerHTML = `
@@ -920,42 +1116,68 @@ document.addEventListener("DOMContentLoaded", () => {
         updateLayoutDescription
     );
 
-
-    /* PROJECT EDITOR */
-
     function setEditorMode(mode) {
         editorMode = mode;
-        const creating = mode === "create";
 
-        projectEditorKicker.textContent = creating
-            ? "New Portfolio Project"
-            : "Portfolio Project";
+        const creating =
+            mode === "create";
 
-        projectEditorTitle.textContent = creating
-            ? "Add a Project"
-            : "Edit Project";
+        projectEditorKicker.textContent =
+            creating
+                ? "New Portfolio Project"
+                : "Portfolio Project";
 
-        projectEditorIntro.textContent = creating
-            ? "Add the project details first. After it is created, you can upload its images without closing this window."
-            : "Change project details and manage images from one place.";
+        projectEditorTitle.textContent =
+            creating
+                ? "Add a Project"
+                : "Edit Project";
 
-        saveProjectButton.textContent = creating
-            ? "Create Project"
-            : "Save Project";
+        projectEditorIntro.textContent =
+            creating
+                ? "Add the project details first. After it is created, you can upload its images without closing this window."
+                : "Change project details and manage images from one place.";
 
-        projectMediaSection.hidden = creating;
-        createProjectMediaNote.hidden = !creating;
+        saveProjectButton.textContent =
+            creating
+                ? "Create Project"
+                : "Save Project";
+
+        projectMediaSection.hidden =
+            creating;
+
+        createProjectMediaNote.hidden =
+            !creating;
     }
 
     function fillProjectFields(project) {
-        projectId.value = project?.id ? String(project.id) : "";
-        projectTitle.value = project?.title || "";
-        projectKicker.value = project?.kicker || "";
-        projectDescription.value = project?.description || "";
-        projectYear.value = project?.year ?? "";
-        projectRole.value = project?.role || "";
-        projectLayout.value = project?.gallery_layout || "smart";
-        projectVisible.checked = Number(project?.is_published) === 1;
+        projectId.value =
+            project?.id
+                ? String(project.id)
+                : "";
+
+        projectTitle.value =
+            project?.title || "";
+
+        projectKicker.value =
+            project?.kicker || "";
+
+        projectDescription.value =
+            project?.description || "";
+
+        projectYear.value =
+            project?.year ?? "";
+
+        projectRole.value =
+            project?.role || "";
+
+        projectLayout.value =
+            project?.gallery_layout ||
+            "smart";
+
+        projectVisible.checked =
+            Number(
+                project?.is_published
+            ) === 1;
 
         if (projectMediaFile) {
             projectMediaFile.value = "";
@@ -970,14 +1192,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function openProjectEditor(slug) {
         const project = projects.find(
-            item => item.slug === slug
+            (item) =>
+                item.slug === slug
         );
 
-        if (!project || !projectEditor) {
+        if (
+            !project ||
+            !projectEditor
+        ) {
             return;
         }
 
         editingProject = project;
+
         setEditorMode("edit");
         fillProjectFields(project);
         renderProjectMedia();
@@ -986,7 +1213,9 @@ document.addEventListener("DOMContentLoaded", () => {
             projectEditor.showModal();
         }
 
-        document.body.classList.add("editor-open");
+        document.body.classList.add(
+            "editor-open"
+        );
 
         window.setTimeout(() => {
             projectTitle.focus();
@@ -995,7 +1224,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function openNewProjectEditor() {
         editingProject = null;
+
         setEditorMode("create");
+
         fillProjectFields({
             gallery_layout: "smart",
             is_published: 0,
@@ -1006,7 +1237,9 @@ document.addEventListener("DOMContentLoaded", () => {
             projectEditor.showModal();
         }
 
-        document.body.classList.add("editor-open");
+        document.body.classList.add(
+            "editor-open"
+        );
 
         window.setTimeout(() => {
             projectTitle.focus();
@@ -1025,35 +1258,71 @@ document.addEventListener("DOMContentLoaded", () => {
 
         editingProject = null;
         editorMode = "edit";
-        document.body.classList.remove("editor-open");
+
+        document.body.classList.remove(
+            "editor-open"
+        );
     }
 
-    closeProjectButtons.forEach((button) => {
-        button.addEventListener("click", closeProjectEditor);
-    });
+    closeProjectButtons.forEach(
+        (button) => {
+            button.addEventListener(
+                "click",
+                closeProjectEditor
+            );
+        }
+    );
 
-    projectEditor?.addEventListener("cancel", (event) => {
-        event.preventDefault();
-        closeProjectEditor();
-    });
-
-    projectEditor?.addEventListener("click", (event) => {
-        if (event.target === projectEditor) {
+    projectEditor?.addEventListener(
+        "cancel",
+        (event) => {
+            event.preventDefault();
             closeProjectEditor();
         }
-    });
+    );
+
+    projectEditor?.addEventListener(
+        "click",
+        (event) => {
+            if (
+                event.target ===
+                projectEditor
+            ) {
+                closeProjectEditor();
+            }
+        }
+    );
 
     function projectPayload() {
-        const yearValue = projectYear.value.trim();
+        const yearValue =
+            projectYear.value.trim();
 
         return {
-            title: projectTitle.value.trim(),
-            kicker: projectKicker.value.trim() || null,
-            description: projectDescription.value.trim() || null,
-            year: yearValue ? Number(yearValue) : null,
-            role: projectRole.value.trim() || null,
-            gallery_layout: projectLayout.value,
-            is_published: projectVisible.checked
+            title:
+                projectTitle.value.trim(),
+
+            kicker:
+                projectKicker.value.trim() ||
+                null,
+
+            description:
+                projectDescription.value.trim() ||
+                null,
+
+            year:
+                yearValue
+                    ? Number(yearValue)
+                    : null,
+
+            role:
+                projectRole.value.trim() ||
+                null,
+
+            gallery_layout:
+                projectLayout.value,
+
+            is_published:
+                projectVisible.checked
         };
     }
 
@@ -1061,34 +1330,56 @@ document.addEventListener("DOMContentLoaded", () => {
         event.preventDefault();
 
         if (!projectTitle.value.trim()) {
-            showToast("Your project needs a name.");
+            showToast(
+                "Your project needs a name."
+            );
+
             projectTitle.focus();
             return;
         }
 
-        const creating = editorMode === "create";
-        const originalText = saveProjectButton.textContent;
+        const creating =
+            editorMode === "create";
+
+        const originalText =
+            saveProjectButton.textContent;
 
         saveProjectButton.disabled = true;
-        saveProjectButton.textContent = creating
-            ? "Creating..."
-            : "Saving...";
+
+        saveProjectButton.textContent =
+            creating
+                ? "Creating..."
+                : "Saving...";
 
         try {
-            const endpoint = creating
-                ? "/api/admin/projects"
-                : `/api/admin/projects/${editingProject.id}`;
+            const endpoint =
+                creating
+                    ? "/api/admin/projects"
+                    : `/api/admin/projects/${editingProject.id}`;
 
             const response = await fetch(
                 endpoint,
                 {
-                    method: creating ? "POST" : "PUT",
-                    credentials: "include",
+                    method:
+                        creating
+                            ? "POST"
+                            : "PUT",
+
+                    credentials:
+                        "include",
+
                     headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json"
+                        "Accept":
+                            "application/json",
+
+                        "Content-Type":
+                            "application/json"
                     },
-                    body: JSON.stringify(projectPayload())
+
+                    body:
+                        JSON.stringify(
+                            projectPayload()
+                        )
                 }
             );
 
@@ -1097,57 +1388,94 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
                     data.error ||
-                    (creating
-                        ? "Unable to create project."
-                        : "Unable to save project.")
+                    (
+                        creating
+                            ? "Unable to create project."
+                            : "Unable to save project."
+                    )
                 );
             }
 
             if (!data.project) {
-                throw new Error("The project response was incomplete.");
+                throw new Error(
+                    "The project response was incomplete."
+                );
             }
 
             if (creating) {
-                editingProject = data.project;
-                projects.push(data.project);
+                editingProject =
+                    data.project;
+
+                projects.push(
+                    data.project
+                );
+
                 renderProjects();
 
                 setEditorMode("edit");
-                fillProjectFields(editingProject);
+
+                fillProjectFields(
+                    editingProject
+                );
+
                 renderProjectMedia();
 
-                showToast("Project created! Now add images, then turn on visibility when you're ready.");
+                showToast(
+                    "Project created! Now add images, then turn on visibility when you're ready."
+                );
             } else {
-                editingProject = data.project;
-                projects = projects.map(project =>
-                    project.id === data.project.id
-                        ? data.project
-                        : project
+                editingProject =
+                    data.project;
+
+                projects = projects.map(
+                    (project) =>
+                        project.id ===
+                        data.project.id
+                            ? data.project
+                            : project
                 );
 
                 renderProjects();
                 closeProjectEditor();
-                showToast("Project changes saved!");
+
+                showToast(
+                    "Project changes saved!"
+                );
             }
         } catch (error) {
-            console.error("Unable to save project:", error);
-            showToast(error.message || "Something went wrong while saving the project.");
-        } finally {
-            saveProjectButton.disabled = false;
+            console.error(
+                "Unable to save project:",
+                error
+            );
 
-            if (editorMode === "create") {
-                saveProjectButton.textContent = "Create Project";
+            showToast(
+                error.message ||
+                "Something went wrong while saving the project."
+            );
+        } finally {
+            saveProjectButton.disabled =
+                false;
+
+            if (
+                editorMode ===
+                "create"
+            ) {
+                saveProjectButton.textContent =
+                    "Create Project";
             } else {
-                saveProjectButton.textContent = "Save Project";
+                saveProjectButton.textContent =
+                    "Save Project";
             }
 
             if (!projectEditor?.open) {
-                saveProjectButton.textContent = originalText;
+                saveProjectButton.textContent =
+                    originalText;
             }
         }
     }
@@ -1157,91 +1485,220 @@ document.addEventListener("DOMContentLoaded", () => {
         saveProject
     );
 
-
-    /* PROJECT MEDIA */
-
     function renderProjectMedia() {
-        if (!projectMediaList || !editingProject) {
+        if (
+            !projectMediaList ||
+            !editingProject
+        ) {
             return;
         }
 
         projectMediaList.replaceChildren();
-        const media = sortedMedia(editingProject);
+
+        const media =
+            sortedMedia(
+                editingProject
+            );
 
         if (projectMediaCount) {
             projectMediaCount.textContent =
-                `${media.length} ${media.length === 1 ? "Image" : "Images"}`;
+                `${media.length} ${
+                    media.length === 1
+                        ? "Image"
+                        : "Images"
+                }`;
         }
 
         if (!media.length) {
-            const empty = document.createElement("div");
-            empty.className = "project-media-empty";
+            const empty =
+                document.createElement(
+                    "div"
+                );
+
+            empty.className =
+                "project-media-empty";
+
             empty.innerHTML = `
                 <strong>No images yet</strong>
                 <p>Upload the first image above.</p>
             `;
-            projectMediaList.appendChild(empty);
+
+            projectMediaList.appendChild(
+                empty
+            );
+
             return;
         }
 
-        media.forEach((item, index) => {
-            const card = document.createElement("article");
-            card.className = "project-media-item";
+        media.forEach(
+            (item, index) => {
+                const card =
+                    document.createElement(
+                        "article"
+                    );
 
-            const preview = document.createElement("div");
-            preview.className = "project-media-item-preview";
+                card.className =
+                    "project-media-item";
 
-            const image = document.createElement("img");
-            image.src = getMediaUrl(item);
-            image.alt = item.alt_text || "Project image";
-            image.loading = "lazy";
-            preview.appendChild(image);
+                const preview =
+                    document.createElement(
+                        "div"
+                    );
 
-            const info = document.createElement("div");
-            info.className = "project-media-item-info";
+                preview.className =
+                    "project-media-item-preview";
 
-            const position = document.createElement("strong");
-            position.textContent = `Image ${index + 1}`;
+                const image =
+                    document.createElement(
+                        "img"
+                    );
 
-            const alt = document.createElement("span");
-            alt.textContent = item.alt_text || "No image description";
+                image.src =
+                    getMediaUrl(item);
 
-            info.append(position, alt);
+                image.alt =
+                    item.alt_text ||
+                    "Project image";
 
-            const controls = document.createElement("div");
-            controls.className = "project-media-controls";
+                image.loading =
+                    "lazy";
 
-            const up = document.createElement("button");
-            up.type = "button";
-            up.textContent = "Move Up";
-            up.disabled = index === 0;
-            up.addEventListener("click", () => {
-                moveProjectMedia(item.id, -1);
-            });
+                preview.appendChild(
+                    image
+                );
 
-            const down = document.createElement("button");
-            down.type = "button";
-            down.textContent = "Move Down";
-            down.disabled = index === media.length - 1;
-            down.addEventListener("click", () => {
-                moveProjectMedia(item.id, 1);
-            });
+                const info =
+                    document.createElement(
+                        "div"
+                    );
 
-            const remove = document.createElement("button");
-            remove.type = "button";
-            remove.className = "remove-media-button";
-            remove.textContent = "Remove";
-            remove.addEventListener("click", () => {
-                deleteProjectMedia(item);
-            });
+                info.className =
+                    "project-media-item-info";
 
-            controls.append(up, down, remove);
-            card.append(preview, info, controls);
-            projectMediaList.appendChild(card);
-        });
+                const position =
+                    document.createElement(
+                        "strong"
+                    );
+
+                position.textContent =
+                    `Image ${index + 1}`;
+
+                const alt =
+                    document.createElement(
+                        "span"
+                    );
+
+                alt.textContent =
+                    item.alt_text ||
+                    "No image description";
+
+                info.append(
+                    position,
+                    alt
+                );
+
+                const controls =
+                    document.createElement(
+                        "div"
+                    );
+
+                controls.className =
+                    "project-media-controls";
+
+                const up =
+                    document.createElement(
+                        "button"
+                    );
+
+                up.type =
+                    "button";
+
+                up.textContent =
+                    "Move Up";
+
+                up.disabled =
+                    index === 0;
+
+                up.addEventListener(
+                    "click",
+                    () => {
+                        moveProjectMedia(
+                            item.id,
+                            -1
+                        );
+                    }
+                );
+
+                const down =
+                    document.createElement(
+                        "button"
+                    );
+
+                down.type =
+                    "button";
+
+                down.textContent =
+                    "Move Down";
+
+                down.disabled =
+                    index ===
+                    media.length - 1;
+
+                down.addEventListener(
+                    "click",
+                    () => {
+                        moveProjectMedia(
+                            item.id,
+                            1
+                        );
+                    }
+                );
+
+                const remove =
+                    document.createElement(
+                        "button"
+                    );
+
+                remove.type =
+                    "button";
+
+                remove.className =
+                    "remove-media-button";
+
+                remove.textContent =
+                    "Remove";
+
+                remove.addEventListener(
+                    "click",
+                    () => {
+                        deleteProjectMedia(
+                            item
+                        );
+                    }
+                );
+
+                controls.append(
+                    up,
+                    down,
+                    remove
+                );
+
+                card.append(
+                    preview,
+                    info,
+                    controls
+                );
+
+                projectMediaList.appendChild(
+                    card
+                );
+            }
+        );
     }
 
-    function updateEditingProjectMedia(media) {
+    function updateEditingProjectMedia(
+        media
+    ) {
         if (!editingProject) {
             return;
         }
@@ -1251,10 +1708,12 @@ document.addEventListener("DOMContentLoaded", () => {
             media
         };
 
-        projects = projects.map(project =>
-            project.id === editingProject.id
-                ? editingProject
-                : project
+        projects = projects.map(
+            (project) =>
+                project.id ===
+                editingProject.id
+                    ? editingProject
+                    : project
         );
 
         renderProjectMedia();
@@ -1262,32 +1721,57 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function uploadProjectMedia() {
-        if (!editingProject || !uploadProjectMediaButton) {
+        if (
+            !editingProject ||
+            !uploadProjectMediaButton
+        ) {
             return;
         }
 
-        const file = projectMediaFile?.files?.[0];
+        const file =
+            projectMediaFile?.files?.[0];
 
         if (!file) {
-            showToast("Choose an image first.");
+            showToast(
+                "Choose an image first."
+            );
+
             projectMediaFile?.focus();
             return;
         }
 
-        if (file.size > 20 * 1024 * 1024) {
-            showToast("Images must be 20 MB or smaller.");
+        if (
+            file.size >
+            20 * 1024 * 1024
+        ) {
+            showToast(
+                "Images must be 20 MB or smaller."
+            );
+
             return;
         }
 
-        const originalText = uploadProjectMediaButton.textContent;
-        uploadProjectMediaButton.disabled = true;
-        uploadProjectMediaButton.textContent = "Uploading...";
+        const originalText =
+            uploadProjectMediaButton.textContent;
 
-        const formData = new FormData();
-        formData.append("file", file);
+        uploadProjectMediaButton.disabled =
+            true;
+
+        uploadProjectMediaButton.textContent =
+            "Uploading...";
+
+        const formData =
+            new FormData();
+
+        formData.append(
+            "file",
+            file
+        );
+
         formData.append(
             "alt_text",
-            projectMediaAlt?.value.trim() || ""
+            projectMediaAlt?.value.trim() ||
+            ""
         );
 
         try {
@@ -1305,28 +1789,45 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
-                    data.error || "Unable to upload image."
+                    data.error ||
+                    "Unable to upload image."
                 );
             }
 
             updateEditingProjectMedia([
-                ...sortedMedia(editingProject),
+                ...sortedMedia(
+                    editingProject
+                ),
                 data.media
             ]);
 
             projectMediaFile.value = "";
             projectMediaAlt.value = "";
-            showToast("Image uploaded!");
+
+            showToast(
+                "Image uploaded!"
+            );
         } catch (error) {
-            console.error("Unable to upload image:", error);
-            showToast(error.message || "We couldn't upload that image.");
+            console.error(
+                "Unable to upload image:",
+                error
+            );
+
+            showToast(
+                error.message ||
+                "We couldn't upload that image."
+            );
         } finally {
-            uploadProjectMediaButton.disabled = false;
-            uploadProjectMediaButton.textContent = originalText;
+            uploadProjectMediaButton.disabled =
+                false;
+
+            uploadProjectMediaButton.textContent =
+                originalText;
         }
     }
 
@@ -1335,27 +1836,43 @@ document.addEventListener("DOMContentLoaded", () => {
         uploadProjectMedia
     );
 
-    async function moveProjectMedia(mediaId, direction) {
+    async function moveProjectMedia(
+        mediaId,
+        direction
+    ) {
         if (!editingProject) {
             return;
         }
 
-        const current = sortedMedia(editingProject);
-        const index = current.findIndex(
-            media => Number(media.id) === Number(mediaId)
-        );
+        const current =
+            sortedMedia(
+                editingProject
+            );
+
+        const index =
+            current.findIndex(
+                (media) =>
+                    Number(media.id) ===
+                    Number(mediaId)
+            );
 
         if (index === -1) {
             return;
         }
 
-        const newIndex = index + direction;
+        const newIndex =
+            index + direction;
 
-        if (newIndex < 0 || newIndex >= current.length) {
+        if (
+            newIndex < 0 ||
+            newIndex >= current.length
+        ) {
             return;
         }
 
-        const reordered = [...current];
+        const reordered =
+            [...current];
+
         [
             reordered[index],
             reordered[newIndex]
@@ -1365,10 +1882,12 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
 
         updateEditingProjectMedia(
-            reordered.map((media, order) => ({
-                ...media,
-                sort_order: order
-            }))
+            reordered.map(
+                (media, order) => ({
+                    ...media,
+                    sort_order: order
+                })
+            )
         );
 
         try {
@@ -1378,11 +1897,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     method: "PUT",
                     credentials: "include",
                     headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json"
+                        "Accept":
+                            "application/json",
+
+                        "Content-Type":
+                            "application/json"
                     },
                     body: JSON.stringify({
-                        media_ids: reordered.map(media => media.id)
+                        media_ids:
+                            reordered.map(
+                                (media) =>
+                                    media.id
+                            )
                     })
                 }
             );
@@ -1392,34 +1918,59 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
-                    data.error || "Unable to reorder images."
+                    data.error ||
+                    "Unable to reorder images."
                 );
             }
 
-            if (Array.isArray(data.media)) {
-                updateEditingProjectMedia(data.media);
+            if (
+                Array.isArray(
+                    data.media
+                )
+            ) {
+                updateEditingProjectMedia(
+                    data.media
+                );
             }
 
-            showToast("Image order saved!");
+            showToast(
+                "Image order saved!"
+            );
         } catch (error) {
-            console.error("Unable to reorder images:", error);
-            updateEditingProjectMedia(current);
-            showToast("We couldn't save that image order.");
+            console.error(
+                "Unable to reorder images:",
+                error
+            );
+
+            updateEditingProjectMedia(
+                current
+            );
+
+            showToast(
+                "We couldn't save that image order."
+            );
         }
     }
 
-    async function deleteProjectMedia(media) {
-        if (!editingProject || !media) {
+    async function deleteProjectMedia(
+        media
+    ) {
+        if (
+            !editingProject ||
+            !media
+        ) {
             return;
         }
 
-        const confirmed = window.confirm(
-            "Remove this image from the project? This deletes the R2 file too."
-        );
+        const confirmed =
+            window.confirm(
+                "Remove this image from the project? This deletes the R2 file too."
+            );
 
         if (!confirmed) {
             return;
@@ -1432,7 +1983,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     method: "DELETE",
                     credentials: "include",
                     headers: {
-                        "Accept": "application/json"
+                        "Accept":
+                            "application/json"
                     }
                 }
             );
@@ -1442,33 +1994,45 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
-                    data.error || "Unable to remove image."
+                    data.error ||
+                    "Unable to remove image."
                 );
             }
 
             updateEditingProjectMedia(
-                sortedMedia(editingProject).filter(
-                    item => Number(item.id) !== Number(media.id)
+                sortedMedia(
+                    editingProject
+                ).filter(
+                    (item) =>
+                        Number(item.id) !==
+                        Number(media.id)
                 )
             );
 
-            showToast("Image removed.");
+            showToast(
+                "Image removed."
+            );
         } catch (error) {
-            console.error("Unable to remove image:", error);
-            showToast(error.message || "We couldn't remove that image.");
+            console.error(
+                "Unable to remove image:",
+                error
+            );
+
+            showToast(
+                error.message ||
+                "We couldn't remove that image."
+            );
         }
     }
 
-
-    /* NAVIGATION */
-
     navigationLinks.forEach((link) => {
         link.addEventListener("click", () => {
-            navigationLinks.forEach(item => {
+            navigationLinks.forEach((item) => {
                 item.classList.remove("active");
             });
 
@@ -1476,11 +2040,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-
-    /* START */
-
     async function startDashboard() {
-        const authenticated = await checkSession();
+        const authenticated =
+            await checkSession();
 
         if (!authenticated) {
             return;
